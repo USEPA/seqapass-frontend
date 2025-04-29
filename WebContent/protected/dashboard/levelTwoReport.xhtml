@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+
+		<p:dialog widgetVar="statusDialog1" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false">
+			<p:panelGrid>
+				<p:row>
+					<p:column style="text-align:center">
+								Querying Database...
+							</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+						<p:graphicImage library="images" name="spinner.gif" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+								Please Wait
+							</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+
+		<p:growl id="validateGrowl" showDetail="true" sticky="false"
+			life="10000" />
+
+		<p:panel id="LevelTwoQueryPanel"
+			header="Level 2 Query Domain Information"
+			styleClass="searchPanelContent">
+			<h:outputText style="font-size:0.75em"
+				value="Hit domains are identified for the following query domain.  Use the main button to go back to the SeqAPASS Reports list." />
+			<p:panelGrid id="queryInfoGrid" autoupdate="true"
+				style="margin-bottom:10px;margin-left:5px;font-size:0.75em">
+				<p:row>
+					<p:column style="width:20%">
+						<b>SeqAPASS ID:</b> #{reportView.runId}</p:column>
+					<p:column style="width:30%">
+						<b>Query Accession: </b>
+						<p:link
+							href="http://www.ncbi.nlm.nih.gov/protein/#{reportView.accession}"
+							value="#{reportView.accession}" target="_blank" rel="noreferrer noopener"/>
+						<a class="exit-disclaimer" style="font-size: 0.75em;"
+							href="https://www.epa.gov/home/exit-epa"
+							title="EPA's External Link Disclaimer">Exit</a>
+					</p:column>
+					<p:column style="width:25%">
+						<b>Ortholog Count:</b> #{reportView.level2_ortholog_count}</p:column>
+					<p:column style="width:25%">
+						<b>Protein and Taxonomy Data: </b>
+						<h:outputText escape="false" value="#{reportView.ncbiDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputText>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="3">
+						<b>Query Species:</b> #{reportView.querySpecies}
+						</p:column>
+					<p:column>
+						<b>BLAST Version: </b>
+						<h:outputText value="#{reportView.blastVersion}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="3">
+						<b>Query Domain: </b> #{reportView.selectedCompletedDomainLoc} <p:link
+							href="http://www.ncbi.nlm.nih.gov/Structure/cdd/cddsrv.cgi?ascbin=8&amp;maxaln=10&amp;seltype=2&amp;uid=#{reportView.selectedCompletedDomainId}"
+							value="#{reportView.selectedCompletedDomainId}" target="_blank" rel="noreferrer noopener"/>
+						<a class="exit-disclaimer" style="font-size: 0.75em;"
+							href="https://www.epa.gov/home/exit-epa"
+							title="EPA's External Link Disclaimer">Exit</a> , #{reportView.selectedCompletedDomainName} #{reportView.selectedCompletedDomainInfo}
+					</p:column>
+					<p:column>
+						<b>CDD Data: </b>
+						<h:outputText escape="false" value="#{reportView.cddDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputText>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="3">
+						<b>Query Protein:</b> #{reportView.queryProtein}
+					</p:column>
+					<p:column>
+						<b>Software Version: </b>
+						<h:outputText value="#{reportView.seqapassVersion}" />
+					</p:column>
+				</p:row>
+
+			</p:panelGrid>
+
+			<p:panelGrid id="levelTwoInfoPanels" style="width:100%">
+				<p:row>
+					<p:column style="width:50%;vertical-align:top;">
+						<p:panel id="cutoffPanel2" header="Susceptibility Cut-off"
+							style="text-align:center" toggleable="true" collapsed="true">
+							<p:panelGrid id="cutoffGrid2"
+								style="font-size:0.75em; margin:0 auto;">
+								<p:row>
+									<p:column>
+										<p:graphicImage value="#{reportView.levelTwoDensityStream}"
+											width="200" height="200" cache="false"
+											rendered="#{not empty (reportView.levelTwoCutData.getxData())}" />
+										<p:graphicImage library="images" name="seqapass_logo.png"
+											rendered="#{empty (reportView.levelTwoCutData.getxData())}" />
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:commandButton id="viewCutoffButton2" value="View Cutoff"
+											style="color:black;background-color:#5585bf;"
+											onclick="OpenCutoffInBrowserTab(2); setLastClick('_cut2');"
+											disabled="#{empty (reportView.levelTwoCutData.getxData())}" />
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+									  This will open in a separate tab
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+						</p:panel>
+						<p:panel id="viz2Panel" header="Visualization"
+							style="text-align:center" toggleable="true" collapsed="true">
+							<f:facet name="actions">
+								<p:commandLink styleClass="infoBtn"
+									oncomplete="PF('infoDlg').show();"
+									action="#{reportView.populateInfoText('visualization')}"
+									update="levelTwoInfoBox">
+									<p:graphicImage library="images" name="info_small.png"
+										style="border-radius:50%; width:15px; float:right;" />
+								</p:commandLink>
+							</f:facet>
+							<p:panelGrid id="viz2Grid" style="font-size:0.75em">
+								<p:row>
+									<p:column>
+										<p:commandButton id="viz2Button" value="Visualize Data"
+											style="color:black;background-color:#5585bf;"
+											action="#{visualizationView.resetLevelTwoViz}"
+											oncomplete="OpenVizInBrowserTab(2); setLastClick('_viz2');" />
+									</p:column>
+									<p:column>
+									  This will open in a separate tab.
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+						</p:panel>
+					</p:column>
+					<p:column style="width:50%; vertical-align: top;">
+						<p:panel id="defaultPanel" header="Primary Report Settings"
+							style="font-size:0.75em"
+							rendered="#{reportView.levelTwoReportType eq 'Primary' ? true : false}"
+							toggleable="true" collapsed="true">
+							<f:facet name="actions">
+								<p:commandLink styleClass="infoBtn"
+									oncomplete="PF('infoDlg').show();"
+									action="#{reportView.populateInfoText('lev2PrimaryReportSettings')}"
+									update="levelTwoInfoBox">
+									<p:graphicImage library="images" name="info_small.png"
+										style="border-radius:50%; width:15px; float:right;" />
+								</p:commandLink>
+							</f:facet>
+							<p:panelGrid id="defaultGrid">
+								<p:row>
+									<p:column>
+										<p>E-value:</p>
+									</p:column>
+									<p:column>
+										<p:inputText id="levTwoEvalue" label="E-value"
+											value="#{reportView.primaryLevTwoEvalueLimit}"
+											required="true">
+											<f:validateDoubleRange minimum="0.0e0" maximum="10" />
+										</p:inputText>
+									</p:column>
+									<p:column
+										style="padding-right:0px; padding-left:0px; text-align: right">
+										<p:commandLink oncomplete="PF('infoDlg').show();"
+											action="#{reportView.populateInfoText('eValue')}"
+											update="levelTwoInfoBox">
+											<p:graphicImage library="images" name="info_small.png"
+												style="border-radius:50%; width:15px;" />
+										</p:commandLink>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p>Sorted by Taxonomic Group:</p>
+									</p:column>
+									<p:column>
+										<p:selectOneMenu id="taxGroupMenu"
+											value="#{reportView.levTwoPrimaryTaxGroup}">
+											<f:selectItems value="#{reportView.taxRankings}" var="rank"
+												itemValue="#{rank}" itemLabel="#{rank.label}" />
+										</p:selectOneMenu>
+									</p:column>
+									<p:column
+										style="padding-right:0px; padding-left:0px; text-align: right">
+										<p:commandLink oncomplete="PF('infoDlg').show();"
+											action="#{reportView.populateInfoText('taxGroup')}"
+											update="levelTwoInfoBox">
+											<p:graphicImage library="images" name="info_small.png"
+												style="border-radius:50%; width:15px" />
+										</p:commandLink>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p>Species Read-Across:</p>
+									</p:column>
+									<p:column>
+										<p:selectOneMenu id="speciesReadAcrossMenu"
+											value="#{reportView.levelTwoSpeciesReadAcross}">
+											<f:selectItem itemLabel="Yes" itemValue="#{true}" />
+											<f:selectItem itemLabel="No" itemValue="#{false}" />
+										</p:selectOneMenu>
+									</p:column>
+									<p:column
+										style="padding-right:0px; padding-left:0px; text-align: right">
+										<p:commandLink oncomplete="PF('infoDlg').show();"
+											action="#{reportView.populateInfoText('speciesReadAcross')}"
+											update="levelTwoInfoBox">
+											<p:graphicImage library="images" name="info_small.png"
+												style="border-radius:50%; width:15px" />
+										</p:commandLink>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:commandButton id="updateReportBtn" value="Update Report"
+											style="color:black;background-color:#5585bf;"
+											action="#{reportView.updateLevTwoReportButton}"
+											onstart="closeCutWin(2); PF('statusDialog1').show();"
+											onsuccess="PF('statusDialog1').hide()"
+											update="validateGrowl, levelTwoDataPanel, otherReportsGrid" />
+									</p:column>
+									<p:column>
+										<p:commandButton id="defaultReportBtn"
+											value="Use Default Settings"
+											style="color:black;background-color:#5585bf;"
+											action="#{reportView.updateLevelTwoDefault}"
+											update="defaultPanel, otherReportsGrid"
+											onstart="closeCutWin(2); PF('statusDialog1').show();"
+											oncomplete="PF('tabViewWidget').select(3), PF('statusDialog1').hide()"
+											process="@this">
+											<p:resetInput target="defaultPanel" />
+										</p:commandButton>
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+						</p:panel>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:panel>
+
+		<p:panel style="width:100%;padding:0px;">
+			<p:panelGrid style="width:100%">
+				<p:row>
+					<p:column style="width:50%">
+						<p:panelGrid id="reportTypeGrid" cellpadding="10"
+							style="vertical-align:top; font-size:0.75em; padding:0px;">
+							<p:row>
+								<p:column style="width:150px" rowspan="2">
+									<p:selectOneRadio id="reportTypeRadio" layout="pageDirection"
+										style="text-align: left"
+										value="#{reportView.levelTwoReportType}">
+										<f:selectItem itemLabel="Primary Report" itemValue='Primary' />
+										<f:selectItem itemLabel="Full Report" itemValue='Full' />
+										<p:ajax event="change" execute="@this"
+											listener="#{reportView.changeLevelTwoReportPage()}"
+											update="levelTwoDataPanel, levelTwoInfoPanels, otherReportsGrid" />
+									</p:selectOneRadio>
+								</p:column>
+								<p:column style="width:300px;" rowspan="2">
+									<p:panelGrid style="margin-bottom:10px" cellpadding="5">
+										<p:row>
+											<p:column>
+												<p:selectBooleanCheckbox
+													value="#{reportView.highlightPartials}">
+													<p:ajax update="levelTwoDataPanel" />
+												</p:selectBooleanCheckbox>
+											</p:column>
+											<p:column>
+												<h:outputText value="Partial Hit Protein Sequence"
+													style="background-color:#ffff99;" />
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:selectBooleanCheckbox
+													value="#{reportView.highlightPercSim}">
+													<p:ajax update="levelTwoDataPanel" />
+												</p:selectBooleanCheckbox>
+											</p:column>
+											<p:column>
+												<h:outputText value="Percent Similarity > 100%"
+													style="background-color:#ff5b33;" />
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:selectBooleanCheckbox
+													value="#{reportView.highlightZeroOrtho}">
+													<p:ajax update="levelTwoDataPanel" />
+												</p:selectBooleanCheckbox>
+											</p:column>
+											<p:column>
+												<h:outputText value="Susceptible = Y, Ortholog Count = 0"
+													style="background-color:#ff33cc;" />
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:selectBooleanCheckbox
+													value="#{reportView.eukaryotesOnly2}">
+													<p:ajax
+														listener="#{reportView.changeLevelTwoReportsWithEukaryoteChoice}"
+														onstart="PF('statusDialog1').show();"
+														onsuccess="PF('statusDialog1').hide();closeCutWin(1);"
+														update="levelTwoDataPanel,queryInfoGrid,cutoffPanel2,otherReportsGrid" />
+												</p:selectBooleanCheckbox>
+											</p:column>
+											<p:column>
+												<h:outputText value="Show Only Eukaryotes" />
+											</p:column>
+										</p:row>
+									</p:panelGrid>
+
+								</p:column>
+								<p:column style="width:40px;vertical-align:top" rowspan="2">
+									<p:commandLink styleClass="infoBtn"
+										oncomplete="PF('infoDlg').show();"
+										action="#{reportView.populateInfoText('ReportTableSettings')}"
+										update="levelTwoInfoBox">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px" />
+									</p:commandLink>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:column>
+					<p:column style="width:50%">
+						<p:panelGrid id="otherReportsGrid" cellpadding="10"
+							style="vertical-align:top; font-size:0.75em; padding:0px;width:100%">
+							<p:row>
+								<p:column style="width:40%;text-align:right" rowspan="1">
+									<p:commandButton id="viewLevel2Summary"
+										value="View Level 2 Summary Report"
+										style="color:black;background-color:#5585bf;"
+										action="#{reportView.viewLevelSummaryButton(2)}"
+										update="summaryTable"
+										oncomplete="PF('summaryTableDlg').show();" />
+								</p:column>
+								<p:column
+									style="padding-right:0px; padding-left:0px; text-align: left"
+									rowspan="1">
+									<p:commandLink oncomplete="PF('infoDlg').show();"
+										action="#{reportView.populateInfoText('viewSummaryReport')}"
+										update="levelTwoInfoBox">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px" />
+									</p:commandLink>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column style="text-align:right;width:60%" rowspan="1">
+									<p:commandButton id="pushLevel2ToRA"
+										value="Push Level 2 To DS Report"
+										style="color:black;background-color:#5585bf;"
+										action="#{reportView.pushToRA('level2')}"
+										update="tabView:reportForm:RAReportButton,otherReportsGrid"
+										disabled="#{!reportView.level2RAReportDiffers}"/>
+								</p:column>
+								<p:column
+									style="padding-right:0px; padding-left:0px; text-align: left;width:10%"
+									rowspan="1">
+									<p:commandLink oncomplete="PF('infoDlg').show();"
+										action="#{reportView.populateInfoText('pushLevTwoToDS')}"
+										update="levelTwoInfoBox">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px" />
+									</p:commandLink>
+								</p:column>
+								<p:column style="width:30%">
+									<h:outputText value="Click to push new changes"
+										style="color:red;width:10%; padding-left:0px" 
+										rendered="#{reportView.level2RAReportDiffers and reportView.level2RAPushWarning}"/>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:panel>
+
+		<p:panel id="levelTwoDataPanel"
+			header="#{reportView.levelTwoHeaderText}"
+			styleClass="searchPanelContent">
+			<p style="font-size: 0.75em;">
+				<span class="disclaimer">The following links exit the site <a
+					class="exit-disclaimer" href="https://www.epa.gov/home/exit-epa"
+					title="EPA's External Link Disclaimer">Exit</a> <span
+					style="padding-right: 5%; display: inline-block; width: 70%; text-align: right;">
+						<p:commandButton id="downloadLev2Settings"
+							value="Download Current Level 2 Report Settings"
+							style="color:black;background-color:#5585bf;" ajax="false"
+							onclick="PrimeFaces.monitorDownload(start, stop);"
+							actionListener="#{reportView.createLev2SettingsFile}">
+							<p:fileDownload value="#{reportView.lev2SettingsFile}" />
+						</p:commandButton> <p:commandLink oncomplete="PF('infoDlg').show();"
+							action="#{reportView.populateInfoText('currentReportSettings')}"
+							update="levelTwoInfoBox">
+							<p:graphicImage library="images" name="info_small.png"
+								style="border-radius:50%; width:15px;margin-left:5px;" />
+						</p:commandLink>
+				</span>
+				</span>
+			</p>
+			<ui:include src="#{reportView.getLevelTwoReportPage()}" />
+
+		</p:panel>
+
+		<p:dialog id="levelTwoInfoBox" widgetVar="infoDlg" modal="true"
+			draggable="true" closable="true" resizable="true" showHeader="true"
+			header="#{reportView.infoHeaderText}" width="50%" fitViewport="true">
+			<h:outputText style="font-size:1.2em;" value="#{reportView.infoText}" escape="False" />
+		</p:dialog>
+
+		<p:dialog id="summaryTable" widgetVar="summaryTableDlg" modal="true"
+			resizable="true" showEffect="clip" hideEffect="clip"
+			scrollable="true" width="900" height="300" focus="levTwoSumPanel">
+			<p:panel header="Level Two Summary Report" id="levTwoSumPanel">
+				<p:dataTable id="levTwoSummaryTable" var="r"
+					value="#{reportView.levelTwoSummaryReport}" scrollable="true"
+					paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+					paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+					<f:facet name="{Exporters}">
+						<h:panelGroup>
+							<h:outputText value="Download Table:" />
+							<h:commandLink>
+								<p:graphicImage id="excelIcon" library="images" name="excel.png" />
+								<p:dataExporter type="xls" target="levTwoSummaryTable"
+									fileName="SeqAPASS_Level2_Summary_Report" />
+								<p:tooltip id="excelIconTip" for="excelIcon"
+									value="Download table in excel(.xls) format" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage id="csvIcon" library="images" name="csv.png" />
+								<p:dataExporter type="csv" target="levTwoSummaryTable"
+									fileName="SeqAPASS_Level2_Summary_Report" />
+								<p:tooltip id="csvIconTip" for="csvIcon"
+									value="Download table in csv format" />
+							</h:commandLink>
+						</h:panelGroup>
+					</f:facet>
+					<p:column id="taxGroup" headerText="Taxonomic Group"
+						sortBy="#{r.taxGroup}" filterBy="#{r.taxGroup}"
+						style="width:120px;text-align:center;font-size:0.75em;white-space:normal"
+						filterStyle="display:none">
+						<h:outputText value="#{r.taxGroup}" />
+					</p:column>
+					<p:column id="filteredTaxGroup"
+						headerText="Filtered Taxonomic Group"
+						sortBy="#{r.filteredTaxGroup}" filterBy="#{r.filteredTaxGroup}"
+						style="width:120px;text-align:center;white-space:normal"
+						filterStyle="display:none">
+						<h:outputText value="#{r.filteredTaxGroup}" />
+					</p:column>
+					<p:column headerText="Number of Species" sortBy="#{r.numSpecies}"
+						style="width:80px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.numSpecies}" />
+					</p:column>
+					<p:column headerText="Mean Percent Similarity"
+						sortBy="#{r.meanSim}"
+						style="width:100px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.meanSim > 1.0 ? 100.0 : r.meanSim*100}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Median Percent Similarity"
+						sortBy="#{r.medSim}"
+						style="width:100px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.medSim > 1.0 ? 100.0 : r.medSim*100}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Susceptibility Prediction"
+						sortBy="#{r.susceptible}" filterBy="#{r.susceptible}"
+						filterStyle="display:none"
+						style="width:100px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.susceptible}" />
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+		</p:dialog>
+
+		<p:remoteCommand name="reloadTable" update="levelTwoDataPanel"
+			autoRun="true" />
+
+
+	</ui:composition>
+</body>
+</html>

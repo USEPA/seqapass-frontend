@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+		
+		<p:dialog widgetVar="statusDialog1" modal="true" draggable="false"
+					closable="false" resizable="false" showHeader="false">
+					<p:panelGrid>
+						<p:row>
+							<p:column style="text-align:center">
+								Querying Database...
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column style="text-align:center">
+								<p:graphicImage library="images" name="spinner.gif" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column style="text-align:center">
+								Please Wait
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:dialog>
+
+		<p:panel styleClass="searchPanelContent">
+
+			<p:panelGrid cellpadding="10" id="mainPanel">
+				<p:row>
+					<p:column style="width:300px">
+						<p:selectBooleanCheckbox value="#{reportView.highlightPartials}">
+							<p:ajax update="chosenReportPanel" />
+						</p:selectBooleanCheckbox>
+						<h:outputText value="Partial Protein Sequence"
+							styleClass="partialProtein" />
+					</p:column>
+					<p:column>
+						<p:commandButton id="requestSelectedButton"
+							ajax="#{reportView.chosenMainReportOption != 'Save'}"
+							
+							value="#{reportView.mainReportButtonText}"
+							action="#{reportView.requestSelectedButton}"
+							styleClass="custom-small-button" update="@form, growl"
+							onclick="#{reportView.chosenMainReportOption != 'Save'} ? null : PrimeFaces.monitorDownload(start(), stop());"
+							onstart="PF('statusDialog1').show();"
+							onsuccess="PF('statusDialog1').hide(); updateVizWindows(1); updateCutWindows(1); setLastClickForMain();" />
+					</p:column>
+					<p:column>
+						<p:commandButton id="refreshMainReportButton"
+							value="Refresh Available Reports"
+							styleClass="custom-small-button" update="@form"
+							onstart="PF('statusDialog1').show();"
+							onsuccess="PF('statusDialog1').hide()" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneRadio id="mainOptionRadio" layout="pageDirection"
+							style="text-align: left"
+							value="#{reportView.chosenMainReportOption}">
+							<f:selectItem itemLabel="View Report" itemValue='View' />
+							<f:selectItem itemLabel="Save Report(s)" itemValue='Save' />
+							<p:ajax event="change" execute="@this"
+								listener="#{reportView.changeMainReportOption()}"
+								update="chosenReportPanel, mainPanel, :tabView:reportForm:levelButtonId" />
+						</p:selectOneRadio>
+					</p:column>
+				</p:row>
+
+			</p:panelGrid>
+		</p:panel>
+
+		<p:panel id="chosenReportPanel" header="Available Reports"
+			styleClass="searchPanelContent">
+			<ui:include src="#{reportView.getReportOptionPage()}" />
+
+		</p:panel>
+
+		<p:remoteCommand name="reloadTable"
+			action="#{reportView.refreshButton}" update="chosenReportPanel"
+			autoRun="true" onstart="PF('statusDialog1').show();"
+			onsuccess="PF('statusDialog1').hide()" />
+		
+		<script>
+		   function setLastClickForMain(){
+			   if (vizNamespace.viz1Window !== undefined){
+				   setLastClick('_viz1');
+			   } else {
+				   localStorage.removeItem('lastClick');
+			   }
+		   }
+		</script>
+
+	</ui:composition>
+</body>
+</html>

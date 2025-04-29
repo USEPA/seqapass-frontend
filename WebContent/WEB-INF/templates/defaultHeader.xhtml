@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+
+<body>
+
+	<ui:composition>
+		<h:form id="headerForm">
+			<h:panelGrid columns="2" cellpadding="10" styleClass="mainHeader"
+				columnClasses="header-left-column,header-right-column">
+				<p:column>Sequence Alignment to Predict Across Species Susceptibility (SeqAPASS)</p:column>
+				<p:column>
+					<p:commandLink id="LogoutLink" action="#{loginController.logout}"
+						ajax="true" style="color:#ffffff">
+						<h:outputText value="Log out" />
+					</p:commandLink>
+				</p:column>
+			</h:panelGrid>
+		</h:form>
+	</ui:composition>
+
+</body>
+</html>

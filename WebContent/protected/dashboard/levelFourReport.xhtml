@@ -1,0 +1,1166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+
+		<p:dialog widgetVar="statusDialog1" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false">
+			<p:panelGrid>
+				<p:row>
+					<p:column style="text-align:center">
+								Querying Database...
+							</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+						<p:graphicImage library="images" name="spinner.gif" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+								Please Wait
+							</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+
+		<p:panel id="LevelFourQueryPanel"
+			header="Level 4 Protein Structure Selection"
+			styleClass="searchPanelContent">
+			<p:panelGrid id="queryInfoGrid" autoupdate="true"
+				style="margin-bottom:10px;margin-left:5px;font-size:0.75em;width:100%">
+				<p:row>
+					<p:column style="width:30%">
+						<b>Job Name(s): </b>
+						<h:outputText value="#{reportView.displayedLevel4JobName}" />
+					</p:column>
+					<p:column>
+						<a href="https://zhanggroup.org/I-TASSER/" target="_blank" rel="noreferrer noopener">I-TASSER Link</a>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<b>I-TASSER Version: </b>
+						<h:outputText value="#{reportView.itasserVersion}" />
+					</p:column>
+					<p:column>
+						<a href="https://zhanggroup.org/TM-align/" target="_blank" rel="noreferrer noopener">TM-align Link</a>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<b>TM-align Version: </b>
+						<h:outputText value="#{reportView.tmalignVersion}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<b>UniProt Data: </b>
+						<h:outputText escape="false" value="#{reportView.uniprotDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputText>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+
+			<p:panel id="cutoffPanel4" header="Length Cut-off"
+				style="text-align:center" toggleable="true" collapsed="false">
+				<f:facet name="actions">
+					<p:commandLink styleClass="infoBtn"
+						oncomplete="PF('infoDlg').show();"
+						action="#{reportView.populateInfoText('level4Cutoff')}"
+						update="tabView:reportForm:levelFourInfoBox">
+						<p:graphicImage library="images" name="info_small.png"
+							style="padding:5px; border-radius:50%; width:15px" />
+					</p:commandLink>
+				</f:facet>
+				<h:outputText style="font-size:2em" value="Not Available"
+					rendered="#{reportView.levelFourDensityModel == null}" />
+				<p:panelGrid id="densityGrid" styleClass="no-border"
+					rendered="#{reportView.levelFourDensityModel != null}">
+					<p:row>
+						<p:column style="width:30%;">
+							<p:dataTable id="cutoffTableId" var="r"
+								value="#{reportView.levelFourCutoffs}" resizableColumns="true"
+								draggableColumns="true" style="width:250px"
+								rowIndexVar="rowIndex">
+								<p:column headerText="Length&lt;br/&gt;Cut-off"
+									style="width:100px;text-align:center;font-size:0.75em;">
+									<f:facet name="header">
+										<h:outputText value="Length&lt;br/&gt;Cut-off" escape="false"
+											style="white-space:pre-line;" />
+									</f:facet>
+									<h:outputText value="#{r}">
+										<f:convertNumber pattern="#0.00" />
+									</h:outputText>
+								</p:column>
+							</p:dataTable>
+						</p:column>
+						<p:column style="width:70%;">
+							<p:chart type="line" model="#{reportView.levelFourDensityModel}"
+								style="height:300px;width:600px" />
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+			<p:panel id="reportPanel4"
+				header="I-TASSER Results &amp; TM-align Selection"
+				style="text-align:center;" toggleable="true" collapsed="false">
+				<f:facet name="actions">
+					<p:commandLink styleClass="infoBtn"
+						oncomplete="PF('infoDlg').show();"
+						action="#{reportView.populateInfoText('level4ITasser')}"
+						update="tabView:reportForm:levelFourInfoBox">
+						<p:graphicImage library="images" name="info_small.png"
+							style="padding:5px; border-radius:50%; width:15px" />
+					</p:commandLink>
+				</f:facet>
+				<p:panelGrid style="font-size:0.75em;width:100%;">
+					<p:row>
+						<p:column style="width:40px;vertical-align:top" rowspan="3">
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('levelFourQuality')}"
+								update="tabView:reportForm:levelFourInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="border-radius:50%; width:15px" />
+							</p:commandLink>
+						</p:column>
+						<p:column>
+							<div style="display: flex; align-items: center;">
+								<div class='box muted_green'></div>
+								<span>"High" if C-Score between -5 and 2</span>
+							</div>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<div style="display: flex; align-items: center;">
+								<div class='box muted_yellow'></div>
+								<span>"Check" if C-Score between -5 and 2 but <span
+									style="background-color: #52F14F;">RMSD &gt; 95th
+										percentile</span> and/or <span style="background-color: #ffff99;">Density
+										&lt; 5th percentile</span></span>
+							</div>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<div style="display: flex; align-items: center;">
+								<div class='box muted_red'></div>
+								<span>"Low" if <span style="background-color: #e66063;">C-Score
+										&lt; -5 or &gt; 2 and/or TM-score &lt; 0.5</span></span>
+							</div>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+				<p:dataTable id="reportLevelFourITasserTableId" var="r"
+					style="font-size:0.75em;width:100%;"
+					widgetVar="LevFourITasserTable"
+					value="#{reportView.levelFourReport}"
+					selection="#{reportView.selectedLevelFourReportRows}"
+					rowKey="#{r.ncbiAccession}_#{r.template}_#{r.level4RunId}" rowSelectMode="checkbox"
+					emptyMessage="No entries with given criteria"
+					resizableColumns="true" draggableColumns="false" paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+					paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+					<f:facet name="header">
+						<p:outputPanel>
+							<h:outputText value="Search:" />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('LevFourITasserTable').filter()" style="width:150px"
+								placeholder="Enter keyword" />
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('levFourITasserReport')}"
+								update="tabView:reportForm:levelFourInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="padding:5px; border-radius:50%; width:15px" />
+							</p:commandLink>
+						</p:outputPanel>
+					</f:facet>
+					<f:facet name="{Exporters}">
+						<h:panelGroup>
+							<h:outputText value="Download Table:" />
+							<h:commandLink>
+								<p:graphicImage id="excelIcon" library="images" name="excel.png" />
+								<p:dataExporter type="xls"
+									target="reportLevelFourITasserTableId"
+									fileName="SeqAPASS_Level4_ITASSER_Report" />
+								<p:tooltip id="excelIconTip" for="excelIcon"
+									value="Download table in excel(.xls) format" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage id="csvIcon" library="images" name="csv.png" />
+								<p:dataExporter type="csv"
+									target="reportLevelFourITasserTableId"
+									fileName="SeqAPASS_Level4_ITASSER_Report" />
+								<p:tooltip id="csvIconTip" for="csvIcon"
+									value="Download table in csv format" />
+							</h:commandLink>
+						</h:panelGroup>
+					</f:facet>
+					<p:column selectionMode="multiple"
+						style="width:16px;text-align:center" />
+					<p:column headerText="iCn3D"
+						style="text-align:center;width:145px;white-space: pre;"
+						filterStyle="display:none" sortBy="#{r.pdb}">
+						<f:facet name="header">
+							<h:outputText value="iCn3D" />
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('icn3dResultCol')}"
+								update="tabView:reportForm:levelFourInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="padding:5px; border-radius:50%; width:15px" />
+							</p:commandLink>
+						</f:facet>
+						<h:outputText value="-" rendered="#{empty r.pdb}" />
+						<p:commandButton id="pushToICN3D"
+							value="Push to&#10;iCn3D"
+							style="color:black;background-color:#5585bf;"
+							rendered="#{not empty r.pdb}"
+							action="#{reportView.concatPDB(r)}"
+							oncomplete="PF('icn3dvar').expand();">
+						</p:commandButton>
+					</p:column>
+					<p:column headerText="Accession"
+						style="text-align:center;width:110px;" filterStyle="display:none"
+						filterBy="#{r.ncbiAccession}" sortBy="#{r.ncbiAccession}"
+						exportFunction="#{reportView.exportLink}">
+						<p:link href="http://www.ncbi.nlm.nih.gov/protein/#{r.ncbiAccession}"
+					value="#{r.ncbiAccession}" target="_blank" rel="noreferrer noopener"/>
+					</p:column>
+					<p:column headerText="Domain" sortBy="#{r.domain}"
+						style="text-align:center;width:110px;"
+						filterBy="#{r.domainId}" filterStyle="display:none"
+						rendered="#{reportView.levelFourSourceLevel == 2}">
+						<p:link href="https://www.ncbi.nlm.nih.gov/Structure/cdd/cddsrv.cgi?maxaln=10&amp;uid=#{r.domainId}"
+							value="#{r.domainId}" target="_blank" rel="noreferrer noopener"/>
+					</p:column>
+					<p:column headerText="Status"
+						style="text-align:center;width:180px;" filterStyle="display:none"
+						filterBy="#{r.status}" sortBy="#{r.status}">
+						<h:outputText value="#{r.status}" />
+					</p:column>
+					<p:column headerText="Restraint Template"
+						style="text-align:center;width:80px;white-space:normal;"
+						filterStyle="display:none"
+						filterBy="#{r.template == null ? '-' : r.template}"
+						sortBy="#{r.template}">
+						<h:outputText value="#{r.template == null ? '-' : r.template}" />
+					</p:column>
+					<p:column headerText="Quality"
+						style="text-align:center;width:60px;" filterStyle="display:none"
+						filterBy="#{r.status=='I-TASSER complete' ? r.quality : '-'}"
+						sortBy="#{r.status}">
+						<h:outputText
+							value="#{r.status=='I-TASSER complete' ? r.quality : '-'}" />
+					</p:column>
+					<p:column headerText="PDB"
+						style="text-align:center;width:145px;white-space: pre;"
+						filterStyle="display:none" sortBy="#{r.pdb}">
+						<f:facet name="header">
+						<h:outputText value="PDB"/>
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('pdbHeader')}"
+								update="tabView:reportForm:levelFourInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="padding:5px; border-radius:50%; width:15px" />
+							</p:commandLink>
+					</f:facet>
+						<h:outputText value="-" rendered="#{empty r.pdb}" />
+						<p:commandButton id="downloadLev4PDBFile"
+							value="Download PDB&#10;As Text File"
+							style="color:black;background-color:#5585bf;" ajax="false"
+							rendered="#{not empty r.pdb}"
+							onclick="PrimeFaces.monitorDownload(start, stop);"
+							actionListener="#{reportView.createLev4PDBFile(r)}">
+							<p:fileDownload value="#{reportView.lev4PDBFile}" />
+						</p:commandButton>
+					</p:column>
+					<p:column headerText="Sequence Notes"
+						style="text-align:center;width:120px;white-space:normal;"
+						filterStyle="display:none"
+						filterBy="#{r.fasta.contains('X')? 'X to A':'-'}">
+						<h:outputText
+							value="#{r.fasta.contains('X')? 'X to A':(r.fasta.contains('U')? 'Presence of selenocystine in FASTA' : '-')}" />
+					</p:column>
+					<p:column headerText="Taxonomic Group"
+						style="text-align:center;width:120px;" filterStyle="display:none"
+						filterBy="#{r.taxonomyName}" sortBy="#{r.taxonomyName}">
+						<h:outputText value="#{r.taxonomyName}" />
+					</p:column>
+					<p:column headerText="Scientific Name"
+						style="text-align:center;width:300px;" filterStyle="display:none"
+						filterBy="#{r.scientificName}" sortBy="#{r.scientificName}">
+						<h:outputText value="#{r.scientificName}" />
+					</p:column>
+					<p:column headerText="Common Name"
+						style="text-align:center;width:200px;" filterStyle="display:none"
+						filterBy="#{r.commonName}" sortBy="#{r.commonName}">
+						<h:outputText value="#{r.commonName}" />
+					</p:column>
+					<p:column headerText="Protein Name"
+						style="text-align:center;width:400px;" filterStyle="display:none"
+						filterBy="#{r.proteinName}" sortBy="#{r.proteinName}">
+						<h:outputText value="#{r.proteinName}" />
+					</p:column>
+					<p:column headerText="C-Score"
+						style="text-align:center;width:70px;#{r.status=='I-TASSER complete' ? (r.cscore lt -5 or r.cscore gt 2 ? 'background-color: #e66063;' : '') : ''}" 
+						filterStyle="display:none"
+						filterBy="#{r.cscore}" sortBy="#{r.cscore}">
+						<h:outputText value="#{r.cscore==-9999 ? '-' : r.cscore}" />
+					</p:column>
+					<p:column headerText="TM-Score"
+						style="text-align:center;width:70px;#{r.status=='I-TASSER complete' ? (r.tm_score lt 0.5 ? 'background-color: #e66063;' : '') : ''}"
+						filterStyle="display:none"
+						filterBy="#{r.status=='I-TASSER complete' ? r.tmScoreStr : '-'}"
+						sortBy="#{r.status=='I-TASSER complete' ? r.tmScoreStr : '-'}">
+						<h:outputText
+							value="#{r.status=='I-TASSER complete' ? r.tmScoreStr : '-'}" />
+					</p:column>
+					<p:column headerText="RMSD"
+						style="text-align:center;width:70px;#{r.rmsd gt 95 ? 'background-color: #b4f263;' : ''}"
+						filterStyle="display:none"
+						filterBy="#{r.status=='I-TASSER complete' ? r.rmsdStr : '-'}"
+						sortBy="#{r.status=='I-TASSER complete' ? r.rmsdStr : '-'}">
+						<h:outputText
+							value="#{r.status=='I-TASSER complete' ? r.rmsdStr : '-'}" />
+					</p:column>
+					<p:column headerText="Density"
+						style="text-align:center;width:50px;#{r.status=='I-TASSER complete' ? (r.density lt 5 ? 'background-color: #ffff99; color:black;' : '') : ''}"
+						filterStyle="display:none"
+						filterBy="#{r.status=='I-TASSER complete' ? r.density : '-'}"
+						sortBy="#{r.density}">
+						<h:outputText
+							value="#{r.status=='I-TASSER complete' ? r.density : '-'}" />
+					</p:column>
+					<p:column headerText="Absolute Length"
+						style="text-align:center;white-space:normal;width:50px;"
+						filterStyle="display:none" filterBy="#{r.absLength}"
+						sortBy="#{r.absLength > 1.0 ? 100.0 : r.absLength*100}">
+						<h:outputText
+							value="#{r.absLength > 1.0 ? 100.0 : r.absLength*100}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Length Cut-off"
+						style="text-align:center;white-space:normal;width:60px;"
+						filterStyle="display:none"
+						filterBy="#{r.status=='I-TASSER complete' ? reportView.levelFourCutValue : '-'}">
+						<h:outputText
+							value="#{r.status=='I-TASSER complete' ? reportView.levelFourCutValue : '-'}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Cut-off Status"
+						style="text-align:center;white-space:normal;width:60px;"
+						filterStyle="display:none"
+						filterBy="#{r.status=='I-TASSER complete' ? r.lengthCutOff : '-'}"
+						sortBy="#{r.status=='I-TASSER complete' ? r.lengthCutOff : '-'}">
+						<h:outputText
+							value="#{r.status=='I-TASSER complete' ? r.lengthCutOff : '-'}" />
+					</p:column>
+					<p:column headerText="Duration"
+						style="text-align:center;width:320px;" filterStyle="display:none"
+						filterBy="#{r.itasserDuration}" sortBy="#{r.itasserDuration}">
+						<h:outputText
+							value="#{statusView.convertRunDuration(r.itasserDuration)}" />
+					</p:column>
+				</p:dataTable>
+				<p:panelGrid style="width:100%">
+					<p:row>
+						<p:column>
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('pushITasserToTMAlign')}"
+								update="tabView:reportForm:levelFourInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="padding:5px; border-radius:50%; width:15px" />
+							</p:commandLink>
+							<p:commandButton id="pushItasserToTMalign"
+								value="Push to TM-align"
+								style="color:black;background-color:#5585bf;width:50%;font-size:0.75em;"
+								action="#{reportView.pushITasserToTMalignButton}"
+								oncomplete="PF('tmAlignSelectionPanel').expand()"
+								update="tmAlignSelectionPanelId, growl">
+							</p:commandButton>
+						</p:column>
+						<p:column>
+							<p:commandButton id="downloadLev4PDB"
+								value="Download Zipped PDB Text Files"
+								style="color:black;background-color:#5585bf;width:50%;font-size:0.75em;"
+								ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+								actionListener="#{reportView.createZippedLev4PDBFile}">
+								<p:fileDownload value="#{reportView.lev4PDBFile}" />
+							</p:commandButton>
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('levelFourDownloadZippedPDB')}"
+								update="tabView:reportForm:levelFourInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="padding:5px; border-radius:50%; width:15px" />
+							</p:commandLink>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+			<p:panel id="icn3dPanel" widgetVar="icn3dvar"
+				style="text-align:center; overflow:auto;" toggleable="true"
+				collapsed="true">
+				<f:facet name="header">
+					<a href="https://www.ncbi.nlm.nih.gov/Structure/icn3d" target="_blank" rel="noreferrer noopener">iCn3D</a>:Visualize Protein Structures
+				</f:facet>
+				<f:facet name="actions">
+					<p:commandLink styleClass="infoBtn"
+						oncomplete="PF('infoDlg').show();"
+						action="#{reportView.populateInfoText('icn3d')}"
+						update="tabView:reportForm:levelFourInfoBox">
+						<p:graphicImage library="images" name="info_small.png"
+							style="padding:5px; border-radius:50%; width:15px" />
+					</p:commandLink>
+				</f:facet>
+				<h:outputStylesheet library="css" name="icn3d.css" />
+
+				<h:outputStylesheet library="css" name="jquery-ui.min.css" />
+
+				<!-- 
+				<h:outputStylesheet library="css" name="icn3d_3.33.1.css" />
+				-->
+				<!-- 
+				<h:outputStylesheet library="css" name="jquery-ui-1.13.2.min.css" />
+				-->
+                <!-- 
+				<p:commandButton value="reload" update="icn3dPanel" />
+				-->
+
+				<div id="icn3d" class="icn3d">
+					<br />
+					<ui:include src="icn3d.html" />
+
+					<p:panelGrid id="icn3dButtons" columns="5" layout="grid"
+						styleClass="showcase-text-align-center"
+						columnClasses="ui-g-12 ui-md-6 ui-lg-3, ui-g-12 ui-md-6 ui-lg-3, ui-g-12 ui-md-6 ui-lg-2, ui-g-12 ui-md-6 ui-lg-2, ui-g-12 ui-md-6 ui-lg-2">
+						<h:outputLabel for="backgroundColor" value="Background Color: "
+							styleClass="col-12 mb-2 md:col-2 md:mb-0" />
+						<p:selectOneRadio id="backgroundColor"
+							value="#{reportView.itasserBackground}" layout="lineDirection"
+							styleclass="col-12 md:col-10">
+							<f:selectItem itemLabel="White" itemValue="white" />
+							<f:selectItem itemLabel="Black" itemValue="black" />
+							<f:selectItem itemLabel="Transparent" itemValue="transparent" />
+							<p:ajax event="change"
+								listener="#{reportView.changeIcn3dBackgroundColor}" />
+						</p:selectOneRadio>
+						<p:commandButton id="alignSuperpose" value="Align/Superpose"
+							styleClass="ui-button-outlined"
+							onclick="icn3dSetupChainsSelection();PF('icn3dChainsListDlg').show();">
+						</p:commandButton>
+						<p:commandButton id="openPopOut" value="Open as Pop-Out"
+							styleClass="ui-button-outlined"
+							onclick="PF('icn3dpopupVar').show();moveIcn3d2pop(0);"
+							oncomplete="positionPopup()">
+						</p:commandButton>
+						<p:commandButton id="clearSelection" value="Reset iCn3D"
+							styleClass="ui-button-outlined"
+							action="#{reportView.clearIcn3dSelection}"
+							oncomplete="startOrResetICN3D(true);">
+						</p:commandButton>
+					</p:panelGrid>
+				</div>
+			</p:panel>
+
+
+			<p:panel id="alphaFoldPanel" header="Input Other Protein Structures for TM-align: AlphaFold, RCSB PDB, and Other"
+				style="text-align:center" toggleable="true" collapsed="true">
+				<f:facet name="actions">
+					<p:commandLink styleClass="infoBtn"
+						oncomplete="PF('infoDlg').show();"
+						action="#{reportView.populateInfoText('alphaFoldPanel')}"
+						update="tabView:reportForm:levelFourInfoBox">
+						<p:graphicImage library="images" name="info_small.png"
+							style="padding:5px; border-radius:50%; width:15px" />
+					</p:commandLink>
+				</f:facet>
+				
+				<p:panelGrid style="width:100%">
+					<p:row>
+						<p:column>
+							<p:commandButton id="requestUniProtButton"
+								value="Request/Update Swiss Prot Accessions"
+								style="color:black;background-color:#5585bf;width:50%;font-size:0.75em;"
+								action="#{reportView.requestUniprotButton}"
+								onstart="PF('statusDialog1').show();"
+								onsuccess="PF('statusDialog1').hide();"
+								update="reportLevelFourAlphaFoldTableId">
+							</p:commandButton>
+							<p:commandLink oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('requestUniProt')}"
+								update="levelFourInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="border-radius:50%; width:15px" />
+							</p:commandLink>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+
+				<p:dataTable id="reportLevelFourAlphaFoldTableId" var="r"
+					style="font-size:0.75em;width:100%;" tableStyle="width:auto"
+					widgetVar="LevFourAlphaFoldTable"
+					value="#{reportView.levelFourAlphaFoldReport}"
+					selection="#{reportView.selectedAlphaFoldRow}" rowKey="#{r.ncbiAccession}"
+					emptyMessage="No entries with given criteria"
+					resizableColumns="true" draggableColumns="false" paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+					paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+					<p:ajax event="rowSelect" listener="#{reportView.onAlphaRowSelect}" update="tabView:reportForm:reportLevelFourAlphaFoldTableId,tabView:reportForm:alphaFoldInfoPanel"/>
+					<p:ajax event="rowSelectRadio" listener="#{reportView.onAlphaRowSelectRadio}" update="tabView:reportForm:reportLevelFourAlphaFoldTableId,tabView:reportForm:alphaFoldInfoPanel"/>
+					<f:facet name="header">
+						<p:outputPanel>
+							<h:outputText value="Search:" />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('LevFourAlphaFoldTable').filter()"
+								style="width:150px" placeholder="Enter keyword" />
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('alphaFoldReport')}"
+								update="tabView:reportForm:levelFourInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="padding:5px; border-radius:50%; width:15px" />
+							</p:commandLink>
+							<a href="https://www.uniprot.org/id-mapping" target="_blank" rel="noreferrer noopener">NCBI to Swiss Prot Conversion Link</a>
+						</p:outputPanel>
+					</f:facet>
+					<f:facet name="{Exporters}">
+						<h:panelGroup>
+							<h:outputText value="Download Table:" />
+							<h:commandLink>
+								<p:graphicImage id="excelIcon" library="images" name="excel.png" />
+								<p:dataExporter type="xls"
+									target="reportLevelFourAlphaFoldTableId"
+									fileName="SeqAPASS_Level4_AlphaFold_Report" />
+								<p:tooltip id="excelIconTip" for="excelIcon"
+									value="Download table in excel(.xls) format" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage id="csvIcon" library="images" name="csv.png" />
+								<p:dataExporter type="csv"
+									target="reportLevelFourAlphaFoldTableId"
+									fileName="SeqAPASS_Level4_AlphaFold_Report" />
+								<p:tooltip id="csvIconTip" for="csvIcon"
+									value="Download table in csv format" />
+							</h:commandLink>
+						</h:panelGroup>
+					</f:facet>
+					<p:column selectionMode="single"
+						style="width:16px;text-align:center" />
+					<p:column headerText="Swiss Prot Accession"
+						style="text-align:center;width:70px;" filterStyle="display:none"
+						filterBy="#{r.uniprot_acc}" sortBy="#{r.uniprot_acc}">
+						<h:outputText value="#{r.uniprot_acc}" />
+					</p:column>
+					<p:column headerText="NCBI Accession"
+						style="text-align:center;width:110px;" filterStyle="display:none"
+						filterBy="#{r.ncbiAccession}" sortBy="#{r.ncbiAccession}">
+						<h:outputText value="#{r.ncbiAccession}" />
+					</p:column>
+					<p:column headerText="Protein Count"
+						style="text-align:center;width:70px;white-space:normal;"
+						filterStyle="display:none" filterBy="#{r.proteinCount}"
+						sortBy="#{r.proteinCount}">
+						<h:outputText value="#{r.proteinCount}" />
+					</p:column>
+					<p:column headerText="Species Tax ID"
+						style="text-align:center;width:70px;" filterStyle="display:none"
+						filterBy="#{r.speciesTaxId}" sortBy="#{r.speciesTaxId}">
+						<h:outputText value="#{r.speciesTaxId}" />
+					</p:column>
+					<p:column headerText="Taxonomic Group"
+						style="text-align:center;width:120px;" filterStyle="display:none"
+						filterBy="#{r.taxonomyName}" sortBy="#{r.taxonomyName}">
+						<h:outputText value="#{r.taxonomyName}" />
+					</p:column>
+					<p:column headerText="Scientific Name"
+						style="text-align:center;width:300px;" filterStyle="display:none"
+						filterBy="#{r.scientificName}" sortBy="#{r.scientificName}">
+						<h:outputText value="#{r.scientificName}" />
+					</p:column>
+					<p:column headerText="Common Name"
+						style="text-align:center;width:200px;" filterStyle="display:none"
+						filterBy="#{r.commonName}" sortBy="#{r.commonName}">
+						<h:outputText value="#{r.commonName}" />
+					</p:column>
+					<p:column headerText="Protein Name"
+						style="text-align:center;width:400px;" filterStyle="display:none"
+						filterBy="#{r.proteinName}" sortBy="#{r.proteinName}">
+						<h:outputText value="#{r.proteinName}" />
+					</p:column>
+					
+				</p:dataTable>
+
+				<p:panelGrid style="width:100%">
+					<p:row>
+						<p:column style="width:70%">
+							<p:panel header="Information for TM-align" id="alphaFoldInfoPanel">
+								<p:panelGrid style="text-align:left">
+									<p:selectOneMenu id="sourceChoice"
+										value="#{reportView.sourceChoice}"
+										style="white-space:nowrap;display:inline-grid;font-size:0.75em;">
+										<f:selectItem itemLabel="- Select Source -" itemValue="" />
+										<f:selectItem itemLabel="AlphaFold" itemValue="AlphaFold" />
+										<f:selectItem itemLabel="RCSB" itemValue="RCSB" />
+										<f:selectItem itemLabel="Other" itemValue="Other" />
+									</p:selectOneMenu>
+									<br />
+									<br />
+									<p:outputLabel for="accInput" value="Accession"
+										style="font-size:90%" />
+									<br />
+									<p:inputText id="accInput" style="width:90%" value="#{reportView.alphaFoldAccInput}"/>
+									<br />
+									<br />
+									<p:outputLabel for="protInput" value="Protein Name"
+										style="font-size:90%" />
+									<br />
+									<p:inputText id="protInput" style="width:90%"  value="#{reportView.alphaFoldProtInput}"/>
+									<br />
+									<br />
+									<p:outputLabel for="speciesInput" value="Species Tax Id"
+										style="font-size:90%" />
+									<br />
+									<p:inputText id="speciesInput" style="width:90%"  value="#{reportView.alphaFoldTaxIdInput}"/>
+									<br />
+									<br />
+									<p:outputLabel for="taxInput" value="Taxonomic Group"
+										style="font-size:90%" />
+									<br />
+									<p:inputText id="taxInput" style="width:90%"  value="#{reportView.alphaFoldTaxGrpInput}"/>
+									<br />
+									<br />
+									<p:outputLabel for="scientificNameInput"
+										value="Scientific Name" style="font-size:90%" />
+									<br />
+									<p:inputText id="scientificNameInput" style="width:90%"  value="#{reportView.alphaFoldSciNameInput}"/>
+									<br />
+									<br />
+									<p:outputLabel for="commonNameInput" value="Common Name"
+										style="font-size:90%" />
+									<br />
+									<p:inputText id="commonNameInput" style="width:90%"  value="#{reportView.alphaFoldCommonNameInput}"/>
+									<br />
+									<br />
+									<p:outputLabel for="pdbInput" value="PDB" style="font-size:90%" />
+									<br />
+									<p:inputTextarea id="pdbInput" style="width:90%; font-size:90%" rows="6"
+										cols="33" autoResize="false" value="#{reportView.alphaFoldPDBInput}"/>
+
+									<br />
+									<br />
+									<p:row>
+										<p:column style="width:50%">
+											<p:commandButton id="pushAlphaToTMAlign"
+												value="Push to TM-align"
+												style="color:black;background-color:#5585bf;font-size:0.75em;"
+												action="#{reportView.pushAlphaToTMAlign}"
+												oncomplete="PF('tmAlignSelectionPanel').expand()"
+												update="tmAlignSelectionPanelId, growl, tabView:reportForm:alphaFoldInfoPanel">
+											</p:commandButton>
+										</p:column>
+										<p:column style="width:50%">
+											<p:commandButton id="clearAlpha" value="Clear"
+												style="color:black;background-color:#5585bf;font-size:0.75em;"
+												action="#{reportView.clearAlpha}"
+												update="tabView:reportForm:alphaFoldInfoPanel">
+											</p:commandButton>
+										</p:column>
+									</p:row>
+								</p:panelGrid>
+							</p:panel>
+						</p:column>
+						<p:column style="width:30%;vertical-align:top">
+							<p:panel header="Instructions"
+								style="text-align:left;">
+								<b>Instructions for AlphaFold</b>
+								<ol type="1">
+									<li>Select Swiss Prot accessions from the table above to query
+										the AlphaFold Database.</li>
+									<li>Access the AlphaFold Database via link provided below.</li>
+									<li>Search the database using the selected Swiss Prot Accession.</li>
+									<li>If a structure exists for this accession, copy and paste the PDB text into
+										the PDB box in the "Information for TM-align" section.</li>
+									<li>Select "Push to TM-align" to submit the externally generated structure to TM-align.</li>
+								</ol>
+								<br />
+								<a href="https://alphafold.com/" target="_blank" rel="noreferrer noopener">AlphaFold Link</a>
+								<br /><br />
+								<b>Instructions for RCSB PDB</b>
+								<ol type="1">
+									<li>Open the RCSB PDB link</li>
+									<li>Query the RCSB PDB using protein name and species of interest</li>
+									<li>Identify protein structure of interest and open PDB from RCSB PDB as a
+										.txt file and copy the PDB text</li>
+									<li>In the "Information for TM-align" section of SeqAPASS, paste the PDB text and fill in
+										available information about the structure</li>
+									<li>Select "Push to TM-align" to submit the externally generated structure to TM-align</li>
+								</ol>
+								<br />
+								<a href="https://www.rcsb.org/" target="_blank" rel="noreferrer noopener">RCSB PDB</a>
+							</p:panel>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+			<p:panel id="tmAlignSelectionPanelId" header="TM-align Selection"
+				widgetVar="tmAlignSelectionPanel" style="text-align:center"
+				toggleable="true" collapsed="true">
+				<f:facet name="actions">
+					<p:commandLink styleClass="infoBtn"
+						oncomplete="PF('infoDlg').show();"
+						action="#{reportView.populateInfoText('LevFourTMAlignSelectionPanel')}"
+						update="tabView:reportForm:levelFourInfoBox">
+						<p:graphicImage library="images" name="info_small.png"
+							style="border-radius:50%; width:15px; float:right" />
+					</p:commandLink>
+				</f:facet>
+				<p:dataTable id="reportLevelFourTMAlignSelectionTableId" var="r"
+					style="font-size:0.75em;width:100%;"
+					widgetVar="LevFourTMAlignSelectionTable"
+					value="#{reportView.levelFourTMAlignSelectionReport}"
+					selection="#{reportView.selectedTMAlignSelectionReportRows}"
+					rowKey="#{r.acc2}_#{r.template}_#{r.level4RunId}" rowSelectMode="checkbox"
+					emptyMessage="No entries with given criteria"
+					resizableColumns="true" draggableColumns="false" paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+					paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+					<f:facet name="header">
+						<p:outputPanel>
+							<h:outputText value="Search:" />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('LevFourTMAlignSelectionTable').filter()"
+								style="width:150px" placeholder="Enter keyword" />
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('LevFourTMAlignSelectionTable')}"
+								update="tabView:reportForm:levelFourInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="padding:5px; border-radius:50%; width:15px" />
+							</p:commandLink>
+						</p:outputPanel>
+					</f:facet>
+					<p:column selectionMode="multiple"
+						style="width:16px;text-align:center" />
+					<p:column headerText="PDB Source"
+						style="text-align:center;width:70px;" filterStyle="display:none"
+						filterBy="#{r.pdbSource}" sortBy="#{r.pdbSource}">
+						<h:outputText value="#{r.pdbSource}" />
+					</p:column>
+					<p:column headerText="Accession"
+						style="text-align:center;width:110px;" filterStyle="display:none"
+						filterBy="#{r.acc2}" sortBy="#{r.acc2}">
+						<h:outputText value="#{r.acc2}" />
+					</p:column>
+					<p:column headerText="Domain" sortBy="#{r.domain}"
+						style="text-align:center;width:110px;"
+						filterBy="#{r.domainId}" filterStyle="display:none"
+						rendered="#{reportView.levelFourSourceLevel == 2}">
+						<h:outputText value="#{r.domainId}" />
+					</p:column>
+					<p:column headerText="Restraint Template"
+						style="text-align:center;width:70px;white-space:normal;"
+						filterStyle="display:none"
+						filterBy="#{r.template == null ? '-' : r.template}"
+						sortBy="#{r.template}">
+						<h:outputText value="#{r.template == null ? '-' : r.template}" />
+					</p:column>
+					<p:column headerText="Tax ID" style="text-align:center;width:70px;"
+						filterStyle="display:none" filterBy="#{r.speciesTaxId}"
+						sortBy="#{r.speciesTaxId}">
+						<h:outputText value="#{r.speciesTaxId lt 0 ? '-' : r.speciesTaxId}" />
+					</p:column>
+					<p:column headerText="Taxonomic Group"
+						style="text-align:center;width:120px;" filterStyle="display:none"
+						filterBy="#{r.taxonomyName}" sortBy="#{r.taxonomyName}">
+						<h:outputText value="#{r.taxonomyName}" />
+					</p:column>
+					<p:column headerText="Scientific Name"
+						style="text-align:center;width:300px;" filterStyle="display:none"
+						filterBy="#{r.scientificName}" sortBy="#{r.scientificName}">
+						<h:outputText value="#{r.scientificName}" />
+					</p:column>
+					<p:column headerText="Common Name"
+						style="text-align:center;width:200px;" filterStyle="display:none"
+						filterBy="#{r.commonName}" sortBy="#{r.commonName}">
+						<h:outputText value="#{r.commonName}" />
+					</p:column>
+					<p:column headerText="Protein Name"
+						style="text-align:center;width:400px;" filterStyle="display:none"
+						filterBy="#{r.proteinName}" sortBy="#{r.proteinName}">
+						<h:outputText value="#{r.proteinName}" />
+					</p:column>
+				</p:dataTable>
+				<p:panelGrid>
+					<p:row>
+						<p:column>
+							<p:commandButton id="removeTMAlignRow" value="Remove Selected Row"
+								style="color:black;background-color:#5585bf;font-size:0.75em;"
+								action="#{reportView.removeTMAlignRow}"
+								update="tabView:reportForm:tmAlignSelectionPanelId">
+							</p:commandButton>
+						</p:column>
+						<p:column>
+							<p:commandButton id="clearTMAlignRows" value="Clear"
+								style="color:black;background-color:#5585bf;font-size:0.75em;"
+								action="#{reportView.clearTMAlignRows}"
+								update="tabView:reportForm:tmAlignSelectionPanelId">
+							</p:commandButton>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+				<p:panelGrid>
+					<p:row>
+						<p:column>
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('LevelFourSearchTemplate')}"
+								update="tabView:reportForm:levelFourInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="padding:5px; border-radius:50%; width:15px" />
+							</p:commandLink>
+							<p:outputLabel for="@next" value="Search Template"
+								style="padding-right:5px;vertical-align: middle" />
+							<p:selectOneMenu id="tmAlignQueryChoiceMenu"
+								value="#{reportView.selectedTMAlignQueryAcc}"
+								converter="levelFourRequestableConverter2" var="s" filter="true"
+								filterMatchMode="contains"
+								style="white-space:nowrap;display:inline-grid;font-size:0.75em;vertical-align:middle;"
+								scrollHeight="150" panelStyle="width:550px;white-space:nowrap;">
+								<f:selectItem itemLabel="- Select Query Accession -"
+									itemValue="#{null}" noSelectionOption="true" />
+								<f:selectItems value="#{reportView.tmAlignQueryAccs}"
+									var="queryAcc" itemLabel="#{queryAcc.queryDisplayName}"
+									itemValue="#{levelFourRequestableRow}" />
+								<p:column>
+									<h:outputText value="#{s.queryDisplayName}" />
+								</p:column>
+							</p:selectOneMenu>
+						</p:column>
+						<p:column>
+							<p:commandButton id="submitTMalign" value="Submit to TM-align"
+								style="color:black;background-color:#5585bf;font-size:0.75em;"
+								action="#{reportView.submitTMAlign}" update="growl">
+							</p:commandButton>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+				
+
+			</p:panel>
+			<p:panel id="TMAlignResultsPanel" header="TM-align Results"
+				style="text-align:center" toggleable="true" collapsed="true">
+				<f:facet name="actions">
+					<p:commandLink styleClass="infoBtn"
+						oncomplete="PF('infoDlg').show();"
+						action="#{reportView.populateInfoText('LevFourTMAlignResultsPanel')}"
+						update="tabView:reportForm:levelFourInfoBox">
+						<p:graphicImage library="images" name="info_small.png"
+							style="border-radius:50%; width:15px; float:right" />
+					</p:commandLink>
+				</f:facet>
+				<p:commandButton id="refreshTMalign" value="Refresh Available TM-align Reports"
+					style="color:black;background-color:#5585bf;font-size:0.75em;"
+					action="#{reportView.getAvailableTMAlignReports}"
+					update="tmAlignResultsChoiceMenu">
+				</p:commandButton>
+				<p:selectOneMenu id="tmAlignResultsChoiceMenu"
+					value="#{reportView.selectedTMAlignReportChoice}"
+					converter="levelFourRequestableConverter3" var="s"
+					style="white-space:nowrap;display:inline-grid;font-size:0.75em;margin-left:20px;margin-right:20px;" 
+					scrollHeight="150"
+					panelStyle="width:550px;white-space:nowrap;">
+					<f:selectItem itemLabel="- Select TM-align Report -"
+						itemValue="#{null}" noSelectionOption="true" />
+					<f:selectItems value="#{reportView.tmalignReportChoices}"
+						var="queryAcc" itemLabel="#{queryAcc.queryDisplayName}"
+						itemValue="#{levelFourRequestableRow}" />
+					<p:column>
+						<h:outputText value="#{s.queryDisplayName}" />
+					</p:column>
+				</p:selectOneMenu>
+				<p:commandButton id="viewTMalign" value="View TM-align Report"
+					style="color:black;background-color:#5585bf;font-size:0.75em;"
+					action="#{reportView.viewTMAlign}"
+					update="reportLevelFourTMAlignTableId">
+				</p:commandButton>
+				<p:dataTable id="reportLevelFourTMAlignTableId" var="r"
+					style="font-size:0.75em;width:100%;"
+					widgetVar="LevFourTMAlignTable"
+					value="#{reportView.levelFourTMAlignReport}"
+					emptyMessage="No entries with given criteria"
+					resizableColumns="true" draggableColumns="false" paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+					paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+					<f:facet name="header">
+						<p:outputPanel>
+							<h:outputText value="Search:" />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('LevFourTMAlignTable').filter()" style="width:150px"
+								placeholder="Enter keyword" />
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('levFourTMAlignReport')}"
+								update="tabView:reportForm:levelFourInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="padding:5px; border-radius:50%; width:15px" />
+							</p:commandLink>
+						</p:outputPanel>
+					</f:facet>
+					<f:facet name="{Exporters}">
+						<h:panelGroup>
+							<h:outputText value="Download Table:" />
+							<h:commandLink>
+								<p:graphicImage id="excelIcon" library="images" name="excel.png" />
+								<p:dataExporter type="xls"
+									target="reportLevelFourTMAlignTableId"
+									fileName="SeqAPASS_Level4_TMAlign_Report" />
+								<p:tooltip id="excelIconTip" for="excelIcon"
+									value="Download table in excel(.xls) format" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage id="csvIcon" library="images" name="csv.png" />
+								<p:dataExporter type="csv"
+									target="reportLevelFourTMAlignTableId"
+									fileName="SeqAPASS_Level4_TMAlign_Report" />
+								<p:tooltip id="csvIconTip" for="csvIcon"
+									value="Download table in csv format" />
+							</h:commandLink>
+						</h:panelGroup>
+					</f:facet>
+					<p:column headerText="PDB Source"
+						style="text-align:center;width:70px;white-space:normal;" filterStyle="display:none"
+						filterBy="#{r.pdbSource}"
+						sortBy="#{r.pdbSource}">
+						<h:outputText value="#{r.pdbSource}" />
+					</p:column>
+					<p:column headerText="PDB"
+						style="text-align:center;width:145px;white-space: pre;"
+						filterStyle="display:none" sortBy="#{r.pdb}">
+						<h:outputText value="-" rendered="#{empty r.pdb}" />
+						<p:commandButton id="downloadLev4PDBFile"
+							value="Download PDB&#10;As Text File"
+							style="color:black;background-color:#5585bf;" ajax="false"
+							rendered="#{not empty r.pdb}"
+							onclick="PrimeFaces.monitorDownload(start, stop);"
+							actionListener="#{reportView.createLev4PDBFile2(r)}">
+							<p:fileDownload value="#{reportView.lev4PDBFile}" />
+						</p:commandButton>
+					</p:column>
+					<p:column headerText="Accession"
+						style="text-align:center;width:110px;" filterStyle="display:none"
+						filterBy="#{r.acc2}"
+						sortBy="#{r.acc2}">
+						<h:outputText value="#{r.acc2}" />
+					</p:column>
+					<p:column headerText="Domain" sortBy="#{r.domain}"
+						style="text-align:center;width:110px;"
+						filterBy="#{r.domainId}" filterStyle="display:none"
+						rendered="#{reportView.levelFourSourceLevel == 2}">
+						<p:link href="https://www.ncbi.nlm.nih.gov/Structure/cdd/cddsrv.cgi?maxaln=10&amp;uid=#{r.domainId}"
+							value="#{r.domainId}" target="_blank" rel="noreferrer noopener"/>
+					</p:column>
+					<p:column headerText="Average Percent Similarity"
+						style="text-align:center;width:70px;white-space:normal;" filterStyle="display:none"
+						sortBy="#{r.avgVal > 1.0 ? 100.0 : r.avgVal*100}">
+						<h:outputText
+							value="#{r.avgVal > 1.0 ? 100.0 : r.avgVal*100}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Susceptibility" sortBy="#{r.susceptible}"
+						filterBy="#{r.susceptible}" filterStyle="display:none"
+						style="width:100px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.susceptible}" />
+					</p:column>
+					<p:column headerText="Quality"
+						style="text-align:center;width:60px;" filterStyle="display:none"
+						sortBy="#{r.quality}">
+						<h:outputText value="#{r.quality}" />
+					</p:column>
+					<p:column headerText="Protein Name"
+						style="text-align:center;width:400px;" filterStyle="display:none"
+						filterBy="#{r.proteinName}" sortBy="#{r.proteinName}">
+						<h:outputText value="#{r.proteinName}" />
+					</p:column>
+					<p:column headerText="Tax ID" style="text-align:center;width:70px;"
+						filterStyle="display:none" filterBy="#{r.speciesTaxId}"
+						sortBy="#{r.speciesTaxId}">
+						<h:outputText value="#{r.speciesTaxId lt 0 ? '-' : r.speciesTaxId}" />
+					</p:column>
+					<p:column headerText="Taxonomic Group"
+						style="text-align:center;width:120px;" filterStyle="display:none"
+						filterBy="#{r.taxonomyName}" sortBy="#{r.taxonomyName}">
+						<h:outputText value="#{r.taxonomyName}" />
+					</p:column>
+					<p:column headerText="Scientific Name"
+						style="text-align:center;width:300px;" filterStyle="display:none"
+						filterBy="#{r.scientificName}" sortBy="#{r.scientificName}">
+						<h:outputText value="#{r.scientificName}" />
+					</p:column>
+					<p:column headerText="Common Name"
+						style="text-align:center;width:200px;" filterStyle="display:none"
+						filterBy="#{r.commonName}" sortBy="#{r.commonName}">
+						<h:outputText value="#{r.commonName}" />
+					</p:column>
+					<p:column headerText="Absolute Length"
+						style="text-align:center;white-space:normal;width:50px;"
+						filterStyle="display:none"
+						sortBy="#{r.absLength > 1.0 ? 100.0 : r.absLength*100}">
+						<h:outputText
+							value="#{r.absLength > 1.0 ? 100.0 : r.absLength*100}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Length Cut-off"
+						style="text-align:center;white-space:normal;width:60px;"
+						filterStyle="display:none">
+						<h:outputText value="#{r.lengthCutOff}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="C-Score"
+						style="text-align:center;width:70px;" filterStyle="display:none"
+						sortBy="#{r.cscore}">
+						<h:outputText value="#{r.cscore==-9999.0 ? '-' : r.cscore}" />
+					</p:column>
+					<p:column headerText="TM-Score"
+						style="text-align:center;width:70px;" filterStyle="display:none"
+						sortBy="#{r.tm_score}">
+						<h:outputText value="#{r.tm_score==-9999.0 ? '-' : r.tm_score}" />
+					</p:column>
+					<p:column headerText="RMSD" style="text-align:center;width:70px;"
+						filterStyle="display:none" sortBy="#{r.rmsd}">
+						<h:outputText value="#{r.rmsd==-9999.0 ? '-' : r.rmsd}" />
+					</p:column>
+					<p:column headerText="Density"
+						style="text-align:center;width:50px;" filterStyle="display:none"
+						sortBy="#{r.density}">
+						<h:outputText value="#{r.density==-9999.0 ? '-' : r.density}" />
+					</p:column>
+					<p:column headerText="L1" style="text-align:center;width:50px;"
+						filterStyle="display:none" sortBy="#{r.L1}">
+						<h:outputText value="#{r.length1}" />
+					</p:column>
+					<p:column headerText="L2" style="text-align:center;width:50px;"
+						filterStyle="display:none" sortBy="#{r.L2}">
+						<h:outputText value="#{r.length2}" />
+					</p:column>
+					<p:column headerText="Value 1"
+						style="text-align:center;width:50px;" filterStyle="display:none"
+						sortBy="#{r.val1}">
+						<h:outputText value="#{r.val1}" >
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Value 2"
+						style="text-align:center;width:50px;" filterStyle="display:none"
+						sortBy="#{r.val2}">
+						<h:outputText value="#{r.val2}" >
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Average Value"
+						style="text-align:center;width:70px;" filterStyle="display:none"
+						sortBy="#{r.avgVal}">
+						<h:outputText value="#{r.avgVal}" >
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+				</p:dataTable>
+				<p:panelGrid style="width:100%">
+					<p:row>
+						<p:column style="width:50%"/>
+						<p:column>
+							<p:commandButton id="downloadTMalignPDB"
+								value="Download Zipped PDB Text Files"
+								style="color:black;background-color:#5585bf;width:50%;font-size:0.75em;"
+								ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+								actionListener="#{reportView.createZippedTMalignPDBFile}">
+								<p:fileDownload value="#{reportView.tmalignPDBFile}" />
+							</p:commandButton>
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('TMalignDownloadZippedPDB')}"
+								update="tabView:reportForm:levelFourInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="padding:5px; border-radius:50%; width:15px" />
+							</p:commandLink>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+		</p:panel>
+
+		<p:dialog id="levelFourInfoBox" widgetVar="infoDlg" modal="true"
+			draggable="true" closable="true" resizable="true" showHeader="true"
+			header="#{reportView.infoHeaderText}" height="50%" width="50%" fitViewport="true">
+				<h:outputText style="font-size:1.2em;" value="#{reportView.infoText}" escape="False" />
+		</p:dialog>
+
+
+		<p:dialog id="icn3dpopup" widgetVar="icn3dpopupVar" modal="false"
+			draggable="true" closable="true" resizable="false" showHeader="true"
+			responsive="false" onHide="moveIcn3dFrompop();" width="auto"
+			height="auto" style="padding:0px">
+			<f:facet name="header">
+				<p:selectOneButton value="#{reportView.icn3dPopupSize}" style="font-size:small">
+					<f:selectItem itemLabel="Small" itemValue="0" />
+					<f:selectItem itemLabel="Large" itemValue="1" />
+					<p:ajax event="change" listener="#{reportView.resizePopup}" />
+				</p:selectOneButton>
+			</f:facet>
+			<div id="icn3dDiv" class="icn3d">
+				<br style="display: none;" />
+				<ui:include src="icn3d.html" />
+			</div>
+		</p:dialog>
+
+		<p:dialog id="icn3dChainsListDialog"
+			header="Select Chains for Alignment" widgetVar="icn3dChainsListDlg"
+			modal="true" minHeight="400" width="550" showEffect="fade"
+			closeOnEscape="true">
+			<p:selectManyCheckbox id="icn3dCheckBoxes"
+				value="#{reportView.selectedIcn3dChains}" layout="pageDirection">
+				<f:selectItems value="#{reportView.icn3dChains}" var="chain"
+					itemLabel="#{chain}" itemValue="#{chain}" />
+			</p:selectManyCheckbox>
+ 			<p:commandButton id="icn3dSuperpose" value="Superpose"
+				style="background-color: #e7e7e7; color: black; text-align: center; border: 1px solid black; font-size: 16px; float: right;"
+				action="#{reportView.superposeIcn3dChains}"
+				oncomplete="PF('icn3dChainsListDlg').hide();">
+			</p:commandButton>
+			
+		</p:dialog>
+
+		<p:remoteCommand name="showChainsOptions" update="icn3dCheckBoxes" actionListener="#{reportView.viewIcn3dChainsList}" /> 
+
+		<p:remoteCommand name="switchToL4" actionListener="#{reportView.switchToL4}"/>
+		
+		<p:remoteCommand name="clearPDBStr" actionListener="#{reportView.clearPDBStr}"/>
+		
+		<p:remoteCommand name="resetDefaultBackground" actionListener="#{reportView.resetDefaultIcn3dBackground}" update="tabView:reportForm:backgroundColor"/>
+		
+	</ui:composition>
+</body>
+</html>

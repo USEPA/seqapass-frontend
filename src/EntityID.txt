@@ -1,0 +1,16 @@
+Dev1 (IRIS)
+Entity id:  seqapassdev1.epa.gov
+Assertion consumer URL: https://seq-dev.rtpnc.epa.gov/seqapass/saml/SSO
+//Assertion consumer URL: http://iris2.rtpnc.epa.gov:8083/seqapass/saml/SSO
+
+Dev2 (LOCALHOST)
+Entity id:  seqapassdev2.epa.gov //BUT USE seqapass.epa.gov instead
+Assertion consumer URL: http://localhost:8080/seqapass/saml/SSO 
+
+Staging
+Entity id:  seqapass.epa.gov
+Assertion consumer URL: https://seqapassstage.rtpnc.epa.gov/seqapass/saml/SSO
+
+Production
+Entity id:  seqapass.epa.gov
+Assertion consumer URL: https://seqapass.epa.gov/seqapass/saml/SSO

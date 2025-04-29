@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<h:body>
+	<ui:composition>
+		<p:dialog widgetVar="loadDialog" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false">
+			<p:panelGrid>
+				<p:row>
+					<p:column style="text-align:center">
+								Loading...
+							</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+						<p:graphicImage library="images" name="spinner.gif" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+								Please Wait
+							</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+		<h:panelGroup layout="block" id="levelOneReportJSON"
+			style="display:none;">#{visualizationView.levelOneBoxPlotJSON}</h:panelGroup>
+		<h:panelGroup layout="block" id="endangeredSpeciesJSON"
+			style="display:none;">#{visualizationView.endangeredSpeciesJSON}</h:panelGroup>
+		<h:panelGroup layout="block" id="threatenedSpeciesJSON"
+			style="display:none;">#{visualizationView.threatenedSpeciesJSON}</h:panelGroup>
+		<h:panelGroup layout="block" id="modelOrganismsJSON"
+			style="display:none;">#{visualizationView.modelOrganismsJSON}</h:panelGroup>
+		<p:panel id="controls" header="Controls" toggleable="true"
+			styleClass="noLeftPadPanel">
+			<p:panelGrid id="controlGrid" style="border:none;font-size:0.75em;"
+				cellpadding="5">
+				<p:row>
+					<p:column>
+						<p:panelGrid>
+							<p:row>
+								<p:column style="padding:0px;">
+									<p:commandLink oncomplete="PF('infoDlg').show();"
+										action="#{reportView.populateInfoText('visTaxGroups')}"
+										update="levOneVizForm:vis1InfoBox">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px" />
+									</p:commandLink>
+								</p:column>
+								<p:column style="padding-right:0px;">
+									<p:commandButton id="dummy" style="display:none;" />
+									<h:outputLabel for="taxMenu"
+										value="Taxonomic Groups: &lt;br/&gt;(x-axis labels)"
+										escape="false" />
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:column>
+					<p:column>
+						<p:selectCheckboxMenu id="taxMenu"
+							value="#{visualizationView.selectedBoxPlotTaxGroups}"
+							label="Tax Groups" multiple="true" filter="true"
+							filterMatchMode="contains" panelStyle="width:250px">
+							<f:selectItems value="#{visualizationView.boxPlotTaxGroups}" />
+							<p:ajax event="change"
+								onstart="PF('loadDialog').show(); closeTaxTable(1);"
+								oncomplete="handleTaxMenuClick(1);checkDiffLev1BoxDiff();"
+								update="boxPlotButtons1" />
+							<p:ajax event="toggleSelect"
+								onstart="PF('loadDialog').show(); closeTaxTable(1);"
+								oncomplete="addQueryGroupToTaxMenu(1);handleTaxMenuClick(1);checkDiffLev1BoxDiff();" />
+						</p:selectCheckboxMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:panelGrid>
+							<p:row>
+								<p:column style="padding:0px;">
+									<p:commandLink oncomplete="PF('infoDlg').show();"
+										action="#{reportView.populateInfoText('visSpecies4Legend')}"
+										update="levOneVizForm:vis1InfoBox">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px" />
+									</p:commandLink>
+								</p:column>
+								<p:column style="padding-right:0px;">
+									<h:outputLabel for="speciesMenu"
+										value="Select Species for Legend:" />
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:column>
+					<p:column>
+						<p:selectCheckboxMenu id="speciesMenu"
+							widgetVar="speciesMenuWidget"
+							value="#{visualizationView.selectedBoxPlotSpecies}"
+							label="Species Groups" multiple="true" filter="true"
+							filterMatchMode="contains" panelStyle="width:250px">
+							<f:selectItems value="#{visualizationView.boxPlotSpeciesNames}" />
+							<p:ajax event="change" onstart="closeTaxTable(1);"
+								oncomplete="handleSpeciesMenuClick(1);checkDiffLev1BoxDiff();" />
+						</p:selectCheckboxMenu>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<p:panelGrid id="checkboxGrid"
+				style="border:none;font-size:0.75em; width:50%">
+				<p:row>
+					<p:column>
+						<p:panelGrid>
+							<p:row>
+								<p:column style="padding:0px;">
+									<p:commandLink oncomplete="PF('infoDlg').show();"
+										action="#{reportView.populateInfoText('visLegendOptions')}"
+										update="levOneVizForm:vis1InfoBox">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px" />
+									</p:commandLink>
+								</p:column>
+								<p:column style="padding-right:0px;">
+									<p:outputLabel for="speciesOptionsPanel"
+										value="Species Legend Options:" style="text-align:right;" />
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:column>
+					<p:column>
+						<p:panel id="speciesOptionsPanel" style="width:500px;">
+							<p:panelGrid>
+								<p:row>
+									<p:column style="width: 50%">
+										<p:selectOneRadio id="speciesNameType"
+											value="#{visualizationView.boxPlotSpeciesOption1}"
+											layout="pageDirection">
+											<f:selectItem itemLabel="Common Name" itemValue="COMMON" />
+											<f:selectItem itemLabel="Scientific Name"
+												itemValue="SCIENTIFIC" />
+											<p:ajax event="change" execute="@this"
+												oncomplete="changeSpeciesNameType(1);checkDiffLev1BoxDiff();"
+												listener="#{visualizationView.changeBoxPlotSpeciesNameType(1)}"
+												update="speciesMenu, graphicPanel, hiddenSpeciesNameType, boxPlotButtons1" />
+										</p:selectOneRadio>
+										<h:inputHidden id="hiddenSpeciesNameType"
+											value="#{visualizationView.boxPlotSpeciesOption1}" />
+									</p:column>
+									<p:column>
+										<p:selectBooleanCheckbox id="keepCommonChkBox1"
+											value="#{visualizationView.boxPlotKeepCommonSymbols1}"
+											style="margin-left: 3px;">
+											<p:ajax
+												oncomplete="changeMaintainCommonLegendInfo(1);checkDiffLev1BoxDiff();"
+												update="boxPlotButtons1" />
+										</p:selectBooleanCheckbox>
+										<p:outputLabel for="keepCommonChkBox1"
+											value=" Group by Common Name" />
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+						</p:panel>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:spacer height="0" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column rowspan="2">
+						<p:panelGrid>
+							<p:row>
+								<p:column style="padding:0px;">
+									<p:commandLink oncomplete="PF('infoDlg').show();"
+										action="#{reportView.populateInfoText('visOptionalSelections')}"
+										update="levOneVizForm:vis1InfoBox">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px" />
+									</p:commandLink>
+								</p:column>
+								<p:column style="padding-right:0px;">
+									<h:outputText value="Optional Selections:" />
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:column>
+					<p:column>
+						<p:panel>
+							<p:panelGrid>
+								<p:row>
+									<p:column style="text-align:center;margin: 0 auto;">
+										<h:outputText value="Ortholog Candidates" />
+									</p:column>
+									<p:column style="text-align:center;margin: 0 auto;">
+										<h:outputText value="Threatened Species" />
+									</p:column>
+									<p:column style="text-align:center;margin: 0 auto;">
+										<h:outputText value="Endangered Species" />
+									</p:column>
+									<p:column style="text-align:center;margin: 0 auto;">
+										<h:outputText value="Common Model Organisms" />
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column style="text-align:center;margin: 0 auto;">
+										<p:selectBooleanCheckbox id="showOrthologChkBox"
+											value="#{visualizationView.levelOneBoxPlotOrtholog}"
+											disabled="#{!visualizationView.orthologsAvail1}">
+											<p:ajax update="checkboxGrid"
+												listener="#{visualizationView.levelOneBoxPlotSelectCheckbox('Ortholog')}"
+												onstart="PF('loadDialog').show();closeTaxTable(1);"
+												oncomplete="toggleSpecies('orthos',1);disableQueryGroup(1);disableTaxMenuToken(1);checkDiffLev1BoxDiff();PF('loadDialog').hide();" />
+										</p:selectBooleanCheckbox>
+										<h:outputText id="noOrthoText" value="No orthologs found"
+											style="padding-left:15px;display:none" />
+									</p:column>
+									<p:column style="text-align:center;margin: 0 auto;">
+										<p:selectBooleanCheckbox id="showThreatenedChkBox"
+											value="#{visualizationView.levelOneBoxPlotThreatened}"
+											disabled="#{!visualizationView.threatenedsAvail1}">
+											<p:ajax update="checkboxGrid"
+												listener="#{visualizationView.levelOneBoxPlotSelectCheckbox('Threatened')}"
+												onstart="PF('loadDialog').show();closeTaxTable(1);"
+												oncomplete="toggleSpecies('threateneds',1);disableQueryGroup(1);disableTaxMenuToken(1);checkDiffLev1BoxDiff();PF('loadDialog').hide();" />
+										</p:selectBooleanCheckbox>
+										<h:outputText id="noThreatenedText"
+											value="No threatened species found"
+											style="padding-left:15px;display:none" />
+									</p:column>
+									<p:column style="text-align:center;margin: 0 auto;">
+										<p:selectBooleanCheckbox id="showEndangeredChkBox"
+											value="#{visualizationView.levelOneBoxPlotEndangered}"
+											disabled="#{!visualizationView.endangeredsAvail1}">
+											<p:ajax update="checkboxGrid"
+												listener="#{visualizationView.levelOneBoxPlotSelectCheckbox('Endangered')}"
+												onstart="PF('loadDialog').show();closeTaxTable(1);"
+												oncomplete="toggleSpecies('endangereds',1);disableQueryGroup(1);disableTaxMenuToken(1);checkDiffLev1BoxDiff();PF('loadDialog').hide();" />
+										</p:selectBooleanCheckbox>
+										<h:outputText id="noEndangeredText"
+											value="No endangered species found"
+											style="padding-left:15px;display:none" />
+									</p:column>
+									<p:column style="text-align:center;margin: 0 auto;">
+										<p:selectBooleanCheckbox id="showModelOrganismsChkBox"
+											value="#{visualizationView.levelOneBoxPlotModelOrganisms}"
+											disabled="#{!visualizationView.modelsAvail1}">
+											<p:ajax update="checkboxGrid"
+												listener="#{visualizationView.levelOneBoxPlotSelectCheckbox('ModelOrganisms')}"
+												onstart="PF('loadDialog').show();closeTaxTable(1);"
+												oncomplete="toggleSpecies('models',1);disableQueryGroup(1);disableTaxMenuToken(1);checkDiffLev1BoxDiff();PF('loadDialog').hide();" />
+										</p:selectBooleanCheckbox>
+										<h:outputText id="noModelText"
+											value="No model organisms found"
+											style="padding-left:15px;display:none" />
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+						</p:panel>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:spacer height="0" />
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<p:panelGrid id="boxPlotButtons1"
+				style="border:none;font-size:0.75em">
+				<p:row>
+					<p:column />
+					<p:column style="width:20%">
+						<p:commandButton id="downloadBoxPlot" value="Download BoxPlot..."
+							style="color:black;background-color:#5585bf;"
+							onclick="PF('loadDialog').show();getSVGSource('svg1');"
+							oncomplete="PF('loadDialog').hide();PF('downloadPlotDlgWidget').show();" />
+					</p:column>
+					<p:column style="width:20%">
+						<p:commandButton id="graphControls" value="Open Size Controls..."
+							style="color:black;background-color:#5585bf;"
+							onclick="PF('graphDlgWidget').show();" update="sizeControlPanel" />
+					</p:column>
+					<p:column style="width:30%;text-align:right">
+						<h:outputText value="Click to push new changes"
+							style="color:red;width:10%; padding-left:0px"
+							rendered="#{visualizationView.level1SVGDiffers and visualizationView.level1SVGPushWarning}" />
+					</p:column>
+					<p:column style="width:30%;text-align:left">
+						<p:commandButton id="pushBoxplot1ToRA"
+							value="Push Level 1 Boxplot To DS Report"
+							style="color:black;background-color:#5585bf;"
+							onclick="PF('loadDialog').show();getSVGSource('svg1');"
+							action="#{reportView.pushToRA('boxplot1')}"
+							oncomplete="updateDSReportFromViz();" update="boxPlotButtons1"
+							disabled="#{!visualizationView.level1SVGDiffers}" />
+						<p:commandLink oncomplete="PF('infoDlg').show();"
+							action="#{reportView.populateInfoText('PushBoxplotToDS')}"
+							update="boxplot1InfoBox">
+							<p:graphicImage library="images" name="info_small.png"
+								style="border-radius:50%; width:15px" />
+						</p:commandLink>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:panel>
+		<p:panel id="graphicPanel" header="Boxplot">
+			<f:facet name="actions">
+				<p:commandLink styleClass="infoBtn"
+					oncomplete="PF('infoDlg').show();"
+					action="#{reportView.populateInfoText('visBoxplot')}"
+					update="levOneVizForm:vis1InfoBox">
+					<p:graphicImage library="images" name="info_small.png"
+						style="border-radius:50%; width:15px; float:right;" />
+				</p:commandLink>
+			</f:facet>
+			<svg id="svg1" viewBox="0 0 1600 900"></svg>
+		</p:panel>
+
+		<p:dialog id="graphDlg" widgetVar="graphDlgWidget"
+			header="BoxPlot Controls" resizable="false" showEffect="clip"
+			hideEffect="clip" scrollable="true" width="330" height="320">
+			<p:ajax event="close" listener="#{visualizationView.zoomPanOff(1)}"
+				update="PanZoomOnOff,hiddenZoomVal,zoomSpinner"
+				oncomplete="panZoomOff(1)" />
+			Bar Width
+			<p:panel>
+				<p:panelGrid id="sizeControlPanel">
+					<p:row>
+						<p:column>
+							<p:spinner id="bwSpinner" size="5"
+								value="#{visualizationView.boxWidth1}" stepFactor="2" min="6"
+								max="60" onchange="changeBarWidth(1)"
+								onkeyup="if(event.keycode == 13) {changeBarWidth(1); return false;}" />
+						</p:column>
+						<p:column>
+							<p:commandButton id="resetBW" value="Reset"
+								style="color:black;background-color:#5585bf;"
+								onclick="bwReset(1);"
+								actionListener="#{visualizationView.resetBoxPlotWidth(1)}"
+								update="bwSpinner" />
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+			Zoom
+			<p:panel>
+				<p:panelGrid>
+					<p:row>
+						<p:column>
+							<p:spinner id="zoomSpinner" size="5"
+								value="#{visualizationView.zoomVal1}" stepFactor="5"
+								disabled="#{!visualizationView.zoomPanOn1}"
+								onchange="setZmVal(1)">
+								<p:ajax />
+							</p:spinner>
+						</p:column>
+						<p:column>
+							<p:commandButton id="resetZoom" value="Reset"
+								style="color:black;background-color:#5585bf;"
+								onclick="zoomReset(1)"
+								actionListener="#{visualizationView.resetBoxPlotZoom(1)}"
+								update="zoomSpinner" />
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Zoom &amp; Pan" />
+						</p:column>
+						<p:column>
+							<p:inputSwitch id="PanZoomOnOff"
+								value="#{visualizationView.zoomPanOn1}">
+								<p:ajax update="zoomSpinner,hiddenZoomVal"
+									oncomplete="panZoomOnOff(1)" />
+							</p:inputSwitch>
+							<h:inputHidden id="hiddenZoomVal"
+								value="#{visualizationView.zoomPanOn1}" />
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+			<p:panel style="text-align:center; border:none;">
+				<p:commandButton id="resetAll" value="Reset All"
+					style="color:black;background-color:#5585bf;" onclick="resetAll(1)"
+					actionListener="#{visualizationView.resetBoxPlotAll(1)}"
+					update="bwSpinner,zoomSpinner" />
+			</p:panel>
+		</p:dialog>
+
+		<p:dialog id="downloadPlotDlg" widgetVar="downloadPlotDlgWidget"
+			modal="true" header="Download Boxplot" showEffect="clip"
+			hideEffect="clip" width="330" height="275">
+			<p:panelGrid>
+				<p:row>
+					<p:column styleClass="align-center">
+						<p:outputLabel for="imageType" value="Image Type:" />
+					</p:column>
+					<p:column styleClass="align-center">
+						<p:selectOneRadio id="imageType"
+							value="#{visualizationView.imageType1}">
+							<f:selectItem itemLabel="SVG" itemValue="SVG" />
+							<f:selectItem itemLabel="PNG" itemValue="PNG" />
+							<f:selectItem itemLabel="JPG" itemValue="JPG" />
+							<p:ajax update="imageWidth, imageHeight" />
+						</p:selectOneRadio>
+
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<p:panelGrid id="sizeGrid" style="margin-top:30px;">
+				<p:row>
+					<p:column style="width:30%;text-align:right;vertical-align:middle;">Width:</p:column>
+					<p:column style="width:50%;text-align:left;vertical-align:middle;">
+						<p:inputNumber id="imageWidth"
+							value="#{visualizationView.imageWidth1}" decimalPlaces="0"
+							size="10" disabled="#{visualizationView.imageType1 eq 'SVG'}">
+							<p:ajax event="keyup"
+								listener="#{visualizationView.constrainAspectRatio(1,'width')}"
+								update="imageHeight" />
+						</p:inputNumber>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="width:30%;text-align:right;vertical-align:middle;">Height:</p:column>
+					<p:column style="width:50%;text-align:left;vertical-align:middle;">
+						<p:inputNumber id="imageHeight"
+							value="#{visualizationView.imageHeight1}" decimalPlaces="0"
+							size="10" disabled="#{visualizationView.imageType1 eq 'SVG'}">
+							<p:ajax event="keyup"
+								listener="#{visualizationView.constrainAspectRatio(1,'height')}"
+								update="imageWidth" />
+						</p:inputNumber>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="2" style="text-align:center;">
+						<p:commandButton id="triggerDownload" value="Download Image"
+							ajax="false" icon="ui-icon-arrowthick-1-s"
+							style="color:black;background-color:#5585bf;margin-top:30px;">
+							<p:fileDownload value="#{visualizationView.downloadImage(1)}" />
+						</p:commandButton>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+
+		</p:dialog>
+
+		<p:dialog id="taxTable" widgetVar="taxTableWidget" resizable="true"
+			showEffect="clip" hideEffect="clip" scrollable="true" width="900"
+			height="300">
+			<f:facet name="header">
+				<h:outputText
+					value="#{visualizationView.dataTableTaxGroup1} (#{visualizationView.taxTable1.size()} species)" />
+				<h:outputText value="&#10;Mean: " escape="false"
+					style="white-space:pre-line;" />
+				<h:outputText value="#{visualizationView.taxMean1}">
+					<f:convertNumber pattern="#0.0" />
+				</h:outputText>
+				<h:outputText value="  Median: " />
+				<h:outputText value="#{visualizationView.taxMedian1}">
+					<f:convertNumber pattern="#0.0" />
+				</h:outputText>
+				<h:outputText
+					value="  Susceptible: #{visualizationView.taxSusceptible1}" />
+			</f:facet>
+			<p:panel>
+				<p:dataTable id="levOneTaxTableData" var="r"
+					value="#{visualizationView.taxTable1}" scrollable="true"
+					paginator="True"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+					paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+					<f:facet name="{Exporters}">
+						<h:panelGroup>
+							<h:outputText value="Download Table:" />
+							<h:commandLink>
+								<p:graphicImage id="excelIcon" library="images" name="excel.png" />
+								<p:dataExporter type="xls" target="levOneTaxTableData"
+									fileName="SeqAPASS_Level1_TaxData_Report" />
+								<p:tooltip id="excelIconTip" for="excelIcon"
+									value="Download table in excel(.xls) format" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage id="csvIcon" library="images" name="csv.png" />
+								<p:dataExporter type="csv" target="levOneTaxTableData"
+									fileName="SeqAPASS_Level1_TaxData_Report" />
+								<p:tooltip id="csvIconTip" for="csvIcon"
+									value="Download table in csv format" />
+							</h:commandLink>
+						</h:panelGroup>
+					</f:facet>
+					<p:column headerText="NCBI Accession" sortBy="#{r.accession}"
+						filterBy="#{r.accession}" filterStyle="display:none"
+						style="width:150px;text-align:center;;font-size:0.75em">
+						<p:link href="http://www.ncbi.nlm.nih.gov/protein/#{r.accession}"
+							value="#{r.accession}" target="_blank" rel="noreferrer noopener" />
+					</p:column>
+					<p:column id="taxonomyGroup" headerText="Taxonomic Group"
+						sortBy="#{r.defaultTaxonomyName}"
+						filterBy="#{r.defaultTaxonomyName}"
+						style="width:120px;text-align:center;font-size:0.75em;white-space:normal"
+						filterStyle="display:none">
+						<h:outputText value="#{r.defaultTaxonomyName}" />
+					</p:column>
+					<p:column id="filteredTaxonomyGroup"
+						headerText="Filtered Taxonomic Group" sortBy="#{r.taxonomyName}"
+						filterBy="#{r.taxonomyName}"
+						style="width:120px;text-align:center;font-size:0.75em;white-space:normal"
+						filterStyle="display:none">
+						<h:outputText value="#{r.taxonomyName}" />
+					</p:column>
+					<p:column headerText="Scientific Name" sortBy="#{r.scientificName}"
+						filterBy="#{r.scientificName}"
+						style="width:300px;text-align:center;font-size:0.75em"
+						filterStyle="display:none">
+						<p:link
+							href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&amp;id=#{r.speciesTaxId}&amp;lvl=3&amp;lin=f&amp;keep=1&amp;srchmode=1&amp;unlock"
+							value="#{r.scientificName}" target="_blank" rel="noreferrer noopener"/>
+					</p:column>
+					<p:column headerText="Common Name" sortBy="#{r.commonName}"
+						filterBy="#{r.commonName}"
+						style="width:200px;text-align:center;font-size:0.75em"
+						filterStyle="display:none">
+						<h:outputText value="#{r.commonName}" />
+					</p:column>
+					<p:column headerText="Protein Name" sortBy="#{r.proteinName}"
+						filterBy="#{r.proteinName}"
+						style="width:400px;text-align:center;font-size:0.75em"
+						filterStyle="display:none">
+						<p:link href="http://www.ncbi.nlm.nih.gov/protein/#{r.accession}"
+							value="#{r.proteinName}" target="_blank" rel="noreferrer noopener"
+							styleClass="#{reportView.highlightPartials==true ? (r.partialProtein==true ? 'partialProtein' : null) : null}" />
+					</p:column>
+					<p:column headerText="Ortholog Candidate" sortBy="#{r.ortholog}"
+						filterBy="#{r.ortholog}" filterStyle="display:none"
+						style="width:100px;text-align:center;font-size:0.75em;white-space:normal">
+						<h:outputText value="#{r.ortholog}" />
+					</p:column>
+					<p:column headerText="Percent Similarity"
+						sortBy="#{r.percentSimilarity}"
+						style="width:100px;text-align:center;font-size:0.75em;white-space:normal">
+						<h:outputText
+							value="#{r.percentSimilarity > 1.0 ? 100.0 : r.percentSimilarity*100}"
+							styleClass="#{reportView.highlightPercSim==true ? (r.percSimOver==true ? 'percSimOver' : null) : null}">
+							<f:convertNumber pattern="#0.0" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Susceptibility Prediction"
+						sortBy="#{r.susceptible}" filterBy="#{r.susceptible}"
+						filterStyle="display:none"
+						style="width:100px;text-align:center;font-size:0.75em;white-space:normal">
+						<h:outputText value="#{r.susceptible}" />
+					</p:column>
+					<p:column headerText="Threatened/ Endangered"
+						sortBy="#{r.endangered or r.threatened}"
+						style="width:100px;text-align:center;font-size:0.75em;white-space:normal">
+						<h:outputText
+							value="#{reportView.convertBooleanToYN(r.endangered or r.threatened)}" />
+					</p:column>
+					<p:column headerText="Common Model Organism" sortBy="#{r.model}"
+						style="width:100px;text-align:center;font-size:0.75em;white-space:normal">
+						<h:outputText value="#{reportView.convertBooleanToYN(r.model)}" />
+					</p:column>
+
+				</p:dataTable>
+			</p:panel>
+		</p:dialog>
+
+		<p:dialog id="boxplot1InfoBox" widgetVar="infoDlg" modal="true"
+			draggable="true" closable="true" resizable="true" showHeader="true"
+			header="#{reportView.infoHeaderText}" width="50%" fitViewport="true">
+			<h:outputText value="#{reportView.infoText}" escape="False" />
+		</p:dialog>
+
+		<p:remoteCommand name="initializePageDataCommand" autoRun="true"
+			onstart="" oncomplete="loadBoxPlot(1)" />
+		<p:remoteCommand name="showSpinner" onstart="PF('loadDialog').show();" />
+		<p:remoteCommand name="hideSpinner" onstart="PF('loadDialog').hide();" />
+
+		<p:remoteCommand name="showTaxTable1"
+			actionListener="#{visualizationView.showTaxTable(1)}"
+			update="taxTable" />
+
+		<p:remoteCommand name="disableBox1Checkbox"
+			actionListener="#{visualizationView.disableBoxPlotCheckBox(1)}"
+			update="showOrthologChkBox, showEndangeredChkBox, showThreatenedChkBox, showModelOrganismsChkBox" />
+
+		<p:remoteCommand name="getSVGSourceRC"
+			actionListener="#{visualizationView.retrieveSVG(1)}"
+			update="sizeGrid" />
+
+		<p:remoteCommand name="updateSpeciesMenu1"
+			actionListener="#{visualizationView.updateSpeciesMenu(1)}"
+			update="speciesMenu" oncomplete="disableSomeSpecies(1)" />
+
+		<p:remoteCommand name="updateBoxPlotBeanValues1"
+			actionListener="#{visualizationView.updateBoxPlotControls(1)}"
+			update="zoomSpinner, bwSpinner" />
+
+		<p:remoteCommand name="checkDiffLev1BoxDiff"
+			action="#{visualizationView.checkDiffLevel1BoxPlotRAReport()}"
+			update="boxPlotButtons1" />
+
+		<script>
+			jQuery(document)
+					.ready(
+							function() {
+								PF('speciesMenuWidget').show = function() {
+									showSpinner();
+
+									var _this = this;
+									setTimeout(
+											function() {
+												PrimeFaces.widget.SelectCheckboxMenu.prototype.show
+														.call(_this);
+												hideSpinner();
+											}, 100);
+								}
+							});
+		</script>
+
+	</ui:composition>
+
+</h:body>
+
+</html>

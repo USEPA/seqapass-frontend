@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+<h:head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title><ui:insert name="title" /></title>
+	<script type="text/javascript"
+		src="/seqapass/javax.faces.resource/jsf.js.xhtml?ln=javax.faces"></script>
+</h:head>
+
+<h:body>
+
+	<h:outputStylesheet library="css" name="seqapass.css" />
+	<h:outputStylesheet library="css" name="viz.css" />
+
+	<div id="page" style="background-color: #eff6fb;height:100%;min-width:1200px;font-family: Arial, Helvetica, sans-serif;font-size: 1.1em;color: #4F4F4F;">
+		<div id="content">
+			<ui:insert name="content">
+				<ui:include src="defaultContent.xhtml" />
+			</ui:insert>
+		</div>
+
+	</div>
+
+</h:body>
+</html>
+

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<head>
+<!-- force IE to render to use the highest compatibility mode -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!-- Exlipse standard settings - COMMENTED OUT -->
+<!-- <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> -->
+<title>SeqAPASS Login Index</title>
+</head>
+
+<h:body>
+	<ui:composition template="/WEB-INF/templates/drupal.xhtml">
+		<ui:define name="title">
+		SeqAPASS Login
+	</ui:define>
+
+		<ui:define name="header">
+			<h:form id="headerForm">
+				<h:panelGrid columns="1"
+					styleClass="seq_mainHeader" columnClasses="seq_header-left-column">
+				</h:panelGrid>
+			</h:form>
+		</ui:define>
+
+		<ui:define name="messageBar">
+			<p:messages id="preLoginMessage" for="preLoginKey" showDetail="true"
+				closable="false" escape="false"
+				style="width:98%; margin-left:1%">
+				<p:autoUpdate/>
+			</p:messages>
+		</ui:define>
+
+
+		<ui:define name="content">
+			<h:form id="loginForm">
+				<p:dialog widgetVar="statusDialog1" modal="true" draggable="false"
+					closable="false" resizable="false" showHeader="false">
+					<p:panelGrid>
+						<p:row>
+							<p:column style="text-align:center">
+								Retrieving User Info...
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column style="text-align:center">
+								<p:graphicImage library="images" name="spinner.gif" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column style="text-align:center">
+								Please Wait
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:dialog>
+
+				<p:panel>
+				<h:panelGrid columns="3"  styleClass="seq_menuBar"
+					columnClasses="seq_left-column,seq_center-column,seq_right-column">
+					<p:column>Log In to SeqAPASS</p:column>
+					<p:column>Version #{userLoginView.updateInfo.get(0).getSeqapassVersion()}</p:column>
+					<p:column />
+				</h:panelGrid>
+				</p:panel>
+
+				<!-- place login panel approximately in the center of the screen -->
+				<p:panel id="loginContainer"
+					style="width:70%; margin: 0 auto; border: none; min-width:500px;">
+					<p:panel header="Welcome to SeqAPASS" id="loginPanel">
+						<f:facet name="actions">
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoLoginDlg').show();"
+								action="#{userLoginView.populateInfoText('login')}"
+								update="loginInfoBox">
+								<p:graphicImage library="images" name="info_small.png" style="border-radius:50%; width:15px; float:right;"/>
+							</p:commandLink>
+						</f:facet>
+
+						<p:messages id="loginMessage" for="loginKey" showDetail="true"
+							closable="false">
+							<p:autoUpdate/>
+						</p:messages>
+
+						<p:panelGrid style="border: hidden;border-color: white;">
+							<p:row>
+								<p:column style="border:none;">
+									<p:commandButton id="loginButton" value="Login"
+										update="loginMessage"
+										action="protected/dashboard/loginSplash.xhtml?faces-redirect=true"
+										style="color:black;background-color:#5585bf;"
+										disabled="#{userLoginView.disableLogin}" />
+								</p:column>
+							</p:row>
+
+						</p:panelGrid>
+									<p style="font-size: 0.75em;">For optimal SeqAPASS performance
+									use Chrome
+									<p:commandLink oncomplete="PF('infoLoginDlg').show();" action="#{userLoginView.populateInfoText('browser')}" update="loginInfoBox">
+										<p:graphicImage library="images" name="info_small.png" style="border-radius:50%; width:15px"/>
+									</p:commandLink>
+									</p>
+						<p style="font-size: 0.75em;">
+							Instructions to create a SeqAPASS account and login can be found <p:link href="https://www.epa.gov/chemical-research/guide-login-seqapass-users" title="Account creation and login instructions" value="here" target="_blank"/>.
+						</p>
+						<p:focus for="loginButton" />
+						<p:defaultCommand target="loginButton" />
+					</p:panel>
+					<p
+						style="text-align: right; font-size: 0.75em; margin: 0; padding: 0;">
+						<a href="info.xhtml" title="Version information and references">About SeqAPASS</a>
+					</p>
+				</p:panel>
+
+				<p:remoteCommand name="checkForMessage" autoRun="true"
+					action="#{userLoginView.displayPreLoginMsg}" update="loginButton" />
+				
+				<p:dialog id="loginInfoBox" widgetVar="infoLoginDlg" modal="false"
+					draggable="true" closable="true" resizable="true"
+					showHeader="true" header="#{userLoginView.infoHeaderText}" width="50%" fitViewport="true">
+					<h:outputText style="font-size:1.2em;" value="#{userLoginView.infoText}" escape="False"/>
+				</p:dialog>
+				
+				<script>
+					jQuery(document).ready(function() {
+						transition2MainTab();
+						closeAllChildTabs();
+					});
+				</script>
+				
+			</h:form>
+		</ui:define>
+		
+	</ui:composition>
+</h:body>
+
+</html>

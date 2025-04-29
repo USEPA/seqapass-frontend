@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<h:body>
+	<ui:composition>
+		<p:panel style="min-width:100px;min-height:400px" id="info"
+			header="Visualization Info">
+			<p:panelGrid columns="1"
+				style="border:none; width:100%;text-align:left"
+				columnClasses="no-border">
+				<h:outputText>
+					The following data visualization is available for Level 1 and Level 2 data:
+					<ul style="background-color: #FFFFFF">
+						<li><b>BoxPlot</b> - Boxplots depicting SeqAPASS data
+							illustrating the percent similarity across species compared to
+							the query species examining the primary amino acid sequences
+							(Level 1 Visualization) or functional domain (Level 2
+							Visualization).
+							<ul style="background-color: #FFFFFF">
+								<li>The open circle, o, represents the query species and
+									closed circles, &#9679;, represent the species with the highest
+									percent similarity within the specified taxonomic group.</li>
+								<li>The top and bottom of each box represent the 75th and
+									25th percentiles, respectively. The top and bottom whiskers
+									extend to 1.5 times the interquartile range.</li>
+								<li>The mean and median values for each taxonomic group are
+									represented by horizontal thick and thin black lines on the
+									box, respectively.</li>
+								<li>The dashed line indicates the cut-off for
+									susceptibility predictions (based on ortholog analysis).</li>
+							</ul></li>
+					</ul>
+				</h:outputText>
+			</p:panelGrid>
+		</p:panel>
+	</ui:composition>
+</h:body>
+
+</html>

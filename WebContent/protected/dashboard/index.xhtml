@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<head>
+<!-- force IE to render to use the highest compatibility mode -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!-- Exlipse standard settings - COMMENTED OUT -->
+<!-- <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> -->
+<title>SeqAPASS Tool</title>
+</head>
+
+<body>
+	<ui:composition template="/WEB-INF/templates/main.xhtml">
+		<ui:define name="title">
+		Sequence Alignment to Predict Across Species Susceptibility (SeqAPASS)
+		</ui:define>
+
+		<ui:define name="messageBar">
+			<p:messages id="userMessage" for="userMessage" showDetail="true"
+				closable="false">
+				<p:autoUpdate />
+			</p:messages>
+		</ui:define>
+
+		<ui:define name="content">
+
+
+			<p:tabView orientation="top" dynamic="true" cache="false"
+				id="tabView" style=" margin: 0 auto;" scrollable="true"
+				widgetVar="tabViewWidget">
+				<p:ajax event="tabChange" listener="#{tabView.onTabChange}" />
+
+
+				<p:tab id="homeTab" title="Home">
+					<ui:include src="seqapass_home.xhtml" />
+				</p:tab>
+
+				<p:tab id="requestTab" title="Request SeqAPASS Run">
+					<ui:include src="request_run.xhtml" />
+				</p:tab>
+
+				<p:tab id="statusTab" title="SeqAPASS Run Status">
+					<ui:include src="seqapass_run_status.xhtml" />
+				</p:tab>
+
+				<p:tab id="reportTab" title="View SeqAPASS Reports">
+					<ui:include src="seqapass_reports.xhtml" />
+				</p:tab>
+
+
+				<p:tab id="settingsTab" title="Settings">
+					<ui:include src="admin.xhtml" />
+				</p:tab>
+
+			</p:tabView>
+
+			<p:growl id="sessionGrowl" global="true"
+				widgetVar="sessionGrowlWidget" showDetail="true" sticky="true" />
+
+			<p:remoteCommand name="endSession" action="#{tabView.endSession}" />
+			<p:remoteCommand name="pingBE" action="#{tabView.onActive}" />
+
+			<p:idleMonitor timeout="600000">
+				<p:ajax event="idle" listener="#{tabView.onIdle}"
+					oncomplete="startTimer();" update="sessionGrowl" />
+				<p:ajax event="active" listener="#{tabView.onActive}"
+					oncomplete="killTimer();killTimerChild();" update="sessionGrowl" />
+			</p:idleMonitor>
+			
+			<p:growl id="growl" global="true" widgetVar="globalGrowl"
+				showDetail="true" sticky="false" life="10000" />
+
+			<script>
+				window.onload = function() {
+					sessionOnLoad();
+				}
+			</script>
+
+		</ui:define>
+
+	</ui:composition>
+
+</body>
+</html>

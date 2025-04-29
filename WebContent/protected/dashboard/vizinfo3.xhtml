@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<h:body>
+	<ui:composition>
+		<p:panel style="min-width:100px;min-height:400px" id="info"
+			header="Visualization Info">
+			<p:panelGrid columns="1"
+				style="border:none; width:100%;text-align:left"
+				columnClasses="no-border">
+				<h:outputText>
+					The following data visualization is available for Level 3 data:
+					<ul style="background-color: #FFFFFF">
+						<li><b>HeatMap</b> - Heat Maps depicting SeqAPASS data illustrating the comparison between
+						the template species and the user selected species allows for a summary of species' protein
+						sequence comparisons. 
+							<ul style="background-color: #FFFFFF">
+								<li>The similarity between species compared to the template species and the user
+								selected amino acids is denoted with either a (Y)-yes, or (N)-no.  The color green
+								is associated with "yes" and red is associated with "no".</li>
+								<li>Similarities between amino acids are determined by comparing the species
+								specific amino acids against the template species.  The amino acids can be either
+								a Total Match, Partial Match, or Not a Match.</li>
+								<li>The user has the ability to add or remove five settings (Susceptibility
+								Prediction, Susceptibility Prediction Text, Alignment Prediction Heat Map,
+								Amino Acid, and Amino Acid Position) to allow for a customizable Heat Map.</li>
+								<li>Selecting one of the Optional Selections will highlight the species names that
+								are associated with that selection.</li>
+							</ul></li>
+					</ul>
+				</h:outputText>
+			</p:panelGrid>
+		</p:panel>
+	</ui:composition>
+</h:body>
+
+</html>

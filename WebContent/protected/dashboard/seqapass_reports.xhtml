@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+		<h:form id="reportForm">
+			<p:defaultCommand target="dummy" />
+			<p:commandButton id="dummy" process="@none" global="false"
+				style="display:none" />
+			<h:panelGrid columns="3" cellpadding="10" styleClass="menuBar"
+				columnClasses="left-column,center-column,right-column">
+				<p:column>SeqAPASS Reports</p:column>
+				<p:column>Version #{userLoginView.updateInfo.get(0).getSeqapassVersion()}</p:column>
+				<p:column>Logged in as: #{userLoginView.username}</p:column>
+			</h:panelGrid>
+
+			<p:dialog widgetVar="statusDialog0" modal="true" draggable="false"
+					closable="false" resizable="false" showHeader="false">
+					<p:panelGrid>
+						<p:row>
+							<p:column style="text-align:center">
+								Querying Database...
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column style="text-align:center">
+								<p:graphicImage library="images" name="spinner.gif" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column style="text-align:center">
+								Please Wait
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:dialog>
+
+			<h:panelGroup id="levelButtonId" layout="block">
+				<p:toolbar id="levelSelectToolbar"
+					rendered="#{reportView.renderLevelButtons}" style="background:#aacdec;">
+					<f:facet name="left">
+						<p:commandButton id="mainButton" value="Main"
+							rendered="#{reportView.renderLevelButtons}"
+							actionListener="#{reportView.changeToMainPage()}"
+							onclick="closeIcn3dDialogsRC();"
+							update="newReportPanel" />
+						<p:commandButton id="levelOneButton" value="Level 1"
+							rendered="#{reportView.renderLevelOne}"
+							actionListener="#{reportView.changeToLevelOnePage(false)}"
+							update="newReportPanel,tabView:reportForm:RAReportButton" onstart="PF('statusDialog0').show();"
+							onclick="closeIcn3dDialogsRC();"
+							onsuccess="PF('statusDialog0').hide()" />
+						<p:commandButton id="levelTwoButton" value="Level 2"
+							rendered="#{reportView.renderLevelTwo}"
+							actionListener="#{reportView.changeToLevelTwoPage(false)}"
+							update="newReportPanel" onstart="PF('statusDialog0').show();"
+							onclick="closeIcn3dDialogsRC();"
+							onsuccess="PF('statusDialog0').hide()" />
+						<p:commandButton id="LevelThreeButton" value="Level 3"
+							rendered="#{reportView.renderLevelThree}"
+							actionListener="#{reportView.changeToLevelThreePage()}"
+							update="newReportPanel" onstart="PF('statusDialog0').show();"
+							onclick="closeIcn3dDialogsRC();"
+							onsuccess="PF('statusDialog0').hide()" />
+						<p:commandButton id="levelFourButton" value="Level 4"
+							rendered="#{reportView.renderLevelFour}"
+							actionListener="#{reportView.changeToLevelFourPage()}"
+							update="newReportPanel" onstart="PF('statusDialog0').show();"
+							onsuccess="switchToL4();PF('statusDialog0').hide()" />
+						<p:commandButton id="RAReportButton" value="DS Report"
+							rendered="#{true}"
+							disabled="#{reportView.disableRAReport}"
+							actionListener="#{reportView.changeToRAReportPage()}"
+							update="newReportPanel" onstart="PF('statusDialog0').show();"
+							onclick="closeIcn3dDialogsRC();"
+							onsuccess="PF('statusDialog0').hide()" />
+					</f:facet>
+				</p:toolbar>
+			</h:panelGroup>
+
+			<p:panel id="newReportPanel" autoupdate="true"
+				styleClass="searchPanel">
+				<ui:include src="#{reportView.getSelectedPageURL()}" />
+			</p:panel>
+
+			<p:commandButton value="Top of Page"
+				onclick="javascript:window.scrollTo(0,0)" />
+
+			<p:growl id="growl" for="growl" showDetail="true" sticky="false"
+				life="10000" />
+				
+			<p:remoteCommand name="closeIcn3dDialogsRC" actionListener="#{reportView.closeIcn3dDialogs}"/>
+			
+			<p:remoteCommand name="reloadL4Viz" actionListener="#{reportView.reloadL4}"	autoRun="true" />
+
+		</h:form>
+
+
+	</ui:composition>
+</body>
+</html>

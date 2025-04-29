@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+<h:head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title><ui:insert name="title" /></title>
+	<script type="text/javascript"
+		src="/seqapass/javax.faces.resource/jsf.js.xhtml?ln=javax.faces"></script>
+	<h:outputScript library="js" name="viz.js" />
+	<h:outputScript library="js" name="seqapass.js" />
+	<h:outputScript library="js" name="session.js" />
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<h:outputScript library="js" name="heatmap.js" />
+	<h:outputScript library="js" name="emvl_icn3d.js" />
+	<h:outputScript library="js" name="threeClass.min.js"/>
+	<h:outputScript library="js" name="icn3d.js"/>
+	<h:outputScript>
+	 	#{userLoginView.requestJSCode('viz')}
+	</h:outputScript>
+	<h:outputScript>
+	 	#{userLoginView.requestJSCode('seqapass')}
+	</h:outputScript>
+	<h:outputScript>
+	 	#{userLoginView.requestJSCode('heatmap')}
+	</h:outputScript>
+	<h:outputScript>
+	 	#{userLoginView.requestJSCode('session')}
+	</h:outputScript>
+	<h:outputScript>
+	 	#{userLoginView.requestJSCode('emvl_icn3d')}
+	</h:outputScript>
+	<h:outputScript>
+	 	#{userLoginView.requestJSCode('threeClass.min')}
+	</h:outputScript>
+	<h:outputScript>
+	 	#{userLoginView.requestJSCode('icn3d')}
+	</h:outputScript>
+	<!-- Google Tag Manager -->
+	<script>
+		deleteICN3DLocalStorage();
+		(function(w, d, s, l, i) {
+			w[l] = w[l] || [];
+			w[l].push({
+				"gtm.start" : new Date().getTime(),
+				event : "gtm.js"
+			});
+			var f = d.getElementsByTagName(s)[0], j = d.createElement(s), dl = l != "dataLayer" ? "&amp;l="
+					+ l
+					: "";
+			j.async = true;
+			j.src = "//www.googletagmanager.com/gtm.js?id=" + i + dl;
+			f.parentNode.insertBefore(j, f);
+		})(window, document, "script", "dataLayer", "GTM-L8ZB");
+	</script>
+	<!-- End Google Tag Manager -->
+</h:head>
+
+<h:body>
+
+	<h:outputStylesheet library="css" name="seqapass.css" />
+	<h:outputStylesheet library="css" name="viz.css" />
+
+	<div id="page" style="background-color: #eff6fb;height:100%;min-width:1200px;font-family: Arial, Helvetica, sans-serif;font-size: 1.1em;color: #4F4F4F;">
+		<div id="header">
+			<ui:insert name="header">
+				<ui:include src="defaultHeader.xhtml" />
+			</ui:insert>
+		</div>
+
+		<div id="messageBar">
+			<ui:insert name="messageBar">
+				<ui:include src="defaultMessageBar.xhtml" />
+			</ui:insert>
+		</div>
+
+		<div id="content">
+			<ui:insert name="content">
+				<ui:include src="defaultContent.xhtml" />
+			</ui:insert>
+		</div>
+
+	</div>
+
+</h:body>
+</html>
+

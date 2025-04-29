@@ -1,0 +1,36 @@
+<style type="text/css">
+body {
+background-color: rgb(0, 255, 255);
+}
+
+.ui-layout-unit-content {
+background-color: rgb(255, 0, 0);
+foreground-color: rgb(0, 0, 0);
+}
+
+.ui-widget-content {
+background-color: rgb(0, 255, 255);
+foreground-color: rgb(0, 0, 0);
+}
+
+.centerClass {
+background-color: rgb(255, 255, 255);
+foreground-color: rgb(0, 0, 0);
+}
+
+.titleText {
+color: rgb(255, 255, 255);
+font-size: 200%;
+}
+
+.titleSubText {
+color: rgb(255, 255, 255);
+font-size: 100%;
+}
+
+.center {
+margin-left: auto;
+margin-right: auto;
+width: 70%;
+}
+</style>

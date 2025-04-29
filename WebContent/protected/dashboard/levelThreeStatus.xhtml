@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+
+
+
+		<p:panel id="runStatusLevelThreePanel"
+			header="SeqAPASS Level 3 Run Status" style="margin:0; padding:0;">
+			<p:dataTable id="runStatusLevelThreeTableId" var="r"
+				widgetVar="LevThreeStatusTable"
+				value="#{statusView.levelThreeStatusList}" rowKey="#{r.key}"
+				emptyMessage="No entries found with given criteria"
+				filteredValue="#{statusView.filteredLevelThreeStatusList}"
+				sortBy="#{r.runId}" sortOrder="descending"
+				selection="#{statusView.selectedLevelThreeRuns}"
+				resizableColumns="true" draggableColumns="true" scrollable="true"
+				scrollWidth="95%" paginator="true"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+				paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+				<f:facet name="header">
+					<p:outputPanel>
+						<h:outputText value="Search:" />
+						<p:inputText id="globalFilter"
+							onkeyup="PF('LevThreeStatusTable').filter()" style="width:150px"
+							placeholder="Enter keyword" />
+					</p:outputPanel>
+				</f:facet>
+				<f:facet name="{Exporters}">
+					<h:panelGroup>
+						<h:outputText value="Download Table:" />
+						<h:commandLink>
+							<p:graphicImage id="excelStatusLev3" library="images" name="excel.png" />
+							<p:dataExporter type="xls" target="runStatusLevelThreeTableId"
+								fileName="SeqAPASS_Level3_Status" />
+							<p:tooltip id="excelStatusLev3Tip" for="excelStatusLev3"
+								value="Download level 3 status table in excel(.xls) format" />
+						</h:commandLink>
+
+						<h:commandLink>
+							<p:graphicImage id="csvStatusLev3" library="images" name="csv.png" />
+							<p:dataExporter type="csv" target="runStatusLevelThreeTableId"
+								fileName="SeqAPASS_Level3_Status" />
+							<p:tooltip id="csvStatusLev3Tip" for="csvStatusLev3"
+								value="Download level 3 status table in csv format" />
+						</h:commandLink>
+					</h:panelGroup>
+				</f:facet>
+				<p:column headerText="SeqAPASS Run Id" sortBy="#{r.runId}"
+					style="width:100px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText value="#{r.runId}" />
+				</p:column>
+				<p:column headerText="Data Version" sortBy="#{r.updateVersion}"
+					style="width:100px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText value="#{r.updateVersion}" />
+				</p:column>
+				<p:column headerText="User" sortBy="#{r.email}"
+					filterBy="#{r.email}" filterStyle="display:none"
+					style="width:150px;text-align:center;font-size:0.75em">
+					<h:outputText value="#{r.email}" />
+				</p:column>
+				<p:column headerText="Job Name" sortBy="#{r.jobName}"
+					filterBy="#{r.jobName}" filterStyle="display:none"
+					style="width:150px;text-align:center;font-size:0.75em">
+					<h:outputText value="#{r.jobName}" />
+				</p:column>
+				<p:column headerText="Level 1 Query Accession" sortBy="#{r.accession}"
+					filterBy="#{r.accession}" filterStyle="display:none"
+					style="width:150px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText value="#{r.accession}" />
+				</p:column>
+				<p:column headerText="Template Accession"
+					sortBy="#{r.templateAccession}" filterBy="#{r.templateAccession}"
+					filterStyle="display:none"
+					style="width:170px;text-align:center;font-size:0.75em">
+					<h:outputText value="#{r.templateAccession}" />
+				</p:column>
+				<p:column headerText="COBALT" sortBy="#{r.cobalt}"
+					filterBy="#{r.cobalt}" filterStyle="display:none"
+					style="width:80px;text-align:center;font-size:0.75em">
+					<h:outputText value="#{r.cobalt}" />
+				</p:column>
+				<p:column headerText="Start Date" sortBy="#{r.startDate}"
+					filterBy="#{reportView.convertUnixTimeToDate(r.startDate)}"
+					filterStyle="display:none"
+					style="width:190px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText
+						value="#{reportView.convertUnixTimeToDate(r.startDate)}" />
+				</p:column>
+				<p:column headerText="Date Completed"
+					sortBy="#{r.endDate}"
+					filterBy="#{reportView.convertUnixTimeToDate(r.endDate)}"
+					filterStyle="display:none"
+					style="width:190px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText
+						value="#{reportView.convertUnixTimeToDate(r.endDate)}" />
+				</p:column>
+				<p:column headerText="SeqAPASS Run Duration"
+					sortBy="#{r.runDuration}"
+					style="width:300px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText
+						value="#{statusView.convertRunDuration(r.runDuration)}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+
+	</ui:composition>
+</body>
+</html>

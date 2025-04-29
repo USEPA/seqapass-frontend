@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<head>
+<!-- force IE to render to use the highest compatibility mode -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!-- Exlipse standard settings - COMMENTED OUT -->
+<!-- <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> -->
+<title>SeqAPASS Login Index</title>
+</head>
+
+
+<h:body>
+	<ui:composition template="/WEB-INF/templates/main.xhtml">
+		<ui:define name="title">
+		SeqAPASS Login
+	</ui:define>
+
+		<ui:define name="content">
+			<h:form>
+				<p:messages>
+					<p:autoUpdate/>
+				</p:messages>
+				<p:panel id="about" header="About" style="margin-bottom:20px">
+				
+	<p:commandButton  value="Return" action="index.xhtml?faces-redirect=false" /><br/>
+
+    <br />
+	The SeqAPASS Tool was developed by Dr. Carlie LaLone and the
+	Environmental Modeling and Visualization Laboratory for:
+	<br />
+	<br /> U.S. Environmental Protection Agency,
+	<br /> Center for Computational Toxicology and Exposure
+	<br /> Great Lakes Toxicology and Ecology Division,
+	<br /> Duluth, MN
+	<br />
+	<br />
+	<br /> Contact:
+	<a href="mailto:SeqAPASS.support@epa.gov">SeqAPASS.support@epa.gov</a>
+	<br />
+	<br/>
+	
+	<p:dataTable var="row" value="#{userLoginView.updateInfo[0]}">
+		<f:facet name="header">
+        	Software Information
+        </f:facet>
+		<p:column headerText="Java Version"
+			style="width:150px;text-align:center;;font-size:0.75em">
+			<h:outputText value="#{row.javaVersion}" />
+		</p:column>
+		<p:column headerText="PrimeFaces Version"
+			style="width:150px;text-align:center;;font-size:0.75em">
+			<h:outputText value="#{row.primefacesVersion}" />
+		</p:column>
+		<p:column headerText="Tomcat Version"
+			style="width:150px;text-align:center;;font-size:0.75em">
+			<h:outputText value="#{row.tomcatVersion}" />
+		</p:column>
+		<p:column headerText="Database Version"
+			style="width:150px;text-align:center;;font-size:0.75em">
+			<h:outputText value="#{row.mysqlVersion}" />
+		</p:column>
+	</p:dataTable>
+	
+	<br/>
+
+	<p:dataTable var="row" value="#{userLoginView.updateInfo}">
+        <f:facet name="header">
+        	NCBI Information (See References)
+        </f:facet>
+        <p:column headerText="Data Version"
+			style="width:60px;text-align:center;;font-size:0.75em;white-space:normal">
+			<h:outputText value="#{row.updateVersion}"/>
+		</p:column>
+		<p:column headerText="Installation Date"
+			style="width:135px;text-align:center;;font-size:0.75em">
+			<h:outputText value="#{row.installDate}">
+				<f:convertDateTime pattern="MM/dd/yyyy hh:mm a" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="SeqAPASS Version"
+			style="width:70px;text-align:center;;font-size:0.75em;white-space:normal">
+			<h:outputText value="#{row.seqapassVersion}" />
+		</p:column>
+		<p:column headerText="BLAST+ Version"
+			style="width:80px;text-align:center;;font-size:0.75em;white-space:normal">
+			<h:outputText value="#{row.blastVersion}" />
+		</p:column>
+		<p:column headerText="Protein and Taxonomy Database"
+			style="width:100px;text-align:center;;font-size:0.75em">
+			<h:outputText value="#{row.ncbiDate}">
+				<f:convertDateTime pattern="MM/dd/yyyy" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="CDD Database"
+			style="width:100px;text-align:center;;font-size:0.75em">
+			<h:outputText value="#{row.cddDate}">
+				<f:convertDateTime pattern="MM/dd/yyyy" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="Cobalt Database"
+			style="width:100px;text-align:center;;font-size:0.75em">
+			<h:outputText value="#{row.cobaltDate}">
+				<f:convertDateTime pattern="MM/dd/yyyy" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="Cobalt Version"
+			style="width:60px;text-align:center;;font-size:0.75em;white-space:normal">
+			<h:outputText value="#{row.cobaltVersion}" />
+		</p:column>
+		<p:column headerText="I-TASSER Version"
+			style="width:65px;text-align:center;;font-size:0.75em;white-space:normal">
+			<h:outputText value="#{row.itasserVersion}" />
+		</p:column>
+		<p:column headerText="TM-align Version"
+			style="width:65px;text-align:center;;font-size:0.75em;white-space:normal">
+			<h:outputText value="#{empty row.tmalignVersion ? '-': row.tmalignVersion}" />
+		</p:column>
+		<p:column headerText="UniProt Database"
+			style="width:100px;text-align:center;;font-size:0.75em">
+			<h:outputText value="#{row.uniprotDate}">
+				<f:convertDateTime pattern="MM/dd/yyyy" />
+			</h:outputText>
+		</p:column>
+	</p:dataTable>
+	<p>
+	 <br/>
+	 #{userLoginView.updateInfo[0].notes}
+	</p>
+	
+	<br />
+	<br />
+	<b>References:</b>
+	<p>
+NCBI Protein Database <br/>
+Pruitt, K. D., Tatusova, T., Maglott, D. R. (2007). NCBI reference sequences (RefSeq): a curated non-redundant sequence database of genomes, transcripts and proteins. Nucleic acids research, 35(suppl_1), D61-D65. <a href="https://doi.org/10.1093/nar/gkl842" target="_blank" rel="noreferrer noopener">https://doi.org/10.1093/nar/gkl842</a>
+</p>
+<p>
+NCBI Taxonomy Database<br/>
+Federhen, S. (2012). The NCBI taxonomy database. Nucleic acids research, 40(D1), D136-D143. <a href="https://doi.org/10.1093/nar/gkr1178" target="_blank" rel="noreferrer noopener">https://doi.org/10.1093/nar/gkr1178</a>
+</p>
+<p>
+NCBI BLAST<br/>
+Altschul, S. F., Gish, W., Miller, W., Myers, E. W., Lipman, D. J. (1990). Basic local alignment search tool. Journal of molecular biology, 215(3), 403-410. <a href="https://doi.org/10.1016/S0022-2836(05)80360-2" target="_blank" rel="noreferrer noopener">https://doi.org/10.1016/S0022-2836(05)80360-2</a>
+</p>
+<p>
+NCBI Conserved Domain Database<br/>
+Marchler-Bauer, A., Zheng, C., Chitsaz, F., Derbyshire, M. K., Geer, L. Y., Geer, R. C., ... &amp; Bryant, S. H. (2012). CDD: conserved domains and protein three-dimensional structure. Nucleic acids research, 41(D1), D348-D352. <a href="https://doi.org/10.1093/nar/gks1243" target="_blank" rel="noreferrer noopener">https://doi.org/10.1093/nar/gks1243</a>
+</p>
+<p>
+NCBI COBALT<br/>
+Papadopoulos, J. S., Agarwala, R. (2007). COBALT: constraint-based alignment tool for multiple protein sequences. Bioinformatics, 23(9), 1073-1079. <a href="https://doi.org/10.1093/bioinformatics/btm076" target="_blank" rel="noreferrer noopener">https://doi.org/10.1093/bioinformatics/btm076</a>
+</p>
+<p>
+ECOS Environmental Conservation Online System<br/>
+US Fish and Wildlife Service. (2018). ECOS Environmental Conservation Online System. Website <a href="https://ecos.fws.gov/ecp/" target="_blank" rel="noreferrer noopener">https://ecos.fws.gov/ecp/</a>[accessed 26 June 2023].
+</p>
+<p>
+ECOTOX Knowledgebase<br/>
+Olker, J.H., Elonen, C.M., Pilli, A., Anderson, A., Kinziger, B., Erickson, S., Skopinski, M., Pomplun, A., LaLone, C.A., Russom, C.L., Hoff, D. (2022). The ECOTOXicology knowledgebase: A curated database of ecologically relevant toxicity tests to support environmental research and risk assessment. Environmental Toxicology and Chemistry, 41(6), 1520-1539. <a href="https://doi.org/10.1002/etc.5324" target="_blank" rel="noreferrer noopener">https://doi.org/10.1002/etc.5324</a>
+</p>
+<p>
+CompTox Chemicals Dashboard<br/>
+Williams, A.J., Grulke, C.M., Edwards, J., McEachran, A.D., Mansouri, K., Baker, N.C., Patlewicz, G., Shah, I., Wambaugh, J.F., Judson, R.S., Richard, A.M. (2017). The CompTox Chemistry Dashboard: a community data resource for environmental chemistry. Journal of cheminformatics, 9, 1-27. <a href="https://doi.org/10.1186/s13321-017-0247-6" target="_blank" rel="noreferrer noopener">https://doi.org/10.1186/s13321-017-0247-6</a>
+</p>
+<p>
+RCSB PDB<br/>
+Rose, P.W., Prlić, A., Altunkaya, A., Bi, C., Bradley, A.R., Christie, C.H., Costanzo, L.D., Duarte, J.M., Dutta, S., Feng, Z., Green, R.K. (2016). The RCSB protein data bank: integrative view of protein, gene and 3D structural information. Nucleic acids research, gkw1000. <a href="https://doi.org/10.1093/nar/gkw1000" target="_blank" rel="noreferrer noopener">https://doi.org/10.1093/nar/gkw1000</a> 
+</p>
+<p>
+I-TASSER<br/>
+Yang, J., Zhang, Y. (2015). I-TASSER server: new development for protein structure and function predictions. Nucleic acids research, 43(W1), W174-W181. <a href="https://doi.org/10.1093/nar/gkv342" target="_blank" rel="noreferrer noopener">https://doi.org/10.1093/nar/gkv342</a>
+</p>
+<p>
+AlphaFold<br/>
+Varadi, M., Anyango, S., Deshpande, M., Nair, S., Natassia, C., Yordanova, G., Yuan, D., Stroe, O., Wood, G., Laydon, A. and Žídek, A. (2022). AlphaFold Protein Structure Database: massively expanding the structural coverage of protein-sequence space with high-accuracy models. Nucleic acids research, 50(D1), D439-D444. <a href="https://doi.org/10.1093/nar/gkab1061" target="_blank" rel="noreferrer noopener">https://doi.org/10.1093/nar/gkab1061</a>
+</p>
+<p>
+TM-align<br/>
+Zhang, Y., Skolnick, J. (2005). TM-align: a protein structure alignment algorithm based on the TM-score. Nucleic acids research, 33(7), 2302-2309. <a href="https://doi.org/10.1093/nar/gki524" target="_blank" rel="noreferrer noopener">https://doi.org/10.1093/nar/gki524</a>
+</p>
+					<br /><b>SeqAPASS Help:</b>
+					<br /> For SeqAPASS user guide and data visualization workspace,
+	click <p:link href="https://www.epa.gov/chemical-research/seqapass-user-guide"
+						value="here" target="_blank" rel="noreferrer noopener"/>.
+	<br />
+
+				</p:panel>
+				<p:commandButton value="Top of Page" onclick="javascript:window.scrollTo(0,0)"/>
+			</h:form>
+		</ui:define>
+	</ui:composition>
+</h:body>
+
+</html>

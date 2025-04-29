@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<head>
+<!-- force IE to render to use the highest compatibility mode -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<title>Request SeqAPASS Run</title>
+</head>
+
+<body>
+	<ui:composition>
+		<h:form id="requestRunForm">
+		
+			<p:messages id="submitMessage" for="userMessage" escape="false"/>
+
+			<h:panelGrid columns="3" cellpadding="10" styleClass="menuBar"
+				columnClasses="left-column,center-column,right-column">
+				<p:column>Request Level 1 SeqAPASS Run</p:column>
+				<p:column>Version #{userLoginView.updateInfo.get(0).getSeqapassVersion()}</p:column>
+				<p:column>Logged in as: #{userLoginView.username}</p:column>
+			</h:panelGrid>
+			
+			<p:panel header="Identify a Protein Target" toggleable="true" toggleSpeed="500" style="margin: 25px;">
+					<p style="font-size:0.75em;">SeqAPASS is designed to predict cross species chemical susceptibility based on a protein
+					molecular target.  The following resources have been identified to guide the user to an
+					appropriate protein target based on the chemical, adverse outcome pathway (AOP), or high-throughput
+					screening (HTS) assay target of interest.  Click the help buttons below for descriptions of how to
+					find relevant protein target information from these resources.</p>
+					<p style="font-size:0.75em;">All links will open in a new tab.
+					<span class="disclaimer">The following links exit the site <a class="exit-disclaimer" href="https://www.epa.gov/home/exit-epa" title="EPA's External Link Disclaimer">Exit</a></span>
+					</p>
+					<p:accordionPanel multiple="true" activeIndex="-1" style="font-size:0.75em;">
+						<p:tab title="Pharmaceutical protein targets:">
+							<p:dataTable var="row" value="#{requestRunView.getLinks('pharmaceutical')}" 
+								styleClass="linktable">
+								<p:column>
+									<p:link id="linkGroup1" href="#{row.url}" value="#{row.label}"
+										target="_blank" rel="noreferrer noopener"/>
+									<p:commandLink styleClass="infoBtn" action="#{reportView.populateInfoTextFromDB(row)}"
+										oncomplete="PF('infoRunDlg').show();" update="tabView:requestRunForm:infoDlg">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px; float:right;" />
+									</p:commandLink>
+								</p:column>
+							</p:dataTable>
+						</p:tab>
+						<p:tab title="Pesticides and other chemical protein targets:" style="font-size:0.75em;">
+							<p:dataTable var="row" value="#{requestRunView.getLinks('pesticide')}" styleClass="linktable">
+								<p:column>
+									<p:link id="linkGroup2" href="#{row.url}"
+									value="#{row.label}" target="_blank" rel="noreferrer noopener"/>
+									<p:commandLink styleClass="infoBtn" action="#{reportView.populateInfoTextFromDB(row)}"
+										oncomplete="PF('infoRunDlg').show();" update="tabView:requestRunForm:infoDlg">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px; float:right;" />
+									</p:commandLink>
+								</p:column>
+							</p:dataTable>
+						</p:tab>
+						<p:tab title="AOP chemical initiators:" style="font-size:0.75em;">
+							<p:dataTable var="row" value="#{requestRunView.getLinks('aop')}" styleClass="linktable">
+								<p:column>
+									<p:link id="linkGroup3" href="#{row.url}"
+									value="#{row.label}" target="_blank" rel="noreferrer noopener"/>
+									<p:commandLink styleClass="infoBtn" action="#{reportView.populateInfoTextFromDB(row)}"
+										oncomplete="PF('infoRunDlg').show();" update="tabView:requestRunForm:infoDlg">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px; float:right;" />
+									</p:commandLink>	
+								</p:column>
+							</p:dataTable>
+						</p:tab>
+						<p:tab title="ToxCast HTS results by chemical:" style="font-size:0.75em;">
+							<p:dataTable var="row" value="#{requestRunView.getLinks('toxcast')}" styleClass="linktable">
+								<p:column>
+									<p:link id="linkGroup4" href="#{row.url}"
+									value="#{row.label}" target="_blank" rel="noreferrer noopener"/>
+									<p:commandLink styleClass="infoBtn" action="#{reportView.populateInfoTextFromDB(row)}"
+										oncomplete="PF('infoRunDlg').show();" update="tabView:requestRunForm:infoDlg">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px; float:right;" />
+									</p:commandLink>
+								</p:column>
+							</p:dataTable>
+						</p:tab>
+					</p:accordionPanel>
+			</p:panel>
+			
+			<p:panel id="search_type"
+				header="Compare Primary Amino Acid Sequences"
+				styleClass="searchTypePanel">
+				<f:facet name="actions">
+					<p:commandLink styleClass="infoBtn" 
+						oncomplete="PF('infoRunDlg').show();" action="#{reportView.populateInfoText('searchType')}" update="infoDlg">
+						<p:graphicImage library="images" name="info_small.png" style="border-radius:50%; width:15px; float:right;"/>
+					</p:commandLink>
+				</f:facet>
+				<p:panelGrid>
+					<p:row>
+						<p:column>
+							<p>Select Search:</p>
+						</p:column>
+						<p:column>
+							<p:selectOneRadio id="searchTypeRadio" layout="pageDirection"
+								style="text-align: left; font-size:0.75em"
+								value="#{requestRunView.searchType}">
+								<f:selectItem itemLabel="By Species" itemValue="0" />
+								<f:selectItem itemLabel="By Accession" itemValue="2" />
+								<p:ajax event="change" execute="@this"
+									listener="#{requestRunView.changeSearchName()}"
+									render="searchTypeRadio" update="newPanel" />
+							</p:selectOneRadio>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+
+			<p:panel id="newPanel" autoupdate="true" styleClass="searchPanel">
+				<ui:include src="#{requestRunView.getSearchName()}" />
+			</p:panel>
+
+			
+			<p:growl id="growl" for="growl" showDetail="true" sticky="false"
+				life="10000" />
+				
+			<p:dialog id="infoDlg" widgetVar="infoRunDlg" modal="true"
+					draggable="true" closable="true" resizable="true"
+					showHeader="true" header="#{reportView.infoHeaderText}" width="50%">
+					<h:outputText style="font-size:1.2em;" value="#{reportView.infoText}" escape="False"/>
+			</p:dialog>
+
+		</h:form>
+
+
+	</ui:composition>
+</body>
+</html>

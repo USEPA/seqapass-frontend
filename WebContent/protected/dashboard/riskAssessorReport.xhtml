@@ -1,0 +1,682 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+
+		<p:dialog widgetVar="statusDialog1" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false">
+			<p:panelGrid>
+				<p:row>
+					<p:column style="text-align:center">
+								Querying Database...
+							</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+						<p:graphicImage library="images" name="spinner.gif" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+								Please Wait
+							</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+
+		<p:growl id="validateGrowl" showDetail="true" sticky="false"
+			life="10000" />
+
+		<p:panel id="riskAssessorReport" header="Decision Summary Report"
+			style="margin-bottom: 20px; display:inline-block; width:100%">
+			<f:facet name="actions">
+					<p:commandLink styleClass="infoBtn"
+						oncomplete="PF('infoDlg').show();"
+						action="#{reportView.populateInfoText('DSReport')}"
+						update="DSInfoBox">
+						<p:graphicImage library="images" name="info_small.png"
+							style="border-radius:50%; width:15px; float:right" />
+					</p:commandLink>
+				</f:facet>
+
+			<p:panel id="raLevel1Report" header="Level 1 Report"
+				toggleable="true"
+				style="margin-bottom: 20px; display:inline-block; width:100%">
+				<f:facet name="actions">
+					<p:commandLink styleClass="infoBtn"
+						oncomplete="PF('infoDlg').show();"
+						action="#{reportView.populateInfoText('DSLevel1')}"
+						update="DSInfoBox">
+						<p:graphicImage library="images" name="info_small.png"
+							style="border-radius:50%; width:15px; float:right" />
+					</p:commandLink>
+				</f:facet>
+				<p:panel style="text-align:center;border:none"
+					rendered="#{empty riskAssessorView.raReport.levelOneReport and empty riskAssessorView.raReport.lev1Boxplot}">
+					<h:outputText value="No Level 1 Report or Visualization Loaded" />
+				</p:panel>
+				<p:panelGrid id="level1Grid" autoupdate="true"
+					style="margin-bottom:10px;margin-left:5px;font-size:0.75em;width:100%"
+					rendered="#{not empty riskAssessorView.raReport.levelOneReport or not empty riskAssessorView.raReport.lev1Boxplot}">
+					<p:row>
+						<p:column style="width:50%">
+							<p:panelGrid
+								style="margin-bottom:10px;margin-left:5px;width:100%;"
+								rendered="#{empty riskAssessorView.raReport.levelOneReport}">
+								<p:row>
+									<p:column style="font-size:1.25em">
+										<p:panel style="text-align:center;border:none">
+											<h:outputText value="No Level 1 Report Loaded" />
+										</p:panel>
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+							<p:panelGrid id="speciesSelectionGrid" autoupdate="true"
+								style="margin-bottom:10px;margin-left:5px;font-size:1em;width:100%"
+								rendered="#{not empty riskAssessorView.raReport.levelOneReport}">
+								<p:row>
+									<p:column style="width:50%">
+										<p:dataTable id="taxMenu" var="r" style="height:400px;"
+											value="#{riskAssessorView.taxGroups}"
+											emptyMessage="No entries found with given criteria"
+											selection="#{riskAssessorView.selectedTaxGroups}"
+											resizableColumns="true" rowKey="#{r}"
+											rowSelectMode="checkbox" draggableColumns="false"
+											scrollable="true" scrollWidth="95%" paginator="false">
+											<f:facet name="header">
+												<p:outputPanel>
+													<h:outputText
+														value="Select Taxonomic Groups (#{riskAssessorView.levOneReportSettings.taxGroup})" />
+												</p:outputPanel>
+											</f:facet>
+											<p:column headerText="Select All" selectionMode="multiple"
+												exportable="false"
+												style="width:60px;text-align:center;font-size:0.75em;white-space:normal" />
+											<p:ajax event="rowSelectCheckbox"
+												listener="#{riskAssessorView.onChangeRATaxMenu}"
+												update="tabView:reportForm:speciesMenu,tabView:reportForm:raFinalReport" />
+											<p:ajax event="rowUnselectCheckbox"
+												listener="#{riskAssessorView.onChangeRATaxMenu}"
+												update="tabView:reportForm:speciesMenu,tabView:reportForm:raFinalReport" />
+											<p:ajax event="toggleSelect"
+												listener="#{riskAssessorView.onChangeRATaxMenu}"
+												update="tabView:reportForm:speciesMenu,tabView:reportForm:raFinalReport" />
+											<p:column headerText="Taxonomic Group">
+												<h:outputText value="#{r}" />
+											</p:column>
+										</p:dataTable>
+									</p:column>
+									<p:column style="width:50%">
+										<p:dataTable id="speciesMenu" var="r" style="height:400px;"
+											value="#{riskAssessorView.speciesColl}"
+											emptyMessage="No entries found with given criteria"
+											selection="#{riskAssessorView.selectedSpeciesColl}"
+											resizableColumns="true" rowKey="#{r.speciesTaxId}"
+											rowSelectMode="checkbox" draggableColumns="false"
+											scrollable="true" scrollWidth="95%" paginator="false"
+											disabledSelection="#{r.disabled}">
+											<f:facet name="header">
+												<p:outputPanel>
+													<h:outputText value="Select Species" />
+												</p:outputPanel>
+											</f:facet>
+											<p:column headerText="Select All" selectionMode="multiple"
+												exportable="false"
+												style="width:60px;text-align:center;font-size:0.75em;white-space:normal" />
+											<p:ajax event="rowSelectCheckbox"
+												listener="#{riskAssessorView.onChangeRASpeciesMenu}"
+												update="tabView:reportForm:raFinalReport" />
+											<p:ajax event="rowUnselectCheckbox"
+												listener="#{riskAssessorView.onChangeRASpeciesMenu}"
+												update="tabView:reportForm:raFinalReport" />
+											<p:ajax event="toggleSelect"
+												listener="#{riskAssessorView.onChangeRASpeciesMenu}"
+												update="tabView:reportForm:raFinalReport" />
+											<p:column headerText="Species">
+												<h:outputText
+													value="#{riskAssessorView.speciesNameType eq 0 ? r.commonName : r.scientificName}" />
+											</p:column>
+										</p:dataTable>
+									</p:column>
+								</p:row>
+
+								<p:row>
+									<p:column />
+									<p:column>
+										<p:selectOneRadio id="nameType" layout="pageDirection"
+											value="#{riskAssessorView.speciesNameType}">
+											<f:selectItem itemLabel="Common Name" itemValue="0" />
+											<f:selectItem itemLabel="Scientific Name" itemValue="1" />
+											<p:ajax event="change"
+												listener="#{riskAssessorView.handleQuerySpecies}"
+												update="speciesMenu, raFinalReport" />
+										</p:selectOneRadio>
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+
+						</p:column>
+						<p:column style="width:50%;vertical-align:top">
+							<p:panelGrid
+								style="margin-bottom:10px;margin-left:5px;font-size:1em">
+								<p:row>
+									<p:column>
+
+										<p:fieldset legend="Level 1 Info"
+											rendered="#{not empty riskAssessorView.raReport.levelOneReport}">
+											<p:panelGrid id="queryInfoGrid" autoupdate="true"
+												style="margin-bottom:10px;margin-left:5px;">
+												<p:row>
+													<p:column style="width:60%;font-size:1.25em">
+														<b><u>Level 1 Query Protein Information</u></b>
+													</p:column>
+													<p:column style="font-size:1.25em">
+														<b><u>Report Settings</u></b>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<b>SeqAPASS ID:</b> #{reportView.runId} 										</p:column>
+													<p:column>
+														<b>Report Type:</b> #{riskAssessorView.levOneReportSettings.reportType eq 'Primary' ? 'Primary' : 'Full'}
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<b>Query Species:</b> #{reportView.querySpecies}
+													</p:column>
+													<p:column>
+														<b>E-Value:</b> #{riskAssessorView.levOneReportSettings.evalueLimit}
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<b>Query Protein:</b> #{reportView.queryProtein}
+													</p:column>
+													<p:column>
+														<b>Sorted By Taxonomic Group:</b> #{riskAssessorView.levOneReportSettings.taxGroup}
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<b>Query Accession: </b>
+														<p:link
+															href="http://www.ncbi.nlm.nih.gov/protein/#{reportView.accession}"
+															value="#{reportView.accession}" target="_blank" rel="noreferrer noopener"/>
+														<a class="exit-disclaimer" style="font-size: 0.75em;"
+															href="https://www.epa.gov/home/exit-epa"
+															title="EPA's External Link Disclaimer">Exit</a>
+													</p:column>
+													<p:column>
+														<b>Common Domains:</b> #{riskAssessorView.levOneReportSettings.commonDomainLimit}
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<b>Ortholog Count:</b> #{riskAssessorView.levOneReportSettings.orthologCount}
+													</p:column>
+													<p:column>
+														<b>Species Read-Across:</b> #{reportView.convertBooleanToYN(riskAssessorView.levOneReportSettings.speciesReadAcross)}
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<b>Protein and Taxonomy Data: </b>
+														<h:outputText escape="false"
+															value="#{reportView.ncbiDate}">
+															<f:convertDateTime pattern="MM/dd/yyyy" />
+														</h:outputText>
+													</p:column>
+													<p:column>
+														<b>Cut-off %:</b>
+														<h:outputText value="#{riskAssessorView.levOneReportSettings.cutValue}">
+															<f:convertNumber pattern="#0.00" />
+														</h:outputText>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<b>BLAST Version: </b>
+														<h:outputText value="#{reportView.blastVersion}" />
+													</p:column>
+													<p:column>
+														<b>Show Only Eukaryotes: </b> #{reportView.convertBooleanToYN(riskAssessorView.levOneReportSettings.eukaryotesOnly)}
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<b>Software Version: </b>
+														<h:outputText value="#{reportView.seqapassVersion}" />
+													</p:column>
+												</p:row>
+											</p:panelGrid>
+										</p:fieldset>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:fieldset>
+											<f:facet name="legend">
+												Optional Components
+												<p:commandLink styleClass="infoBtn"
+													oncomplete="PF('infoDlg').show()"
+													action="#{reportView.populateInfoText('DSOptionalComponents')}"
+													update="DSInfoBox">
+													<p:graphicImage library="images" name="info_small.png"
+														style="border-radius:50%; width:15px; float:right;margin-left:5px;" />
+												</p:commandLink>
+											</f:facet>
+											<p:panelGrid style="margin-bottom:10px;margin-left:5px;">
+												<p:row>
+													<p:column>
+														<b><u>Component</u></b>
+													</p:column>
+													<p:column>
+														<b><u>Add to Report</u></b>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:outputLabel for="downloadLev1InfoBtn"
+															value="Level 1 Info" />
+													</p:column>
+													<p:column style="text-align:center;">
+														<p:selectBooleanCheckbox id="downloadLev1InfoBtn"
+															value="#{riskAssessorView.downloadLev1Info}" 
+															disabled="#{empty riskAssessorView.raReport.levelOneReport}"/>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:outputLabel for="downloadLev1VizBtn"
+															value="Level 1 Visualization" />
+													</p:column>
+													<p:column style="text-align:center;">
+														<p:selectBooleanCheckbox id="downloadLev1VizBtn"
+															value="#{riskAssessorView.downloadLev1Viz}"
+															disabled="#{empty riskAssessorView.raReport.lev1Boxplot}" />
+													</p:column>
+												</p:row>
+											</p:panelGrid>
+										</p:fieldset>
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+
+			<p:panel id="raLevel2Report" header="Level 2 Report">
+				<f:facet name="actions">
+					<p:commandLink styleClass="infoBtn"
+						oncomplete="PF('infoDlg').show();"
+						action="#{reportView.populateInfoText('DSLevel2')}"
+						update="DSInfoBox">
+						<p:graphicImage library="images" name="info_small.png"
+							style="border-radius:50%; width:15px; float:right" />
+					</p:commandLink>
+				</f:facet>
+				<p:panel style="text-align:center;border:none"
+					rendered="#{empty riskAssessorView.level2Groups}">
+					<h:outputText value="No Level 2 Report(s) Loaded" />
+				</p:panel>
+				<p:panelGrid id="level2Grid"
+					rendered="#{not empty riskAssessorView.level2Groups}">
+					<p:row>
+						<p:column style="font-size:0.75em">
+							<p:dataTable id="domainsMenu" var="r"
+								value="#{riskAssessorView.level2Groups}"
+								emptyMessage="No entries found with given criteria"
+								resizableColumns="true" draggableColumns="false"
+								scrollable="true" scrollWidth="100%" paginator="false">
+
+								<f:facet name="header">
+									<p:outputPanel>
+										<h:outputText value="Select Level 2 Domains" />
+									</p:outputPanel>
+								</f:facet>
+								<p:columnGroup type="header">
+									<p:row>
+
+										<p:column rowspan="2" headerText="Domain" />
+										<p:column colspan="3" headerText="Optional Components"
+											style="width:280px" />
+									</p:row>
+									<p:row>
+										<p:column headerText="Add To &#10; Report Table"
+											escape="false" style="white-space:pre-line;" />
+										<p:column headerText="Add Info &#10; to Report" escape="false"
+											style="white-space:pre-line;" />
+										<p:column headerText="Add Visualization &#10; to Report"
+											escape="false" style="white-space:pre-line;" />
+									</p:row>
+								</p:columnGroup>
+								<p:column>
+									<h:outputText value="#{r.info.displayText}" />
+								</p:column>
+								<p:column
+									style="width:80px;text-align:center;font-size:0.75em;white-space:normal">
+									<p:selectBooleanCheckbox value="#{r.downloadTable}"
+										disabled="#{empty r.report}">
+										<p:ajax listener="#{riskAssessorView.updateRAReport}"
+											update="tabView:reportForm:raFinalReport" />
+									</p:selectBooleanCheckbox>
+								</p:column>
+								<p:column
+									style="width:80px;text-align:center;font-size:0.75em;white-space:normal">
+									<p:selectBooleanCheckbox value="#{r.downloadInfo}"
+										disabled="#{empty r.report}" />
+								</p:column>
+								<p:column
+									style="width:80px;text-align:center;font-size:0.75em;white-space:normal">
+									<p:selectBooleanCheckbox value="#{r.downloadViz}"
+										disabled="#{empty r.boxPlot}" />
+								</p:column>
+							</p:dataTable>
+						</p:column>
+						<p:column />
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+
+			<p:panel id="raLevel3Report" header="Level 3 Report">
+				<f:facet name="actions">
+					<p:commandLink styleClass="infoBtn"
+						oncomplete="PF('infoDlg').show();"
+						action="#{reportView.populateInfoText('DSLevel3')}"
+						update="DSInfoBox">
+						<p:graphicImage library="images" name="info_small.png"
+							style="border-radius:50%; width:15px; float:right" />
+					</p:commandLink>
+				</f:facet>
+				<p:panel style="text-align:center;border:none"
+					rendered="#{empty riskAssessorView.raReport.levelThreeReport and empty riskAssessorView.raReport.lev3Heatmap}">
+					<h:outputText value="No Level 3 Report or Visualization Loaded" />
+				</p:panel>
+				<p:panelGrid id="level3Grid" autoupdate="true"
+					style="margin-bottom:10px;margin-left:5px;font-size:0.75em;width:100%"
+					rendered="#{not empty riskAssessorView.raReport.levelThreeReport or not empty riskAssessorView.raReport.lev3Heatmap}">
+
+					<p:row>
+					</p:row>
+					<p:row>
+						<p:column rowspan="2" style="width:50%">
+							<p:fieldset legend="Level 3 Info">
+								<p:panelGrid
+									style="margin-bottom:10px;margin-left:5px;width:100%;"
+									rendered="#{empty riskAssessorView.raReport.levelThreeReport}">
+									<p:row>
+										<p:column>
+											<h:outputText value="No Level 3 Report Loaded" />
+										</p:column>
+									</p:row>
+								</p:panelGrid>
+								<p:panelGrid id="templateInfoGrid" autoupdate="true"
+									style="margin-bottom:10px;margin-left:5px;width:100%;"
+									rendered="#{not empty riskAssessorView.raReport.levelThreeReport}">
+
+									<p:row>
+										<p:column>
+											<b>SeqAPASS ID:</b> #{reportView.runId}
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<b>Template Species:</b> #{riskAssessorView.raReport.levelThreeTemplateSpecies}
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<b>Template Protein:</b> #{riskAssessorView.raReport.levelThreeTemplateProtein}
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<b>Protein and Taxonomy Data: </b>
+											<h:outputText escape="false" value="#{reportView.ncbiDate}">
+												<f:convertDateTime pattern="MM/dd/yyyy" />
+											</h:outputText>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<b>BLAST Version: </b>
+											<h:outputText value="#{reportView.blastVersion}" />
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<b>Software Version: </b>
+											<h:outputText value="#{reportView.seqapassVersion}" />
+										</p:column>
+									</p:row>
+								</p:panelGrid>
+							</p:fieldset>
+						</p:column>
+						<p:column style="width:50%">
+
+							<p:fieldset legend="Selected Amino Acids"
+								rendered="#{not empty riskAssessorView.raReport.levelThreeReport}">
+								<h:outputText style="font-size:1em"
+									value="#{riskAssessorView.formatSelectedAminoAcids()}" />
+							</p:fieldset>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:fieldset>
+								<f:facet name="legend">
+												Optional Components
+												<p:commandLink styleClass="infoBtn"
+										oncomplete="PF('infoDlg').show()"
+										action="#{reportView.populateInfoText('DSOptionalComponents')}"
+										update="DSInfoBox">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px; float:right;margin-left:5px;" />
+									</p:commandLink>
+								</f:facet>
+								<p:panelGrid style="margin-bottom:10px;margin-left:5px;">
+									<p:row>
+										<p:column>
+											<b><u>Component</u></b>
+										</p:column>
+										<p:column>
+											<b><u>Add to Report</u></b>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel for="downloadLev3ReportBtn"
+												value="Level 3 Report" />
+										</p:column>
+										<p:column style="text-align:center;">
+											<p:selectBooleanCheckbox id="downloadLev3ReportBtn"
+												value="#{riskAssessorView.downloadLev3report}"
+												disabled="#{empty riskAssessorView.raReport.levelThreeReport}">
+												<p:ajax listener="#{riskAssessorView.updateRAReport}"
+													update="tabView:reportForm:raFinalReport" />
+											</p:selectBooleanCheckbox>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel for="downloadLev3InfoBtn" value="Level 3 Info" />
+										</p:column>
+										<p:column style="text-align:center;">
+											<p:selectBooleanCheckbox id="downloadLev3InfoBtn"
+												value="#{riskAssessorView.downloadLev3Info}"
+												disabled="#{empty riskAssessorView.raReport.levelThreeReport}" />
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel for="downloadLev3VizBtn"
+												value="Level 3 Visualization" />
+										</p:column>
+										<p:column style="text-align:center;">
+											<p:selectBooleanCheckbox id="downloadLev3VizBtn"
+												value="#{riskAssessorView.downloadLev3Viz}"
+												disabled="#{empty riskAssessorView.raReport.lev3Heatmap}" />
+										</p:column>
+									</p:row>
+								</p:panelGrid>
+							</p:fieldset>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+
+			<p:panel id="raFinalReport" header="Final Decision Summary Report">
+				<f:facet name="actions">
+					<p:commandLink styleClass="infoBtn"
+						oncomplete="PF('infoDlg').show();"
+						action="#{reportView.populateInfoText('DSFinal')}"
+						update="DSInfoBox">
+						<p:graphicImage library="images" name="info_small.png"
+							style="border-radius:50%; width:15px; float:right" />
+					</p:commandLink>
+				</f:facet>
+				<p:panel style="text-align:center;border:none"
+					rendered="#{empty riskAssessorView.raReport.levelOneReport}">
+					<h:outputText value="Requires Level 1 Report" />
+				</p:panel>
+				<p:dataTable id="reportRATableId" var="r" widgetVar="RATable"
+					value="#{riskAssessorView.raReport.report}"
+					emptyMessage="No entries found with given criteria"
+					filteredValue="#{riskAssessorView.filteredRAReport}"
+					resizableColumns="true" draggableColumns="false" scrollable="true"
+					scrollWidth="95%" paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+					paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50"
+					rendered="#{not empty riskAssessorView.raReport.levelOneReport}">
+					<f:facet name="header">
+						<p:outputPanel>
+							<h:outputText value="Search:" />
+							<p:inputText id="globalFilter" onkeyup="PF('RATable').filter()"
+								style="width:150px" placeholder="Enter keyword" />
+						</p:outputPanel>
+					</f:facet>
+					<f:facet name="{Exporters}">
+						<h:panelGroup>
+							<h:outputText value="Download Table:" />
+							<h:commandLink>
+								<p:graphicImage id="excelIcon" library="images" name="excel.png" />
+								<p:dataExporter type="xls" target="reportRATableId"
+									fileName="SeqAPASS_DS_Report" />
+								<p:tooltip id="excelIconTip" for="excelIcon"
+									value="Download table in excel(.xls) format" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage id="csvIcon" library="images" name="csv.png" />
+								<p:dataExporter type="csv" target="reportRATableId"
+									fileName="SeqAPASS_DS_Report" />
+								<p:tooltip id="csvIconTip" for="csvIcon"
+									value="Download table in csv format" />
+							</h:commandLink>
+						</h:panelGroup>
+					</f:facet>
+					<p:column headerText="Data Version"
+						style="width:80px;text-align:center;font-size:0.75em;white-space:normal">
+						<h:outputText value="#{r.dataVersion}" />
+					</p:column>
+					<p:column headerText="NCBI Accession" sortBy="#{r.accession}"
+						filterBy="#{r.accession}" filterStyle="display:none"
+						style="width:150px;text-align:center;font-size:0.75em"
+						exportFunction="#{reportView.exportLink}">
+						<p:link href="http://www.ncbi.nlm.nih.gov/protein/#{r.accession}"
+							value="#{r.accession}" target="_blank" rel="noreferrer noopener"/>
+					</p:column>
+					<p:column headerText="Filtered Taxonomic Group"
+						sortBy="#{r.filteredTaxGroup}" filterBy="#{r.filteredTaxGroup}"
+						style="width:120px;text-align:center;font-size:0.75em;white-space:normal"
+						filterStyle="display:none">
+						<h:outputText value="#{r.filteredTaxGroup}" />
+					</p:column>
+					<p:column headerText="Species" sortBy="#{riskAssessorView.speciesNameType eq 0 ? r.commonName : r.scientificName}"
+						filterBy="#{riskAssessorView.speciesNameType eq 0 ? r.commonName : r.scientificName}"
+						style="width:120px;text-align:center;font-size:0.75em;white-space:normal"
+						filterStyle="display:none">
+						<h:outputText
+							value="#{riskAssessorView.speciesNameType eq 0 ? r.commonName : r.scientificName}" />
+					</p:column>
+					<p:column headerText="Protein" sortBy="#{r.protein}"
+						filterBy="#{r.protein}"
+						style="width:400px;text-align:center;font-size:0.75em;white-space:normal"
+						filterStyle="display:none">
+						<h:outputText value="#{r.protein}" />
+					</p:column>
+					<p:column headerText="Level 1 Susceptible (Y/N)"
+						sortBy="#{r.susceptible}" filterBy="#{r.susceptible}"
+						style="width:100px;text-align:center;font-size:0.75em;white-space:normal"
+						filterStyle="display:none">
+						<h:outputText value="#{r.susceptible}" />
+					</p:column>
+					<p:columns value="#{riskAssessorView.level2RunHeaders}" var="id"
+						headerText="#{id}" escape="false"
+						style="width:80px;text-align:center;font-size:0.75em;white-space:normal">
+						<h:outputText value="#{r.level2Run[id]}" />
+					</p:columns>
+					<p:column headerText="Level 3 Template"
+						style="width:100px;text-align:center;font-size:0.75em;white-space:normal"
+						rendered="#{riskAssessorView.downloadLev3report}">
+						<h:outputText
+							value="#{riskAssessorView.raReport.levelThreeTemplateSpecies}" />
+					</p:column>
+					<p:column headerText="Level 3 Amino Acids (Y/N)"
+						style="width:100px;text-align:center;font-size:0.75em;white-space:normal"
+						rendered="#{riskAssessorView.downloadLev3report}">
+						<h:outputText value="#{r.level3Susceptible}" />
+					</p:column>
+
+				</p:dataTable>
+			</p:panel>
+			
+			<p:panelGrid style="margin-bottom:10px;margin-left:5px;">
+				<p:row>
+					<p:column>
+						<p:commandButton id="triggerDownload" value="Download DS Report"
+							ajax="false" icon="ui-icon-arrowthick-1-s"
+							style="color:black;background-color:#5585bf;margin-top:30px;"
+							disabled="#{empty riskAssessorView.raReport.levelOneReport}">
+							<p:fileDownload value="#{riskAssessorView.downloadRAReport()}" />
+						</p:commandButton>
+					</p:column>
+					<p:column>
+						<p:commandLink oncomplete="PF('infoDlg').show();"
+							action="#{reportView.populateInfoText('DownloadDSReport')}"
+							update="DSInfoBox">
+							<p:graphicImage library="images" name="info_small.png"
+								style="border-radius:50%; width:15px" />
+						</p:commandLink>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+
+
+		</p:panel>
+
+
+		<p:dialog id="DSInfoBox" widgetVar="infoDlg" modal="true"
+			draggable="true" closable="true" resizable="true" showHeader="true"
+			header="#{reportView.infoHeaderText}" width="50%" fitViewport="true">
+			<h:outputText value="#{reportView.infoText}" escape="False" />
+		</p:dialog>
+
+		<p:remoteCommand name="onPageLoad"
+			action="#{riskAssessorView.onPageLoad}" autoRun="true"
+			update="speciesMenu" />
+
+
+	</ui:composition>
+</body>
+</html>

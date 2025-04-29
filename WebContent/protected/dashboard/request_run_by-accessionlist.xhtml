@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog modal="true" widgetVar="statusDialog3"
+		style="position:absolute;left:400px;top:400px;"
+		header="Processing request ... Please wait" draggable="false"
+		closable="false" resizable="False">
+		<p:graphicImage library="images" name="status.gif" />
+	</p:dialog>
+
+	<p:panel id="mainAccessionPanel" header="SeqAPASS Submission"
+		styleClass="searchPanelContent">
+		<f:facet name="actions">
+			<p:commandLink styleClass="infoBtn" 
+				oncomplete="PF('infoRunDlg').show();" action="#{reportView.populateInfoText('submitByAccession')}" update="infoDlg">
+				<p:graphicImage library="images" name="info_small.png" style="border-radius:50%; width:15px; float:right;"/>
+			</p:commandLink>
+		</f:facet>
+		<p:panelGrid id="AccessionPanel"
+			style="margin-bottom:10px;margin-left:0px;" cellpadding="5">
+			<p:row>
+				<p:column />
+				<p:column>
+					<p:link id="proteinLink" href="http://www.ncbi.nlm.nih.gov/protein"
+						value="NCBI Protein Database" target="_blank" rel="noreferrer noopener"
+						style="font-size:0.75em" /><a class="exit-disclaimer" style="font-size:0.75em;" href="https://www.epa.gov/home/exit-epa" title="EPA's External Link Disclaimer">Exit</a>
+					<p:tooltip id="proteinLinkTip" for="proteinLink" value="Explore proteins in database"/>	
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column style="width:250px; text-align:right; vertical-align:top;">
+					<p:outputLabel value="NCBI Protein Accession:" for="accessionBox" />
+				</p:column>
+				<p:column>
+					<p:inputTextarea id="accessionBox"
+						value="#{requestRunView.inputText}" rows="6" cols="33" />
+					<p:tooltip id="accessionBoxTip" for="accessionBox"
+						showEvent="focus" hideEvent="blur">
+						<h:outputText value="Example: NP_000116.2" />
+					</p:tooltip>
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+		<h:panelGrid autoupdate="true" columns="2"
+			style="margin-bottom:10px;margin-left:0px;" cellpadding="5">
+			<p:commandButton id="requestAccessionRunButton" value="Request Run"
+				styleClass="custom-small-button"
+				actionListener="#{requestRunView.requestRunByAccButton}"
+				update="growl, :tabView:requestRunForm:accessionBox"
+				onclick="javascript:window.scrollTo(0,0)"
+				onstart="PF('statusDialog3').show();"
+				oncomplete="PF('statusDialog3').hide()">
+			</p:commandButton>
+			<p:commandButton id="clearAccessionsButton" value="Clear"
+				styleClass="custom-small-button"
+				actionListener="#{requestRunView.clearAccListButton}"
+				update="mainAccessionPanel" />
+		</h:panelGrid>
+	</p:panel>
+
+</ui:composition>

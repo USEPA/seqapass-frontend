@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+
+		<p:dataTable id="reportSaveTableId" var="r"
+			value="#{reportView.reportList}" widgetVar="mainSaveReportTable"
+			emptyMessage="No entries found with given criteria"
+			filteredValue="#{reportView.filteredDownloadList}"
+			selection="#{reportView.selectedReports}" rowKey="#{r.key}" rowSelectMode="checkbox"
+			sortBy="#{r.runId}" sortOrder="descending" resizableColumns="true"
+			draggableColumns="false" scrollable="true" scrollWidth="95%"
+			paginator="true"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+			<f:facet name="header">
+				<p:outputPanel>
+					<h:outputText value="Search:" />
+					<p:inputText id="globalFilter"
+						onkeyup="PF('mainSaveReportTable').filter()" style="width:150px"
+						placeholder="Enter keyword" />
+				</p:outputPanel>
+			</f:facet>
+			
+
+			<p:column selectionMode="multiple" style="width:16px;text-align:center" />
+			<p:column headerText="SeqAPASS Run Id" sortBy="#{r.runId}"
+				style="width:100px;text-align:center;font-size:0.75em;white-space:normal">
+				<h:outputText value="#{r.runId}" />
+			</p:column>
+			<p:column headerText="Data Version" sortBy="#{r.reportInfo.updateVersion}"
+				style="width:100px;text-align:center;font-size:0.75em;white-space:normal">
+				<h:outputText id="updateCol" value="#{r.reportInfo.updateVersion}" />
+				<p:tooltip for="updateCol" >
+					<h:panelGroup style="font-size:0.75em">
+					    <b>Install Date: </b>
+						<h:outputText value="#{r.reportInfo.installDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy hh:mm a" />
+						</h:outputText><br/>
+						<b>Blast+ Version: </b> #{r.reportInfo.blastVersion}<br/>
+						<b>CDD Data: </b>
+						<h:outputText value="#{r.reportInfo.cddDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy hh:mm a" />
+						</h:outputText><br/> 
+						<b>Cobalt Version: </b>#{r.reportInfo.cobaltVersion}<br/>
+						<b>Cobalt Data: </b>
+						<h:outputText value="#{r.reportInfo.cobaltDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy hh:mm a" />
+						</h:outputText><br/>
+						<b>Data Version:</b>#{r.reportInfo.seqapassVersion}
+					</h:panelGroup>
+				</p:tooltip>
+			</p:column>
+			<p:column headerText="Ortholog Count" sortBy="#{r.orthologCnt}"
+				style="width:110px;text-align:center;font-size:0.75em;white-space:normal">
+				<h:outputText value="#{r.orthologCnt &lt; 0 ? '-' : r.orthologCnt}" />
+			</p:column>
+			<p:column headerText="Level 1 Query Accession" sortBy="#{r.accession}"
+				filterBy="#{r.accession}" filterStyle="display:none"
+				style="width:150px;text-align:center;font-size:0.75em;white-space:normal">
+				<h:outputText value="#{r.accession}" />
+			</p:column>
+			<p:column headerText="Query Protein Name" sortBy="#{r.queryProtein}"
+				filterBy="#{r.queryProtein}" filterStyle="display:none"
+				style="width:400px;text-align:center;font-size:0.75em">
+				<h:outputText value="#{r.queryProtein}"
+					styleClass="#{reportView.highlightPartials==true ? (r.partialProtein==true ? 'partialProtein' : null) : null}" />
+			</p:column>
+			<p:column headerText="NCBI Taxonomy ID" sortBy="#{r.taxID}"
+				style="width:110px;text-align:center;font-size:0.75em;white-space:normal">
+				<h:outputText value="#{r.taxID}" />
+			</p:column>
+			<p:column headerText="Query Species Name"
+				sortBy="#{r.querySpeciesName}" filterBy="#{r.querySpeciesName}"
+				filterStyle="display:none"
+				style="width:300px;text-align:center;font-size:0.75em">
+				<h:outputText value="#{r.querySpeciesName}" />
+			</p:column>
+			<p:column headerText="Query Common Name"
+				sortBy="#{r.queryCommonName}" filterBy="#{r.queryCommonName}"
+				filterStyle="display:none"
+				style="width:200px;text-align:center;font-size:0.75em">
+				<h:outputText value="#{r.queryCommonName}" />
+			</p:column>
+			<p:column headerText="Taxonomy" sortBy="#{r.taxonomy}"
+				filterBy="#{r.taxonomy}" filterStyle="display:none"
+				style="width:200px;text-align:center;font-size:0.75em">
+				<h:outputText value="#{r.taxonomy}" />
+			</p:column>
+			
+		</p:dataTable>
+
+	</ui:composition>
+</body>
+</html>

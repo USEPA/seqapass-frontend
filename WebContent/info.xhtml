@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<head>
+<!-- force IE to render to use the highest compatibility mode -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!-- Exlipse standard settings - COMMENTED OUT -->
+<!-- <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> -->
+<title>SeqAPASS Login Index</title>
+</head>
+
+
+<h:body>
+	<ui:composition template="/WEB-INF/templates/drupal.xhtml">
+		<ui:define name="title">
+		About SeqAPASS
+	</ui:define>
+	
+	<ui:define name="header">
+			<h:form id="aboutForm">
+			<h:panelGrid columns="2" cellpadding="10" styleClass="seq_mainHeader"
+				columnClasses="seq_header-left-column,seq_header-right-column">
+				<p:column/>
+				<p:column>
+					<p:commandLink id="LoginLink" action="#{loginController.logout}"
+						ajax="false" style="color:#ffffff">
+						<h:outputText value="Log In" />
+					</p:commandLink>
+				</p:column>
+			</h:panelGrid>
+		</h:form>
+		</ui:define>
+
+
+		<ui:define name="content">
+			<ui:include src="about.xhtml"/>
+		</ui:define>
+	</ui:composition>
+</h:body>
+
+</html>

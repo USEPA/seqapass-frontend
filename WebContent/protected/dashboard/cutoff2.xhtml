@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<head>
+<!-- force IE to render to use the highest compatibility mode -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!-- Exlipse standard settings - COMMENTED OUT -->
+<!-- <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> -->
+<title>Level 2 Cutoff</title>
+</head>
+
+
+<h:body>
+	<a id="cutWin2" />
+	<ui:composition template="/WEB-INF/templates/main.xhtml">
+		<ui:define name="title">
+		Level 2 Cutoff
+	</ui:define>
+		<ui:define name="header">
+			<h:form id="headerForm">
+				<h:panelGrid columns="2" cellpadding="10" styleClass="mainHeader"
+					columnClasses="header-left-column,header-right-column">
+					<p:column>Sequence Alignment to Predict Across Species Susceptibility (SeqAPASS)</p:column>
+					<p:column>
+						<p:commandLink id="LogoutLink" action="#{loginController.logout}"
+							ajax="false" style="color:#ffffff">
+							<h:outputText value="Log out" />
+						</p:commandLink>
+					</p:column>
+				</h:panelGrid>
+			</h:form>
+		</ui:define>
+
+		<ui:define name="content">
+			<h:form id="cutoffForm2">
+
+				<p:growl id="growl" showDetail="false" sticky="false" life="10000" />
+				<p:panel id="LevelTwoCutoffPanel"
+					header="Level 2 Susceptibility Cut-off: #{reportView.levelTwoReportType} Report"
+					styleClass="searchPanelContent">
+					<h:outputText style="font-size:0.75em"
+						value="Local minimums are identified and susceptibility cut-off is set based on % similarity of next ortholog candidate. Use update cut-off button to go back to Level 2 data." />
+					<p:panelGrid id="queryInfoGrid" autoupdate="true"
+						style="margin-bottom:10px;margin-left:5px;font-size:0.75em">
+						<p:row>
+							<p:column style="width:20%">
+								<b>SeqAPASS ID:</b> #{reportView.runId}</p:column>
+							<p:column style="width:30%">
+								<b>Query Accession: </b>
+								<p:link
+									href="http://www.ncbi.nlm.nih.gov/protein/#{reportView.accession}"
+									value="#{reportView.accession}" target="_blank" rel="noreferrer noopener"/>
+							</p:column>
+							<p:column style="width:25%">
+								<b>Ortholog Count:</b> #{reportView.level2_ortholog_count}</p:column>
+							<p:column style="width:25%">
+								<b>Protein and Taxonomy Data: </b>
+								<h:outputText escape="false" value="#{reportView.ncbiDate}">
+									<f:convertDateTime pattern="MM/dd/yyyy" />
+								</h:outputText>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column colspan="3">
+								<b>Query Species:</b> #{reportView.querySpecies}
+						</p:column>
+							<p:column>
+								<b>BLAST Version: </b>
+								<h:outputText value="#{reportView.blastVersion}" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column colspan="3">
+								<b>Query Domain: </b> #{reportView.selectedCompletedDomainLoc} <p:link
+									href="http://www.ncbi.nlm.nih.gov/Structure/cdd/cddsrv.cgi?ascbin=8&amp;maxaln=10&amp;seltype=2&amp;uid=#{reportView.selectedCompletedDomainId}"
+									value="#{reportView.selectedCompletedDomainId}" target="_blank" rel="noreferrer noopener"/> , #{reportView.selectedCompletedDomainName} #{reportView.selectedCompletedDomainInfo}
+					</p:column>
+							<p:column>
+								<b>CDD Data: </b>
+								<h:outputText escape="false" value="#{reportView.cddDate}">
+									<f:convertDateTime pattern="MM/dd/yyyy" />
+								</h:outputText>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column colspan="3">
+								<b>Query Protein:</b> #{reportView.queryProtein}
+					</p:column>
+							<p:column>
+								<b>Software Version: </b>
+								<h:outputText value="#{reportView.seqapassVersion}" />
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+
+					<p:panelGrid id="levelInfoPanels">
+						<p:row>
+							<p:column>
+								<p:outputLabel for="selectCutoffMenu" value="Select Cut-off:" />
+							</p:column>
+							<p:column>
+								<p:selectOneMenu id="selectCutoffMenu" widgetVar="cutoff2Menu"
+									value="#{reportView.chosenLevelTwoCutoffOption}"
+									style="width:500px;white-space: nowrap;font-size:0.75em">
+									<f:selectItem
+										itemLabel="Default: Identify 1st local minimum and find next ortholog candidate"
+										itemValue="1" />
+									<f:selectItem
+										itemLabel="2 minimum: Identify 2nd local minimum and find next ortholog candidate"
+										itemValue="2" />
+									<f:selectItem itemLabel="User defined cut-off" itemValue="3" />
+									<p:ajax event="change" render="cutoffInput"
+										update="LevelTwoCutoffPanel"
+										listener="#{reportView.setLevTwoCutoffField}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column>
+								<p:outputLabel for="cutoffInput" value="Enter Cut-off: " />
+								<p:inputText id="cutoffInput"
+									value="#{reportView.userDefinedLevTwoCut}"
+									disabled="#{reportView.chosenLevelTwoCutoffOption != 3}">
+									<f:validateDoubleRange minimum="1" maximum="100" />
+
+								</p:inputText>
+							</p:column>
+							<p:column style="padding-right:0px; padding-left:0px; text-align: right">
+								<p:commandLink oncomplete="PF('infoDlg').show();"
+									action="#{reportView.populateInfoText('selectCutoff')}"
+									update="cutoff2InfoBox">
+									<p:graphicImage library="images" name="info_small.png"
+										style="border-radius:50%; width:15px" />
+								</p:commandLink>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:commandButton id="updateCutoffButton" value="Update Cut-off"
+									styleClass="custom-small-button"
+									actionListener="#{reportView.updateLevTwoCutoff}"
+									oncomplete="updateFromCutoffChange(2)"
+									update="growl" />
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+
+
+				<p:panel id="densityPlotPanel2" header="Density Plot"
+					styleClass="searchPanelContent">
+					<f:facet name="actions">
+						<p:commandLink styleClass="infoBtn"
+							oncomplete="PF('infoDlg').show();"
+							action="#{reportView.populateInfoText('densityPlot')}"
+							update="cutoff2InfoBox">
+							<p:graphicImage library="images" name="info_small.png"
+									style="border-radius:50%; width:15px; float:right;" />
+						</p:commandLink>
+					</f:facet>
+					<p:panelGrid id="densityGrid" columns="2" styleClass="no-border"
+						columnClasses="no-border,no-border">
+						<p:dataTable id="cutoffTableId2" var="r"
+							value="#{reportView.levelTwoCutoffs}" resizableColumns="true"
+							draggableColumns="true" style="width:250px"
+							rowIndexVar="rowIndex">
+							<p:column 
+								style="width:50px;text-align:center;font-size:0.75em;">
+								<f:facet name="header">
+									<h:outputText value="Cut-off&lt;br/&gt;#" escape="false" style="white-space:pre-line;"/>
+								</f:facet>
+								<h:outputText value="#{rowIndex+1}" />
+							</p:column>
+							<p:column headerText="Susceptibility&lt;br/&gt;Cut-off"
+								style="width:100px;text-align:center;font-size:0.75em;">
+								<f:facet name="header">
+									<h:outputText value="Susceptibility&lt;br/&gt;Cut-off" escape="false" style="white-space:pre-line;"/>
+								</f:facet>
+								<h:outputText value="#{r}">
+									<f:convertNumber pattern="#0.00" />
+								</h:outputText>
+							</p:column>
+						</p:dataTable>
+						<p:chart type="line" model="#{reportView.levelTwoDensityModel}"
+							style="height:600px;width:600px" />
+					</p:panelGrid>
+				</p:panel>
+				
+				<script>
+					jQuery(document).ready(function() {
+						localStorage.setItem('_cut2', 'true');
+					});
+				</script>
+				
+				<script>
+					$(window).unload(function() {
+						localStorage.removeItem('_cut2');
+					});
+				</script>
+				
+				<p:dialog id="cutoff2InfoBox" widgetVar="infoDlg" modal="true"
+					draggable="true" closable="true" resizable="true" showHeader="true"
+					header="#{reportView.infoHeaderText}" width="50%" fitViewport="true">
+					<h:outputText style="font-size:1.2em;" value="#{reportView.infoText}" escape="False" />
+				</p:dialog>
+				
+				<p:growl id="sessionGrowl" widgetVar="sessionGrowlWidget" showDetail="true" sticky="true"/>
+				
+				<p:idleMonitor timeout="600000">
+					<p:ajax event="idle" listener="#{tabView.onIdle}"
+						oncomplete="startTimer();" update="sessionGrowl" />
+					<p:ajax event="active" listener="#{tabView.onActive}"
+						oncomplete="killTimer();killTimerParent();" update="sessionGrowl" />
+				</p:idleMonitor>
+				
+				<p:remoteCommand name="pingBE" action="#{tabView.onActive}" />
+				<p:remoteCommand name="endSession" action="#{tabView.endSession}" />
+				
+				<script>
+					window.onload = function() {
+						sessionOnLoad();
+					}
+				</script>
+
+			</h:form>
+		</ui:define>
+	</ui:composition>
+</h:body>
+
+</html>

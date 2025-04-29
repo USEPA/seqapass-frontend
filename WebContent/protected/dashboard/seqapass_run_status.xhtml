@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+		<h:form>
+
+			<p:dialog widgetVar="statusDialog1" modal="true" draggable="false"
+				closable="false" resizable="false" showHeader="false">
+				<p:panelGrid>
+					<p:row>
+						<p:column style="text-align:center">
+								Querying Database...
+							</p:column>
+					</p:row>
+					<p:row>
+						<p:column style="text-align:center">
+							<p:graphicImage library="images" name="spinner.gif" />
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column style="text-align:center">
+								Please Wait
+							</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:dialog>
+
+			<h:panelGrid columns="3" cellpadding="10" styleClass="menuBar"
+				columnClasses="left-column,center-column,right-column">
+				<p:column>SeqAPASS Run Status</p:column>
+				<p:column>Version #{userLoginView.updateInfo.get(0).getSeqapassVersion()}</p:column>
+				<p:column>Logged in as: #{userLoginView.username}</p:column>
+			</h:panelGrid>
+
+			<p:panel id="status_level" style="margin:20px; padding:0;">
+				<p:panelGrid cellpadding="10">
+					<p:row>
+						<p:column style="width:200px">
+							<p:selectOneRadio id="statusLevelRadio" layout="pageDirection"
+								style="text-align: left; font-size:0.75em"
+								value="#{statusView.statusLevel}">
+								<f:selectItem itemLabel="Level 1 Status" itemValue="1" />
+								<f:selectItem itemLabel="Level 2 Status" itemValue="2" />
+								<f:selectItem itemLabel="Level 3 Status" itemValue="3" />
+								<f:selectItem itemLabel="Level 4 Status" itemValue="4" />
+								<p:ajax event="change" execute="@this"
+									listener="#{statusView.changeStatusLevel()}"
+									render="statusLevelRadio" update="newStatusPanel"
+									onstart="PF('statusDialog1').show();"
+									onsuccess="PF('statusDialog1').hide()" />
+							</p:selectOneRadio>
+						</p:column>
+						<p:column>
+							<p:commandButton id="refreshStatusTable" value="Refresh Data"
+								action="#{statusView.refreshButton}"
+								styleClass="custom-small-button" update="newStatusPanel"
+								onstart="PF('statusDialog1').show();"
+								onsuccess="PF('statusDialog1').hide()">
+							</p:commandButton>
+						</p:column>
+					</p:row>
+
+				</p:panelGrid>
+			</p:panel>
+
+			<p:panel id="newStatusPanel" autoupdate="true"
+				styleClass="searchPanel">
+				<ui:include src="#{statusView.getStatusPage()}" />
+			</p:panel>
+
+			<p:commandButton value="Top of Page"
+				onclick="javascript:window.scrollTo(0,0)" />
+
+			<p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
+				<p:commandButton value="Yes" type="button"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+				<p:commandButton value="No" type="button"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
+
+			<p:remoteCommand name="reloadTable"
+				action="#{statusView.refreshAndResetStatus}" update="newStatusPanel"
+				autoRun="true" onstart="PF('statusDialog1').show();"
+				onsuccess="PF('statusDialog1').hide()" />
+
+
+
+		</h:form>
+
+	</ui:composition>
+</body>
+</html>

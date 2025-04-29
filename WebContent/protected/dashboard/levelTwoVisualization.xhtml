@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<head>
+<!-- force IE to render to use the highest compatibility mode -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!-- Exlipse standard settings - COMMENTED OUT -->
+<!-- <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> -->
+<title>Visualization</title>
+</head>
+
+
+<h:body>
+	<a id="vizWin2" />
+	<ui:composition template="/WEB-INF/templates/main.xhtml">
+		<ui:define name="title">
+		Visualization for Level Two Report: #{reportView.selectedCompletedDomainId}
+		</ui:define>
+		<ui:define name="header">
+			<h:form id="headerForm">
+				<h:panelGrid columns="2" cellpadding="10" styleClass="mainHeader"
+					columnClasses="header-left-column,header-right-column">
+					<p:column>Sequence Alignment to Predict Across Species Susceptibility (SeqAPASS)</p:column>
+				</h:panelGrid>
+			</h:form>
+		</ui:define>
+
+		<ui:define name="content">
+			<h:form id="levTwoVizForm">
+				<p:dialog widgetVar="loadDialogVizTwo" modal="true"
+					draggable="false" closable="false" resizable="false"
+					showHeader="false">
+					<p:panelGrid>
+						<p:row>
+							<p:column style="text-align:center">
+								Loading...
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column style="text-align:center">
+								<p:graphicImage library="images" name="spinner.gif" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column style="text-align:center">
+								Please Wait
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:dialog>
+				<h:panelGroup layout="block" id="viz2Header">
+					<h1>Level Two Visualization - #{reportView.levelTwoReportType}
+						Report</h1>
+				</h:panelGroup>
+				<p:panel id="levTwoVizInfoPanel" widgetVar="levTwoVizWidget"
+					header="Level 1 Query Protein Information"
+					style="margin-bottom: 20px; min-width: 800px;">
+					<p:panelGrid id="levOneVizInfoGrid" autoupdate="true"
+						style="margin-bottom:10px;margin-left:5px;font-size:0.75em">
+						<p:row>
+							<p:column style="width:20%">
+								<b>SeqAPASS ID:</b> #{reportView.runId}</p:column>
+							<p:column style="width:30%">
+								<b>Query Accession: </b>
+								<p:link
+									href="http://www.ncbi.nlm.nih.gov/protein/#{reportView.accession}"
+									value="#{reportView.accession}" target="_blank" rel="noreferrer noopener"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column colspan="3">
+								<b>Query Species:</b> #{reportView.querySpecies}
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<b>Ortholog Count:</b> #{reportView.ortholog_count}
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column colspan="3">
+								<b>Query Domain: </b> #{reportView.selectedCompletedDomainLoc} <p:link
+									href="http://www.ncbi.nlm.nih.gov/Structure/cdd/cddsrv.cgi?ascbin=8&amp;maxaln=10&amp;seltype=2&amp;uid=#{reportView.selectedCompletedDomainId}"
+									value="#{reportView.selectedCompletedDomainId}" target="_blank" rel="noreferrer noopener"/> , #{reportView.selectedCompletedDomainName} #{reportView.selectedCompletedDomainInfo}
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+				<p:panel id="level2DockPanel"
+					header="Select to Open Information or Data Visualization"
+					style="text-align:center;height:175px; position:relative">
+					<f:facet name="actions">
+						<p:commandLink styleClass="infoBtn"
+							oncomplete="PF('infoDlg').show();"
+							action="#{reportView.populateInfoText('selectVis')}"
+							update="vis2InfoBox">
+							<p:graphicImage library="images" name="info_small.png"
+									style="border-radius:50%; width:15px; float:right;" />
+						</p:commandLink>
+					</f:facet>
+					<p:dock>
+						<p:menuitem id="infoButton2" value="Info" icon="/resources/images/info.png"
+							action="#{visualizationView.changeLevelTwoVizPage('INFO')}"
+							update="level2VizPanel, viz2Header" />
+						<p:menuitem id="boxPlotButton2" value="BoxPlot"
+							icon="/resources/images/boxplot.png"
+							action="#{visualizationView.changeLevelTwoVizPage('BOXPLOT')}"
+							update="level2VizPanel, viz2Header"
+							onstart="PF('loadDialogVizTwo').show();"
+							oncomplete="PF('loadDialogVizTwo').hide();" />
+					</p:dock>
+
+				</p:panel>
+				<p:panel id="level2VizPanel"
+					header="#{visualizationView.levelTwoVizPageHeader}">
+					<ui:include src="#{visualizationView.getLevelTwoVizPage()}"
+						id="levelTwoVizId" />
+				</p:panel>
+
+				<script>
+					jQuery(document).ready(function() {
+						localStorage.setItem('_viz2', 'true');
+					});
+				</script>
+
+				<script>
+					$(window).unload(function() {
+						localStorage.removeItem('_viz2');
+					});
+				</script>
+
+				<p:dialog id="vis2InfoBox" widgetVar="infoDlg" modal="true"
+					draggable="true" closable="true" resizable="true" showHeader="true"
+					header="#{reportView.infoHeaderText}" width="50%" fitViewport="true">
+					<h:outputText style="font-size:1.2em;" value="#{reportView.infoText}" escape="False" />
+				</p:dialog>
+				
+				<p:growl id="sessionGrowl" widgetVar="sessionGrowlWidget" showDetail="true" sticky="true"/>
+				
+				<p:idleMonitor timeout="600000">
+					<p:ajax event="idle" listener="#{tabView.onIdle}"
+						oncomplete="startTimer();" update="sessionGrowl" />
+					<p:ajax event="active" listener="#{tabView.onActive}"
+						oncomplete="killTimer();killTimerParent();" update="sessionGrowl" />
+				</p:idleMonitor>
+				
+				<p:remoteCommand name="pingBE" action="#{tabView.onActive}" />
+				<p:remoteCommand name="endSession" action="#{tabView.endSession}" />
+				
+				<script>
+					window.onload = function() {
+						sessionOnLoad();
+					}
+				</script>
+				
+			</h:form>
+		</ui:define>
+	</ui:composition>
+</h:body>
+
+</html>

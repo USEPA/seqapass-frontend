@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<h:body>
+	<ui:composition>
+		<p:dialog widgetVar="loadDialog3" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false">
+			<p:panelGrid>
+				<p:row>
+					<p:column style="text-align:center">
+								Loading...
+							</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+						<p:graphicImage library="images" name="spinner.gif" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+								Please Wait
+							</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+
+		<h:panelGroup layout="block" id="levelThreeReportJSON"
+			style="display:none;">#{visualizationView.levelThreeHeatMapJSON}</h:panelGroup>
+		<h:panelGroup layout="block" id="levelOneReportJSON"
+			style="display:none;">#{visualizationView.levelThreeHeatMapLevel1ReportJSON}</h:panelGroup>
+
+		<p:panel id="controls3" header="Controls" toggleable="true"
+			styleClass="noLeftPadPanel">
+
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<p:pickList id="lev3TaxPick" style="font-size:0.75em"
+							value="#{visualizationView.levelThreeHeatmapPickList}"
+							var="taxGroup" itemLabel="#{taxGroup}" itemValue="#{taxGroup}">
+							<f:facet name="sourceCaption">Level 3<br />Taxonomic Groups</f:facet>
+							<f:facet name="targetCaption">Order Level 3<br />Taxonomic Groups</f:facet>
+							<p:ajax event="transfer"
+								oncomplete="reloadHeatMap();checkDiffLev3HeatmapDiff();"
+								update="heatMapButtons" />
+							<p:ajax event="reorder"
+								oncomplete="reloadHeatMap();checkDiffLev3HeatmapDiff();"
+								update="heatMapButtons" />
+						</p:pickList>
+					</p:column>
+					<p:column style="width:100%; font-size:0.75em">
+						<p:panelGrid style="width:100%">
+							<p:row>
+								<p:column>
+									<p:panel id="reportOptionsPanel" header="Report Options"
+										toggleable="true" collapsed="false" style="text-align:center;">
+										<f:facet name="actions">
+											<p:commandLink oncomplete="PF('infoDlg').show();"
+												action="#{reportView.populateInfoText('heatmapReportOptions')}"
+												update="levThreeVizForm:viz3InfoBox">
+												<p:graphicImage library="images" name="info_small.png"
+													style="border-radius:50%; width:15px" />
+											</p:commandLink>
+										</f:facet>
+										<p:panelGrid>
+											<p:row>
+												<p:column>
+													<p:fieldset legend="Report Type">
+														<p:selectOneRadio id="reportType" layout="pageDirection"
+															style="text-align:left"
+															value="#{visualizationView.hmReportType}">
+															<f:selectItem itemLabel="Simple" itemValue="SIMPLE" />
+															<f:selectItem itemLabel="Full" itemValue="FULL" />
+															<p:ajax event="change"
+																oncomplete="updateHMReportType();checkDiffLev3HeatmapDiff();"
+																update="heatMapButtons" />
+														</p:selectOneRadio>
+													</p:fieldset>
+												</p:column>
+												<p:column>
+													<p:fieldset legend="Species Name Type">
+														<p:selectOneRadio id="nameType" layout="pageDirection"
+															style="text-align:left"
+															value="#{visualizationView.heatmapSpeciesNameType}">
+															<f:selectItem itemLabel="Common Name" itemValue="COMMON" />
+															<f:selectItem itemLabel="Scientific Name"
+																itemValue="SCIENTIFIC" />
+															<p:ajax event="change"
+																oncomplete="updateHMSpeciesNameType();checkDiffLev3HeatmapDiff();"
+																update="heatMapButtons" />
+														</p:selectOneRadio>
+													</p:fieldset>
+												</p:column>
+											</p:row>
+										</p:panelGrid>
+
+									</p:panel>
+
+
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:panel id="optionalSelectionPanel"
+										header="Optional Selections" toggleable="true"
+										collapsed="true" style="text-align:center">
+										<f:facet name="actions">
+											<p:commandLink oncomplete="PF('infoDlg').show();"
+												action="#{reportView.populateInfoText('heatmapOptionalSelections')}"
+												update="levThreeVizForm:viz3InfoBox">
+												<p:graphicImage library="images" name="info_small.png"
+													style="border-radius:50%; width:15px" />
+											</p:commandLink>
+										</f:facet>
+										<p:panelGrid>
+											<p:row>
+												<p:column>
+													<p:selectOneRadio id="optionalSelectionRadio"
+														widgetVar="heatmapOptionWidget"
+														value="#{visualizationView.level3OptionalSelection}"
+														onclick="updateOptionalSelections();checkDiffLev3HeatmapDiff();" unselectable="true"
+														update="heatMapButtons">
+														<f:selectItem itemLabel="Ortholog Candidates"
+															itemValue="ortholog" />
+														<f:selectItem itemLabel="Threatened Species"
+															itemValue="threatened" />
+														<f:selectItem itemLabel="Endangered Species"
+															itemValue="endangered" />
+														<f:selectItem itemLabel="Common Model Organisms"
+															itemValue="common" />
+													</p:selectOneRadio>
+												</p:column>
+											</p:row>
+										</p:panelGrid>
+									</p:panel>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:panel id="hmSettingsPanel" header="Heat Map Settings"
+										toggleable="true" collapsed="true" style="text-align:center">
+										<f:facet name="actions">
+											<p:commandLink oncomplete="PF('infoDlg').show();"
+												action="#{reportView.populateInfoText('vizHeatMapSettings')}"
+												update="levThreeVizForm:viz3InfoBox">
+												<p:graphicImage library="images" name="info_small.png"
+													style="border-radius:50%; width:15px" />
+											</p:commandLink>
+										</f:facet>
+										<p:panelGrid>
+											<p:row style="text-align:center;margin: 0 auto;">
+												<p:column>
+													<p:selectBooleanCheckbox id="showSusceptibilityChkBox3"
+														widgetVar="susceptibleCheck3"
+														value="#{visualizationView.levelThreeHeatmapSusceptibility}">
+														<p:ajax onstart="PF('loadDialog3').show();"
+															listener="#{visualizationView.handleSusceptibleChkBox('susceptible')}"
+															update="showSusceptibilityChkBox3,showSusceptibilityTextChkBox3,heatMapButtons"
+															oncomplete="PF('loadDialog3').hide();updateHeatMapSettings();checkDiffLev3HeatmapDiff();" />
+													</p:selectBooleanCheckbox>
+												</p:column>
+												<p:column>
+													<p:selectBooleanCheckbox id="showSusceptibilityTextChkBox3"
+														widgetVar="susceptibleTextCheck3"
+														value="#{visualizationView.levelThreeHeatmapSusceptibilityText}">
+														<p:ajax onstart="PF('loadDialog3').show();"
+															listener="#{visualizationView.handleSusceptibleChkBox('susceptibleText')}"
+															update="showSusceptibilityChkBox3,showSusceptibilityTextChkBox3,heatMapButtons"
+															oncomplete="PF('loadDialog3').hide();updateHeatMapSettings();checkDiffLev3HeatmapDiff();" />
+													</p:selectBooleanCheckbox>
+												</p:column>
+												<p:column>
+													<p:selectBooleanCheckbox id="showAlignPredictionChkBox3"
+														widgetVar="alignCheck3"
+														value="#{visualizationView.levelThreeHeatmapAlignPrediction}">
+														<p:ajax onstart="PF('loadDialog3').show();"
+															oncomplete="PF('loadDialog3').hide();updateHeatMapSettings();checkDiffLev3HeatmapDiff();"
+															update="heatMapButtons" />
+													</p:selectBooleanCheckbox>
+												</p:column>
+												<p:column>
+													<p:selectBooleanCheckbox id="showAminoAcidChkBox3"
+														widgetVar="aminoAcidCheck3"
+														value="#{visualizationView.levelThreeHeatmapAminoAcid}">
+														<p:ajax onstart="PF('loadDialog3').show();;"
+															oncomplete="PF('loadDialog3').hide();updateHeatMapSettings();checkDiffLev3HeatmapDiff();"
+															update="heatMapButtons" />
+													</p:selectBooleanCheckbox>
+												</p:column>
+												<p:column>
+													<p:selectBooleanCheckbox id="showPositionChkBox3"
+														widgetVar="positionCheck3"
+														value="#{visualizationView.levelThreeHeatMapPosition}">
+														<p:ajax onstart="PF('loadDialog3').show();"
+															oncomplete="PF('loadDialog3').hide();updateHeatMapSettings();checkDiffLev3HeatmapDiff();"
+															update="heatMapButtons" />
+													</p:selectBooleanCheckbox>
+												</p:column>
+											</p:row>
+											<p:row>
+												<p:column style="text-align:center;margin: 0 auto;">
+													<h:outputText value="Susceptibility Prediction Heat Map" />
+												</p:column>
+												<p:column style="text-align:center;margin: 0 auto;">
+													<h:outputText value="Susceptibility Prediction Text" />
+												</p:column>
+												<p:column style="text-align:center;margin: 0 auto;">
+													<h:outputText value="Alignment Prediction Heat Map" />
+												</p:column>
+												<p:column style="text-align:center;margin: 0 auto;">
+													<h:outputText value="Amino Acid" />
+												</p:column>
+												<p:column style="text-align:center;margin: 0 auto;">
+													<h:outputText value="Amino Acid Position" />
+												</p:column>
+											</p:row>
+										</p:panelGrid>
+									</p:panel>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:column>
+				</p:row>
+
+				<p:row>
+					<p:column>
+						<p:panelGrid id="heatMapButtons"
+							style="border:none;font-size:0.75em">
+							<p:row>
+								<p:column />
+								<p:column style="width:30%">
+									<p:commandButton id="downloadHeatMap"
+										value="Download Heat Map..."
+										style="color:black;background-color:#5585bf;"
+										onclick="getHeatMapSVGSize('heatMapSVG');"
+										oncomplete="PF('downloadPlotDlgWidget3').show();" />
+								</p:column>
+								<p:column style="width:40%;text-align:right">
+									<h:outputText value="Click to push new changes"
+										style="color:red;width:10%; padding-left:0px"
+										rendered="#{visualizationView.level3SVGDiffers and visualizationView.level3SVGPushWarning}" />
+								</p:column>
+								<p:column style="width:30%;text-align:left">
+									<p:commandButton id="pushHeatMap3ToDS"
+										value="Push Level 3 Heat Map To DS Report"
+										style="color:black;background-color:#5585bf;"
+										onclick="constructHeatmapImageForDS('heatMapSVG')"
+										action="#{reportView.enableDSReport}"
+										oncomplete="checkDiffLev3HeatmapDiff();updateDSReportFromViz();"
+										disabled="#{!visualizationView.level3SVGDiffers}"
+										update="heatMapButtons" />
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:column>
+				</p:row>
+
+			</p:panelGrid>
+		</p:panel>
+
+		<p:panel id="graphicPanel3" header="Heat Map" style="border:none;">
+			<f:facet name="actions">
+				<p:commandLink styleClass="infoBtn"
+					oncomplete="PF('infoDlg').show();"
+					action="#{reportView.populateInfoText('vizHeatMap')}"
+					update="levThreeVizForm:viz3InfoBox">
+					<p:graphicImage library="images" name="info_small.png"
+						style="border-radius:50%; width:15px; float:right;" />
+				</p:commandLink>
+			</f:facet>
+			<div id="heatmapDiv"></div>
+			<div id="canvasDiv" style="visibility:hidden">
+				<canvas id="svgCanvas"> </canvas>
+			</div>
+		</p:panel>
+
+
+		<p:dialog id="downloadPlotDlg" widgetVar="downloadPlotDlgWidget3"
+			modal="true" header="Download Heatmap" showEffect="clip"
+			hideEffect="clip" width="330" height="275"
+			onShow="constructHeatmapImage('heatMapSVG','');">
+
+			<p:panelGrid>
+				<p:row>
+					<p:column styleClass="align-center">
+						<p:outputLabel for="imageType" value="Image Type:" />
+					</p:column>
+					<p:column styleClass="align-center">
+						<p:selectOneRadio id="imageType"
+							value="#{visualizationView.imageType3}"
+							onchange="constructHeatmapImage('heatMapSVG','');">
+							<f:selectItem itemLabel="SVG" itemValue="SVG" />
+							<f:selectItem itemLabel="PNG" itemValue="PNG" />
+							<f:selectItem itemLabel="JPG" itemValue="JPG" />
+							<p:ajax update="imageWidth, imageHeight" />
+						</p:selectOneRadio>
+
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<p:panelGrid id="sizeGrid" style="margin-top:30px;">
+				<p:row>
+					<p:column style="width:30%;text-align:right;vertical-align:middle;">Width:</p:column>
+					<p:column style="width:50%;text-align:left;vertical-align:middle;">
+						<p:inputNumber id="imageWidth"
+							value="#{visualizationView.imageWidth3}" decimalPlaces="0"
+							size="10" disabled="#{visualizationView.imageType3 eq 'SVG'}"
+							onchange="constructHeatmapImage('heatMapSVG','');">
+							<p:ajax event="keyup"
+								listener="#{visualizationView.constrainAspectRatio(3,'width')}"
+								update="imageHeight" />
+						</p:inputNumber>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="width:30%;text-align:right;vertical-align:middle;">Height:</p:column>
+					<p:column style="width:50%;text-align:left;vertical-align:middle;">
+						<p:inputNumber id="imageHeight"
+							value="#{visualizationView.imageHeight3}" decimalPlaces="0"
+							size="10" disabled="#{visualizationView.imageType3 eq 'SVG'}"
+							onchange="constructHeatmapImage('heatMapSVG','');">
+							<p:ajax event="keyup"
+								listener="#{visualizationView.constrainAspectRatio(3,'height')}"
+								update="imageWidth" />
+						</p:inputNumber>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="2" style="text-align:center;">
+						<p:commandButton id="triggerDownload" value="Download Image"
+							widgetVar="hmDownloadButton"
+							ajax="false" icon="ui-icon-arrowthick-1-s"
+							style="color:black;background-color:#5585bf;margin-top:30px;"
+							onclick="console.log('Done!!!');PF('downloadPlotDlgWidget3').hide();">
+							<p:fileDownload value="#{visualizationView.svgBinarySource3}" />
+						</p:commandButton>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+
+		</p:dialog>
+
+
+		<p:remoteCommand name="initializePageDataCommand" autoRun="true"
+			onstart="" oncomplete="loadHeatMap()" />
+		<p:remoteCommand name="showSpinner"
+			onstart="PF('loadDialog3').show();" />
+		<p:remoteCommand name="hideSpinner"
+			onstart="PF('loadDialog3').hide();" />
+
+
+
+		<p:remoteCommand name="updateHeatMapBeanSizeRC"
+			onstart="console.log('inside updateHeatMapBeanSizeRC')"
+			actionListener="#{visualizationView.setHeatMapSize(3)}"
+			update="sizeGrid" />
+
+		<p:remoteCommand name="getHeatMapSVGSourceRC"
+			actionListener="#{visualizationView.retrieveHeatMapSVG(3)}"
+			oncomplete="enableHeatMapDownloadBtn();" />
+
+		<p:remoteCommand name="pushDSHeatmap"
+			onstart="console.log('inside pushDSHeatmap')"
+			actionListener="#{visualizationView.pushHeatmapToRA()}"
+			update="sizeGrid,heatMapButtons" />
+
+		<p:remoteCommand name="checkDiffLev3HeatmapDiff"
+			action="#{visualizationView.checkDiffLevel3HeatmapRAReport()}"
+			update="heatMapButtons" />
+
+
+	</ui:composition>
+
+</h:body>
+
+</html>

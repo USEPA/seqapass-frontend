@@ -1,0 +1,2258 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+		<h:outputScript name="charts/charts.js" library="primefaces" />
+		<h:outputStylesheet name="charts/charts.css" library="primefaces" />
+
+		<p:dialog widgetVar="statusDialog1" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false">
+			<p:panelGrid>
+				<p:row>
+					<p:column style="text-align:center">
+								Querying Database...
+							</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+						<p:graphicImage library="images" name="spinner.gif" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+								Please Wait
+							</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+
+		<p:growl id="validateGrowl" showDetail="true" sticky="false"
+			life="10000" />
+
+		<p:panel id="LevelOneQueryPanel"
+			header="Level 1 Query Protein Information"
+			style="margin-bottom: 20px; display:inline-block; width:100%">
+			<h:outputText style="font-size:0.75em"
+				value="Hit proteins are identified for the following query protein.  Use the main button to go back to the SeqAPASS Reports list." />
+			<p:panelGrid id="queryInfoGrid" autoupdate="true"
+				style="margin-bottom:10px;margin-left:5px;font-size:0.75em">
+				<p:row>
+					<p:column style="width:20%">
+						<b>SeqAPASS ID:</b> #{reportView.runId}</p:column>
+					<p:column style="width:30%">
+						<b>Query Accession: </b>
+						<p:link
+							href="http://www.ncbi.nlm.nih.gov/protein/#{reportView.accession}"
+							value="#{reportView.accession}" target="_blank" rel="noreferrer noopener"/>
+						<a class="exit-disclaimer" style="font-size: 0.75em;"
+							href="https://www.epa.gov/home/exit-epa"
+							title="EPA's External Link Disclaimer">Exit</a>
+					</p:column>
+					<p:column style="width:25%">
+						<b>Ortholog Count:</b> #{reportView.ortholog_count}</p:column>
+					<p:column style="width:25%">
+						<b>Protein and Taxonomy Data: </b>
+						<h:outputText escape="false" value="#{reportView.ncbiDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputText>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="3">
+						<b>Query Species:</b> #{reportView.querySpecies}
+					</p:column>
+					<p:column>
+						<b>BLAST Version: </b>
+						<h:outputText value="#{reportView.blastVersion}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="3">
+						<b>Query Protein:</b> #{reportView.queryProtein}
+					</p:column>
+					<p:column>
+						<b>Software Version: </b>
+						<h:outputText value="#{reportView.seqapassVersion}" />
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+
+			<p:panelGrid id="levelInfoPanels" style="width:100%">
+				<p:row>
+					<p:column style="width:34%; vertical-align:top">
+						<p:panel id="cutoffPanel" header="Susceptibility Cut-off"
+							toggleable="true" collapsed="true" style="text-align:center">
+							<f:facet name="actions">
+							</f:facet>
+							<p:panelGrid id="cutoffGrid"
+								style="font-size:0.75em; margin:0 auto;">
+								<p:row>
+									<p:column>
+										<p:graphicImage id="cutoffImage"
+											value="#{reportView.levelOneDensityStream}" width="200"
+											height="200" cache="false"
+											rendered="#{not empty (reportView.levelOneCutData.getxData())}" />
+										<p:resizable for="cutoffImage" ghost="true" aspectRatio="true" />
+										<p:graphicImage library="images" name="seqapass_logo.png"
+											rendered="#{empty (reportView.levelOneCutData.getxData())}" />
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:commandButton id="viewCutoffButton" value="Cutoff Settings"
+											style="color:black;background-color:#5585bf;"
+											onclick="OpenCutoffInBrowserTab(1); setLastClick('_cut1');"
+											disabled="#{empty (reportView.levelOneCutData.getxData())}" />
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+									  This will open in a separate tab
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+						</p:panel>
+						<p:panel id="defaultPanel" header="Primary Report Settings"
+							toggleable="true" collapsed="true" style="text-align:center"
+							rendered="#{reportView.levelOneReportType eq 'Primary' ? true : false}">
+							<f:facet name="actions">
+								<p:commandLink styleClass="infoBtn"
+									oncomplete="PF('infoDlg').show();"
+									action="#{reportView.populateInfoText('lev1PrimaryReportSettings')}"
+									update="levelOneInfoBox, ">
+									<p:graphicImage library="images" name="info_small.png"
+										style="border-radius:50%; width:15px; float:right;" />
+								</p:commandLink>
+							</f:facet>
+							<p:panelGrid id="defaultGrid" style="font-size:0.75em">
+								<p:row>
+									<p:column>
+										<p>E-value:</p>
+									</p:column>
+									<p:column>
+										<p:inputText id="levOneEvalue" label="E-value"
+											value="#{reportView.primaryLevOneEvalueLimit}"
+											required="true">
+											<f:validateDoubleRange minimum="0.0e0" maximum="10" />
+										</p:inputText>
+										<p:tooltip id="tooltipEvalue" for="levOneEvalue"
+											showEvent="focus" hideEvent="blur">
+											<h:outputText
+												value="Entry must be a number between 0 and 10." />
+											<br />
+											<h:outputText
+												value="The user can enter specific scientific notation." />
+											<br />
+											<h:outputText
+												value="Example: .01 and 1.0E-2 represent the same value." />
+										</p:tooltip>
+									</p:column>
+									<p:column
+										style="padding-right:0px; padding-left:0px; text-align: right">
+										<p:commandLink oncomplete="PF('infoDlg').show();"
+											action="#{reportView.populateInfoText('eValue')}"
+											update="levelOneInfoBox">
+											<p:graphicImage library="images" name="info_small.png"
+												style="border-radius:50%; width:15px;" />
+										</p:commandLink>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p>Sorted by Taxonomic Group:</p>
+									</p:column>
+									<p:column>
+										<p:selectOneMenu id="taxGroupMenu"
+											value="#{reportView.levOnePrimaryTaxGroup}">
+											<f:selectItems value="#{reportView.taxRankings}" var="rank"
+												itemValue="#{rank}" itemLabel="#{rank.label}" />
+										</p:selectOneMenu>
+									</p:column>
+									<p:column
+										style="padding-right:0px; padding-left:0px; text-align: right">
+										<p:commandLink oncomplete="PF('infoDlg').show();"
+											action="#{reportView.populateInfoText('taxGroup')}"
+											update="levelOneInfoBox">
+											<p:graphicImage library="images" name="info_small.png"
+												style="border-radius:50%; width:15px" />
+										</p:commandLink>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p>Common Domains:</p>
+									</p:column>
+									<p:column>
+										<p:inputText id="levOneNumCommonDomains"
+											label="Common Domains"
+											value="#{reportView.primaryLevOneCommonDomainLimit}"
+											required="true">
+											<f:validateLongRange minimum="0" maximum="100000" />
+										</p:inputText>
+										<p:tooltip id="tooltipCommonDomains"
+											for="levOneNumCommonDomains" showEvent="focus"
+											hideEvent="blur" value="Entry must be a whole number." />
+									</p:column>
+									<p:column
+										style="padding-right:0px; padding-left:0px; text-align: right">
+										<p:commandLink oncomplete="PF('infoDlg').show();"
+											action="#{reportView.populateInfoText('commonDomains')}"
+											update="levelOneInfoBox">
+											<p:graphicImage library="images" name="info_small.png"
+												style="border-radius:50%; width:15px" />
+										</p:commandLink>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p>Species Read-Across:</p>
+									</p:column>
+									<p:column>
+										<p:selectOneMenu id="speciesReadAcrossMenu"
+											value="#{reportView.levelOneSpeciesReadAcross}">
+											<f:selectItem itemLabel="Yes" itemValue="#{true}" />
+											<f:selectItem itemLabel="No" itemValue="#{false}" />
+										</p:selectOneMenu>
+									</p:column>
+									<p:column
+										style="padding-right:0px; padding-left:0px; text-align: right">
+										<p:commandLink oncomplete="PF('infoDlg').show();"
+											action="#{reportView.populateInfoText('speciesReadAcross')}"
+											update="levelOneInfoBox">
+											<p:graphicImage library="images" name="info_small.png"
+												style="border-radius:50%; width:15px" />
+										</p:commandLink>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:commandButton id="updateReportBtn" value="Update Report"
+											style="color:black;background-color:#5585bf;"
+											action="#{reportView.updateLevOneReportButton}"
+											onstart="PF('statusDialog1').show(); closeCutWin(1);"
+											onsuccess="PF('statusDialog1').hide();"
+											oncomplete="PF('tabViewWidget').select(3); "
+											update="validateGrowl, levelOneDataPanel, level3QueryPanel, otherReportsGrid " />
+									</p:column>
+									<p:column>
+										<p:commandButton id="defaultReportBtn"
+											value="Use Default Settings"
+											style="color:black;background-color:#5585bf;"
+											action="#{reportView.updateLevelOneDefault}"
+											update="defaultPanel, level3QueryPanel, otherReportsGrid "
+											onstart="PF('statusDialog1').show();closeCutWin(1);"
+											oncomplete="PF('tabViewWidget').select(3); PF('statusDialog1').hide();"
+											process="@this">
+											<p:resetInput target="defaultPanel" />
+										</p:commandButton>
+									</p:column>
+									<p:column />
+								</p:row>
+							</p:panelGrid>
+						</p:panel>
+						<p:panel id="viz1Panel" header="Visualization" toggleable="true"
+							collapsed="true" style="text-align:center">
+							<f:facet name="actions">
+								<p:commandLink styleClass="infoBtn"
+									oncomplete="PF('infoDlg').show();"
+									action="#{reportView.populateInfoText('visualization')}"
+									update="levelOneInfoBox">
+									<p:graphicImage library="images" name="info_small.png"
+										style="border-radius:50%; width:15px; float:right;" />
+								</p:commandLink>
+							</f:facet>
+							<p:panelGrid id="viz1Grid" style="font-size:0.75em">
+								<p:row>
+									<p:column>
+										<p:commandButton id="viz1Button" value="Visualize Data"
+											style="color:black;background-color:#5585bf;"
+											action="#{visualizationView.resetLevelOneViz}"
+											oncomplete="OpenVizInBrowserTab(1); setLastClick('_viz1');" />
+									</p:column>
+									<p:column>
+									  This will open in a separate tab.
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+						</p:panel>
+					</p:column>
+					<p:column style="width:33%; vertical-align:top">
+						<p:panel id="level2QueryPanel" header="Level 2" toggleable="true"
+							collapsed="true" style="text-align:center">
+							<f:facet name="actions">
+								<p:commandLink styleClass="infoBtn"
+									oncomplete="PF('infoDlg').show();"
+									action="#{reportView.populateInfoText('level2')}"
+									update="levelOneInfoBox">
+									<p:graphicImage library="images" name="info_small.png"
+										style="border-radius:50%; width:15px; float:right;" />
+								</p:commandLink>
+							</f:facet>
+							<p:panelGrid
+								style="font-size:0.75em; text-align:left; width:100%">
+								<p:row>
+									<p:column style="text-align:center;">
+										<p:fieldset legend="Level 2 Query Domain">
+											<p:panelGrid>
+												<p:row>
+													<p:column>
+														<p:link
+															href="http://www.ncbi.nlm.nih.gov/Structure/cdd/wrpsb.cgi?INPUT_TYPE=live&amp;SEQUENCE=#{reportView.topHitAccession}"
+															value="NCBI Conserved Domain Database" target="_blank" rel="noreferrer noopener"/>
+														<a class="exit-disclaimer" style="font-size: 0.75em;"
+															href="https://www.epa.gov/home/exit-epa"
+															title="EPA's External Link Disclaimer">Exit</a>
+													</p:column>
+													<p:column
+														style="padding-right:0px; padding-left:0px; text-align: right">
+														<p:commandLink oncomplete="PF('infoDlg').show();"
+															action="#{reportView.populateInfoText('ncbiCDD')}"
+															update="levelOneInfoBox">
+															<p:graphicImage library="images" name="info_small.png"
+																style="border-radius:50%; width:15px" />
+														</p:commandLink>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:outputLabel for="domainListMenu"
+															value="Functional Domains" />
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:selectOneMenu id="domainListMenu"
+															value="#{reportView.selectedDomain}"
+															converter="levelTwoRequestableConverter" var="s"
+															filter="true" filterMatchMode="contains"
+															style="width:90%;white-space: nowrap; display:inline-grid;"
+															scrollHeight="150"
+															panelStyle="width:550px;white-space: nowrap;">
+															<f:selectItem itemLabel="-Select Domain -"
+																itemValue="#{null}" noSelectionOption="true" />
+															<f:selectItems value="#{reportView.levelTwoDomains}"
+																var="domainItem" itemLabel="#{domainItem.displayText}"
+																itemValue="#{levelTwoRequestableRow}" />
+															<p:column>
+																<h:outputText value="#{s.displayText}" />
+															</p:column>
+															<p:ajax event="change" execute="@this"
+																listener="#{reportView.changeSelectedDomain}"
+																update="requestLevel2Button" />
+														</p:selectOneMenu>
+													</p:column>
+													<p:column
+														style="padding-right:0px; padding-left:0px; text-align: right">
+														<p:commandLink oncomplete="PF('infoDlg').show();"
+															action="#{reportView.populateInfoText('selectDomain')}"
+															update="levelOneInfoBox">
+															<p:graphicImage library="images" name="info_small.png"
+																style="border-radius:50%; width:15px" />
+														</p:commandLink>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:commandButton id="requestLevel2Button"
+															binding="#{save}"
+															action="#{reportView.requestLevel2Button}"
+															value="Request Domain Run" update="growl"
+															style="color:black;background-color:#5585bf;pointer-events:all;"
+															disabled="#{reportView.disableRequestDomainButton}"
+															onclick="javascript:window.scrollTo(0,0)" />
+														<p:tooltip id="lev2tip" for="requestLevel2Button"
+															value="#{reportView.levelTwoRequestTip}"
+															rendered="#{reportView.showLevelTwoRequestTip}"
+															style="max-width: 300px; white-space: pre-wrap;" />
+
+													</p:column>
+												</p:row>
+											</p:panelGrid>
+										</p:fieldset>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column style="text-align:center;">
+										<p:fieldset legend="View Level 2 Data">
+											<p:panelGrid>
+
+												<p:row>
+													<p:column>
+														<p:outputLabel for="domainViewMenu"
+															value="Choose Domain to View" />
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:selectOneMenu id="domainViewMenu"
+															value="#{reportView.selectedCompletedDomain}"
+															converter="levelTwoRequestableConverter" var="s"
+															filter="true" filterMatchMode="contains"
+															style="width:90%;white-space: nowrap; display:inline-grid;"
+															scrollHeight="150"
+															panelStyle="width:550px;white-space: nowrap;">
+															<f:selectItem itemLabel="-Select Completed Domain -"
+																itemValue="#{null}" noSelectionOption="true" />
+															<f:selectItems
+																value="#{reportView.completedLevelTwoDomains}"
+																var="domainItem" itemLabel="#{domainItem.displayText}"
+																itemValue="#{levelTwoRequestableRow}" />
+															<p:column>
+																<h:outputText value="#{s.displayText}" />
+															</p:column>
+														</p:selectOneMenu>
+													</p:column>
+													<p:column
+														style="padding-right:0px; padding-left:0px; text-align: right">
+														<p:commandLink oncomplete="PF('infoDlg').show();"
+															action="#{reportView.populateInfoText('viewDomain')}"
+															update="levelOneInfoBox">
+															<p:graphicImage library="images" name="info_small.png"
+																style="border-radius:50%; width:15px" />
+														</p:commandLink>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:commandButton id="viewLevel2Button"
+															value="View Level 2 Data"
+															style="color:black;background-color:#5585bf;"
+															action="#{reportView.viewLevel2Button}" update="@form"
+															onstart="PF('statusDialog1').show();"
+															onsuccess="PF('statusDialog1').hide(); updateVizWindows(2); updateCutWindows(2);" />
+													</p:column>
+												</p:row>
+											</p:panelGrid>
+										</p:fieldset>
+									</p:column>
+								</p:row>
+
+							</p:panelGrid>
+						</p:panel>
+						<p:panel id="level3QueryPanel" header="Level 3" toggleable="true"
+							collapsed="true" style="text-align:center">
+							<f:facet name="actions">
+								<p:commandLink styleClass="infoBtn"
+									oncomplete="PF('infoDlg').show();"
+									action="#{reportView.populateInfoText('level3')}"
+									update="levelOneInfoBox">
+									<p:graphicImage library="images" name="info_small.png"
+										style="border-radius:50%; width:15px; float:right" />
+								</p:commandLink>
+							</f:facet>
+							<p:panelGrid
+								style="text-align:left; width:100%; font-size:0.75em;">
+								<p:row>
+									<p:column>
+										<p:fieldset toggleable="true" toggleSpeed="500"
+											id="refXplorerFieldSet" collapsed="true">
+											<p:ajax event="toggle"
+												listener="#{reportView.loadRefXplorer}" update="@this" />
+											<f:facet name="legend">
+												Reference Explorer
+												<p:commandLink styleClass="infoBtn"
+													oncomplete="PF('infoDlg').show()"
+													action="#{reportView.populateInfoText('refExplorer')}"
+													update="levelOneInfoBox">
+													<p:graphicImage library="images" name="info_small.png"
+														style="border-radius:50%; width:15px; float:right;margin-left:5px;" />
+												</p:commandLink>
+											</f:facet>
+											<p:panelGrid id="refXplorerGrid">
+												<p:row>
+													<p:column>
+														<p:outputLabel for="AddNamesBox" value="Additional Names:" />
+													</p:column>
+													<p:column style="width:80%">
+														<p:inputText id="AddNamesBox" style="width:98%"
+															value="#{reportView.refExplorerAddName}" />
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column colspan="2">
+														<p:commandButton id="addProteinBtn"
+															value="Add Protein Name"
+															style="color:black;background-color:#5585bf;"
+															action="#{reportView.addRefXplorerProtein}"
+															update="refXplorerFieldSet" />
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column colspan="2">
+														<p:selectOneListbox id="proteinXplorerListbox"
+															style="width:100%"
+															value="#{reportView.xplorerSelectedProtein}">
+															<f:selectItems value="#{reportView.proteinXplorerList}" />
+														</p:selectOneListbox>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column colspan="2">
+														<p:panelGrid>
+															<p:row>
+																<p:column>
+																	<p:commandButton id="removeSelectedProteinBtn"
+																		value="Remove Selected Protein"
+																		style="color:black;background-color:#5585bf;"
+																		action="#{reportView.removeSelectedRefXplorerProtein}"
+																		update="refXplorerFieldSet" />
+																</p:column>
+																<p:column>
+																	<p:commandButton id="restoreDefaultProteinsBtn"
+																		value="Restore Default Proteins"
+																		style="color:black;background-color:#5585bf;"
+																		action="#{reportView.restoreDefaultRefXplorerProteins}"
+																		update="refXplorerFieldSet" />
+																</p:column>
+															</p:row>
+														</p:panelGrid>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column colspan="2">
+														<p:commandButton id="xplorerSearchBtn"
+															value="Generate Google Scholar Link"
+															style="color:black;background-color:#5585bf;"
+															action="#{reportView.generateGoogleScholarLink}"
+															update="xplorerLink"
+															oncomplete="PF('xplorerLinkDlg').show();" />
+													</p:column>
+												</p:row>
+											</p:panelGrid>
+										</p:fieldset>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+
+										<p:fieldset legend="Level 3 Query Amino Acid Residues">
+											<p:panelGrid>
+												<p:row>
+													<p:column>
+														<p:link href="http://www.ncbi.nlm.nih.gov/protein"
+															value="NCBI Protein Database" target="_blank" rel="noreferrer noopener"/>
+														<a class="exit-disclaimer" style="font-size: 0.75em;"
+															href="https://www.epa.gov/home/exit-epa"
+															title="EPA's External Link Disclaimer">Exit</a>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:outputLabel for="templateBox"
+															value="Select Template Sequence" />
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:inputTextarea id="templateBox" style="width:98%"
+															value="#{reportView.templateText}" rows="3" cols="60" />
+														<p:tooltip id="templateBoxTip" for="templateBox"
+															showEvent="focus" hideEvent="blur">
+															<h:panelGroup>
+																<h:outputText
+																	value="-Enter NCBI Protein Accession OR FASTA Sequence-" />
+																<br />
+																<h:outputText value="Examples:" />
+																<br />
+																<h:outputText value="NP_000116.2" />
+																<br />
+																<h:outputText value="OR" />
+																<br />
+																<h:outputText
+																	value=">Sequence description in first line" />
+																<br />
+																<h:outputText
+																	value="MTMTLHTKASGMALLHQIQGNELEPLNRPQLKIPLERPLGEVYLDSSKPAVY" />
+															</h:panelGroup>
+														</p:tooltip>
+													</p:column>
+													<p:column
+														style="padding-right:0px; padding-left:0px; text-align: right">
+														<p:commandLink oncomplete="PF('infoDlg').show();"
+															action="#{reportView.populateInfoText('templateSequence')}"
+															update="levelOneInfoBox">
+															<p:graphicImage library="images" name="info_small.png"
+																style="border-radius:50%; width:15px" />
+														</p:commandLink>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:outputLabel for="additionalBox"
+															value="Additional Comparisons (optional)" />
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:inputTextarea id="additionalBox" style="width:98%"
+															value="#{reportView.additionalComparisonsText}" rows="1"
+															cols="60" />
+														<p:tooltip id="additionalBoxTip" for="additionalBox"
+															showEvent="focus" hideEvent="blur">
+															<h:panelGroup>
+																<h:outputText
+																	value="-Enter 0 or more NCBI Protein Accession(s) followed by 0 or more FASTA Sequence(s)-" />
+																<br />
+																<h:outputText value="Examples:" />
+																<br />
+																<h:outputText value="NP_000116.2" />
+																<br />
+																<h:outputText value="1JLY_A" />
+																<br />
+																<h:outputText
+																	value=">Sequence description of first FASTA" />
+																<br />
+																<h:outputText
+																	value="MTMTLHTKASGMALLHQIQGNELEPLNRPQLKIPLERPLGEVYLDSSKPAVY" />
+																<br />
+																<h:outputText
+																	value=">Sequence description of second FASTA" />
+																<br />
+																<h:outputText
+																	value="XAGLPVIMCLKSNNHQKYLRYQSDNIQQYGLLQFSADKILDPLAQFEVEPSKTYDGLV" />
+															</h:panelGroup>
+														</p:tooltip>
+													</p:column>
+													<p:column
+														style="padding-right:0px; padding-left:0px; text-align: right">
+														<p:commandLink oncomplete="PF('infoDlg').show();"
+															action="#{reportView.populateInfoText('additionalComps')}"
+															update="levelOneInfoBox">
+															<p:graphicImage library="images" name="info_small.png"
+																style="border-radius:50%; width:15px" />
+														</p:commandLink>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:link
+															href="https://www.ncbi.nlm.nih.gov/tools/cobalt/re_cobalt.cgi"
+															value="NCBI COBALT" target="_blank" rel="noreferrer noopener"/>
+														<a class="exit-disclaimer" style="font-size: 0.75em;"
+															href="https://www.epa.gov/home/exit-epa"
+															title="EPA's External Link Disclaimer">Exit</a>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:outputLabel for="jobNameBox"
+															value="Enter Level 3 Run Name" />
+													</p:column>
+												</p:row>
+
+												<p:row>
+													<p:column>
+														<p:inputText id="jobNameBox" style="width:98%"
+															value="#{reportView.level3JobName}" />
+													</p:column>
+													<p:column
+														style="padding-right:0px; padding-left:0px; text-align: right">
+														<p:commandLink oncomplete="PF('infoDlg').show();"
+															action="#{reportView.populateInfoText('lev3RunName')}"
+															update="levelOneInfoBox">
+															<p:graphicImage library="images" name="info_small.png"
+																style="border-radius:50%; width:15px" />
+														</p:commandLink>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:link href="http://www.ncbi.nlm.nih.gov/taxonomy"
+															value="NCBI Taxonomy Database" target="_blank" rel="noreferrer noopener"/>
+														<a class="exit-disclaimer" style="font-size: 0.75em;"
+															href="https://www.epa.gov/home/exit-epa"
+															title="EPA's External Link Disclaimer">Exit</a>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:outputLabel for="taxonimicChoiceMenu"
+															value="Choose Taxonomic Group(s)" />
+													</p:column>
+												</p:row>
+
+												<p:row>
+													<p:column>
+														<p:selectOneMenu id="taxonimicChoiceMenu"
+															value="#{reportView.selectedTaxGroup}" filter="true"
+															filterMatchMode="contains"
+															style="width:90%;white-space:nowrap;display:inline-grid;"
+															scrollHeight="150"
+															panelStyle="width:550px;white-space:nowrap;">
+															<f:selectItem itemLabel="All Groups" itemValue="#{null}" />
+															<f:selectItems value="#{reportView.taxonomyGroup}" />
+															<p:ajax listener="#{reportView.updateFilter}"
+																update="levelOneDataPanel" />
+
+
+														</p:selectOneMenu>
+													</p:column>
+													<p:column
+														style="padding-right:0px; padding-left:0px; text-align: right">
+														<p:commandLink oncomplete="PF('infoDlg').show();"
+															action="#{reportView.populateInfoText('chooseTaxGroups')}"
+															update="levelOneInfoBox">
+															<p:graphicImage library="images" name="info_small.png"
+																style="border-radius:50%; width:15px" />
+														</p:commandLink>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<h:outputText value="Use table below to select sequences" />
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column style="width:95%">
+														<p:commandButton id="prioritizeLevel3Button"
+															action="#{reportView.setL3DefaultPriority}"
+															value="Prioritize Accessions"
+															update="selectedCountText, levelOneDataPanel"
+															style="color:black;background-color:#5585bf;" />
+													</p:column>
+													<p:column
+														style="padding-right:0px; padding-left:0px; text-align: right">
+														<p:commandLink oncomplete="PF('infoDlg').show();"
+															action="#{reportView.populateInfoText('prioritizeLev3')}"
+															update="levelOneInfoBox">
+															<p:graphicImage library="images" name="info_small.png"
+																style="border-radius:50%; width:15px;" />
+														</p:commandLink>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<h:outputText id="selectedCountText"
+															value="#{reportView.selectedSpeciesCount} Species Selected" />
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:commandButton id="requestLevel3Button"
+															disabled="#{reportView.disableRequestResidueButton}"
+															action="#{reportView.requestLevel3Button}"
+															value="Request Residue Run"
+															update="level3QueryPanel, levelOneDataPanel, growl"
+															style="color:black;background-color:#5585bf;pointer-events:all;"
+															oncomplete="javascript:window.scrollTo(0,0)" />
+														<p:tooltip id="lev3tip" for="requestLevel3Button"
+															value="#{reportView.levelThreeRequestTip}"
+															rendered="#{reportView.showLevelThreeRequestTip}"
+															style="max-width: 300px; white-space: pre-wrap;" />
+													</p:column>
+												</p:row>
+											</p:panelGrid>
+										</p:fieldset>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:fieldset legend="View Single Report">
+											<p:panelGrid>
+												<p:row>
+													<p:column>
+														<p:outputLabel for="level3ViewMenu"
+															value="Choose Query to View" />
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column style="width:95%">
+														<p:selectOneMenu id="level3ViewMenu"
+															value="#{reportView.selectedCompletedLevel3}"
+															converter="levelThreeRequestableConverter" var="s"
+															filter="true" filterMatchMode="contains"
+															style="width:90%;white-space:nowrap;display:inline-grid;"
+															scrollHeight="150"
+															panelStyle="width:550px;white-space:nowrap;">
+															<f:selectItem itemLabel="-Select Level 3 Run Name -"
+																itemValue="#{null}" noSelectionOption="true" />
+															<f:selectItems
+																value="#{reportView.completedLevelThreeRuns}" var="item"
+																itemLabel="#{item.jobName}"
+																itemValue="#{levelThreeRequestableRow}" />
+															<p:column>
+																<h:outputText value="#{s.jobName}" />
+															</p:column>
+														</p:selectOneMenu>
+													</p:column>
+													<p:column
+														style="padding-right:0px; padding-left:0px; text-align: right">
+														<p:commandLink oncomplete="PF('infoDlg').show();"
+															action="#{reportView.populateInfoText('viewLev3Data')}"
+															update="levelOneInfoBox">
+															<p:graphicImage library="images" name="info_small.png"
+																style="border-radius:50%; width:15px;" />
+														</p:commandLink>
+													</p:column>
+												</p:row>
+												<p:row>
+													<p:column>
+														<p:commandButton id="viewLevel3Button"
+															value="View Level 3 Data"
+															style="color:black;background-color:#5585bf;"
+															action="#{reportView.viewLevel3Button}" update="@form"
+															onstart="PF('statusDialog1').show();"
+															onsuccess="PF('statusDialog1').hide()" />
+													</p:column>
+												</p:row>
+											</p:panelGrid>
+										</p:fieldset>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:fieldset legend="View Combined Report">
+											<p:panelGrid>
+												<p:row>
+													<p:column style="width:95%">
+														<p:commandButton id="combineLevel3Button"
+															value="Combine Level 3 Data"
+															style="color:black;background-color:#5585bf;"
+															action="#{reportView.combineLevel3Button}" update="@form"
+															oncomplete="PF('wizardDialog').show();" />
+													</p:column>
+													<p:column
+														style="padding-right:0px; padding-left:0px; text-align: right">
+														<p:commandLink oncomplete="PF('infoDlg').show();"
+															action="#{reportView.populateInfoText('level3ComboReport')}"
+															update="levelOneInfoBox">
+															<p:graphicImage library="images" name="info_small.png"
+																style="border-radius:50%; width:15px;margin-left:5px;" />
+														</p:commandLink>
+													</p:column>
+												</p:row>
+											</p:panelGrid>
+										</p:fieldset>
+									</p:column>
+								</p:row>
+
+							</p:panelGrid>
+
+						</p:panel>
+						<p:panel style="font-size:0.75em;text-align:center;border:none;">
+							<p:commandButton id="refreshLevel2and3"
+								value="Refresh Level 2 and 3 Runs"
+								style="color:black;background-color:#5585bf;"
+								action="#{reportView.reloadLevelTwoAndThreeResults}"
+								update="level2QueryPanel,level3QueryPanel"
+								onstart="PF('statusDialog1').show();"
+								onsuccess="PF('statusDialog1').hide();" />
+						</p:panel>
+					</p:column>
+					<p:column style="width:33%; vertical-align:top">
+						<p:panel id="level4QueryPanel" header="Level 4" toggleable="true"
+							collapsed="true" style=";text-align:center">
+							<f:facet name="actions">
+								<p:commandLink styleClass="infoBtn"
+									oncomplete="PF('infoDlg').show();"
+									action="#{reportView.populateInfoText('level4')}"
+									update="levelOneInfoBox">
+									<p:graphicImage library="images" name="info_small.png"
+										style="border-radius:50%; width:15px; float:right;" />
+								</p:commandLink>
+							</f:facet>
+
+							<p:panel id="noItasser" rendered="#{not userLoginView.itasser}">
+								Level 4 Unavailable<br />
+								<br />
+								To request access, contact:<br />
+								<a href="mailto:SeqAPASS.support@epa.gov">SeqAPASS.support@epa.gov</a>
+							</p:panel>
+
+							<p:fieldset id="level4Fieldset"
+								style="font-size:0.75em;text-align:center;"
+								legend="Level 4 Generate FASTA"
+								rendered="#{userLoginView.itasser}">
+								<p:panelGrid style="text-align:left;">
+									<p:row>
+										<p:column style="width:95%">
+											<p:outputLabel for="Level4RunNameBox"
+												value="Enter Level 4 Run Name" />
+										</p:column>
+										<p:column>
+											<p:commandLink styleClass="infoBtn"
+												oncomplete="PF('infoDlg').show()"
+												action="#{reportView.populateInfoText('level4RunName')}"
+												update="levelOneInfoBox">
+												<p:graphicImage library="images" name="info_small.png"
+													style="border-radius:50%; width:15px; float:right;margin-left:5px;" />
+											</p:commandLink>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:inputText id="Level4RunNameBox" style="width:98%"
+												value="#{reportView.level4JobName}" />
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel for="levelFourLevel"
+												value="Select Run Level" />
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:selectOneRadio id="levelFourLevel" layout="pageDirection"
+												style="text-align: left"
+												value="#{reportView.chosenLevelFourLevel}">
+												<f:selectItem itemLabel="Level 1" itemValue='Level1' />
+												<f:selectItem itemLabel="Level 2" itemValue='Level2' />
+												<p:ajax event="change" execute="@this"
+													listener="#{reportView.changeLevelFourLevel()}"
+													update="levFourDomainPanel,prioritizeL4Button,numPriorityAccLabel,tabView:reportForm:levFourPriorityPanel,tabView:reportForm:prioritizeTable" />
+											</p:selectOneRadio>
+										</p:column>
+										<p:column>
+											<p:commandLink styleClass="infoBtn"
+												oncomplete="PF('infoDlg').show()"
+												action="#{reportView.populateInfoText('selectRunLevel')}"
+												update="levelOneInfoBox">
+												<p:graphicImage library="images" name="info_small.png"
+													style="border-radius:50%; width:15px; float:right;margin-left:5px;" />
+											</p:commandLink>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputPanel id="levFourDomainPanel">
+											<p:panelGrid style="text-align:left;" rendered="#{reportView.levelFourDomainVisible}">
+												<p:row>
+													<p:column>
+														<p:outputLabel for="@next"
+															value="Select Functional Domain" />
+														<p:selectOneMenu id="levelFourFunctionalDomain"
+															value="#{reportView.selectedLevelFourDomain}"
+															converter="levelTwoRequestableConverter" var="s"
+															filter="true" filterMatchMode="contains"
+															style="width:90%;white-space: nowrap; display:inline-grid;"
+															scrollHeight="150"
+															panelStyle="width:550px;white-space: nowrap;">
+															<f:selectItem itemLabel="-Select Domain -"
+																itemValue="#{null}" noSelectionOption="true" />
+															<f:selectItems value="#{reportView.completedLevelTwoDomains}"
+																var="domainItem" itemLabel="#{domainItem.displayText}"
+																itemValue="#{levelTwoRequestableRow}" />
+															<p:column>
+																<h:outputText value="#{s.displayText}" />
+															</p:column>
+															<p:ajax listener="#{reportView.selectLevelFourFunctionalDomain}"
+																action="#{reportView.setupNewLevel4Run}"
+																update="prioritizeL4Button,numPriorityAccLabel,tabView:reportForm:levFourPriorityPanel,tabView:reportForm:prioritizeTable" 
+																onstart="PF('statusDialog1').show();"
+																oncomplete="PF('statusDialog1').hide();"/>
+														</p:selectOneMenu>
+													</p:column>
+												</p:row>
+											</p:panelGrid>
+											</p:outputPanel>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:commandButton id="prioritizeL4Button"
+												value="Prioritize Accessions"
+												disabled="#{reportView.disableL4PrioritizeBtn}"
+												style="color:black;background-color:#5585bf;float:left;margin:5px;"
+												update="prioritizeDialog,tabView:reportForm:levFourPriorityPanel,tabView:reportForm:prioritizeTable"
+												oncomplete="resetGlobalFilter();PF('prioritizeDlg').show();" />
+										</p:column>
+										<p:column>
+											<p:commandLink styleClass="infoBtn"
+												oncomplete="PF('infoDlg').show()"
+												action="#{reportView.populateInfoText('prioritizeFASTAs')}"
+												update="levelOneInfoBox">
+												<p:graphicImage library="images" name="info_small.png"
+													style="border-radius:50%; width:15px; float:right;margin-left:5px;" />
+											</p:commandLink>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<h:outputText id="numPriorityAccLabel"
+												value="#{fn:length(reportView.selectedLevelFourAccessions)} Accessions Prioritized" />
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:commandButton id="requestFASTARunBtn"
+												value="Request FASTA" action="#{reportView.requestFastaRun}"
+												style="color:black;background-color:#5585bf;float:left;margin:5px;pointer-events: all;"
+												disabled="#{reportView.disableRequestLevel4Buttons}"
+												update="growl,tabView:reportForm:Level4RunNameBox,tabView:reportForm:levelFourLevel,levFourDomainPanel,numPriorityAccLabel" />
+											<p:tooltip id="lev4FASTAtip" for="requestFASTARunBtn"
+												value="#{reportView.levelFourRequestTip}"
+												rendered="#{reportView.showLevelFourRequestTip}"
+												style="max-width: 300px; white-space: pre-wrap;" />
+										</p:column>
+									</p:row>
+								</p:panelGrid>
+							</p:fieldset>
+							<p:fieldset id="viewFASTAFieldset"
+								style="font-size:0.75em;text-align:center" legend="View FASTA"
+								rendered="#{userLoginView.itasser}">
+								<p:panelGrid style="text-align:left;">
+									<p:row>
+										<p:column style="width:95%">
+											<p:selectOneMenu id="level4JobMenu"
+												value="#{reportView.selectedCreatedLevelFourRun}"
+												converter="levelFourRequestableConverter" var="s"
+												filter="true" filterMatchMode="contains"
+												style="width:90%;white-space:nowrap;display:inline-grid;"
+												scrollHeight="150"
+												panelStyle="width:550px;white-space:nowrap;">
+												<f:selectItem itemLabel="-Select Level 4 Run Name -"
+													itemValue="#{null}" noSelectionOption="true" />
+												<f:selectItems value="#{reportView.createdLevelFourRuns}"
+													var="item" itemLabel="#{item.displayName}"
+													itemValue="#{levelFourRequestableRow}" />
+												<p:column>
+													<h:outputText value="#{s.displayName}" />
+												</p:column>
+												<p:ajax listener="#{reportView.loadFASTAReport}"
+													update="viewFASTAFieldset,viewFASTAsDialog,tabView:reportForm:viewFASTAsTable" />
+											</p:selectOneMenu>
+										</p:column>
+										<p:column>
+											<p:commandLink styleClass="infoBtn"
+												oncomplete="PF('infoDlg').show()"
+												action="#{reportView.populateInfoText('selectLevel4FASTA')}"
+												update="levelOneInfoBox">
+												<p:graphicImage library="images" name="info_small.png"
+													style="border-radius:50%; width:15px; float:right;margin-left:5px;" />
+											</p:commandLink>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:commandButton id="filterFasta4ItasserBtn"
+												value="Filter FASTA Table"
+												style="color:black;background-color:#5585bf;float:left;"
+												disabled="#{empty reportView.selectedCreatedLevelFourRun}"
+												update="viewFASTAsTable"
+												oncomplete="PF('viewFASTAsDlg').show();" />
+										</p:column>
+										<p:column>
+											<p:commandLink styleClass="infoBtn"
+												oncomplete="PF('infoDlg').show()"
+												action="#{reportView.populateInfoText('level4FilterFASTA')}"
+												update="levelOneInfoBox">
+												<p:graphicImage library="images" name="info_small.png"
+													style="border-radius:50%; width:15px; float:right;margin-left:5px;" />
+											</p:commandLink>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<h:outputText
+												value="#{fn:length(reportView.selectedLevelFourFASTAs)} FASTAs Selected" />
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:link href="http://www.rcsb.org" value="RCSB PDB"
+												target="_blank" rel="noreferrer noopener"/>
+											<a class="exit-disclaimer" style="font-size: 0.75em;"
+												href="https://www.epa.gov/home/exit-epa"
+												title="EPA's External Link Disclaimer">Exit</a>
+										</p:column>
+										<p:column>
+											<p:commandLink styleClass="infoBtn"
+												oncomplete="PF('infoDlg').show()"
+												action="#{reportView.populateInfoText('pdbLink')}"
+												update="levelOneInfoBox">
+												<p:graphicImage library="images" name="info_small.png"
+													style="border-radius:50%; width:15px; float:right;margin-left:5px;" />
+											</p:commandLink>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<u>Restraints (Optional)</u>
+										</p:column>
+										<p:column>
+											<p:commandLink styleClass="infoBtn"
+												oncomplete="PF('infoDlg').show()"
+												action="#{reportView.populateInfoText('level4Restraint')}"
+												update="levelOneInfoBox">
+												<p:graphicImage library="images" name="info_small.png"
+													style="border-radius:50%; width:15px; float:right;margin-left:5px;" />
+											</p:commandLink>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel for="itasserPDBIDTemplate"
+												value="PDBID Restraint " />
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<span class="ui-float-label"> <p:inputText
+													id="itasserPDBIDTemplate" style="width:98%"
+													value="#{reportView.levelFourTemplate}"
+													placeholder="PDBID:ChainID" />
+											</span>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											- OR - 
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											User Defined Restraint 
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:outputLabel for="itasserTemplateName"
+												value="Restraint Name" />
+										</p:column>
+									</p:row>
+
+									<p:row>
+										<p:column>
+											<span class="ui-float-label"> <p:inputText
+													id="itasserTemplateName" style="width:98%"
+													value="#{reportView.levelFourTemplateName}" 
+													placeholder="User-Defined Restraint Name"/>
+											</span>
+										</p:column>
+									</p:row>
+									
+									<p:row>
+										<p:column>
+											<p:outputLabel for="itasserUserTemplate"
+												value="Restraint PDB"/>
+										</p:column>
+									</p:row>
+									
+									<p:row>
+										<p:column>
+											<p:inputTextarea id="itasserUserTemplate" style="width:98%;" rows="4"
+												cols="33" autoResize="false" value="#{reportView.userInputL4Restraint}"
+												placeholder="User-Defined Restraint PDB"/>
+										</p:column>
+									</p:row>
+
+									<p:row>
+										<p:column>
+											<p:commandButton id="requestITasserButton"
+												value="Request I-TASSER Run"
+												action="#{reportView.validateL4Submission}"
+												style="color:black;background-color:#5585bf;float:left;pointer-events: all;"
+												disabled="#{empty reportView.selectedCreatedLevelFourRun || reportView.disableRequestLevel4Buttons 
+												|| empty reportView.selectedLevelFourFASTAs}"
+												update="level4QueryPanel, growl, requestITasserDialog">
+											</p:commandButton>
+											<p:tooltip id="lev4tip" for="requestITasserButton"
+												value="#{reportView.levelFourRequestTip}"
+												rendered="#{reportView.showLevelFourRequestTip}"
+												style="max-width: 300px; white-space: pre-wrap;" />
+										</p:column>
+									</p:row>
+
+								</p:panelGrid>
+							</p:fieldset>
+							<p:fieldset id="viewCombinedITtasserFieldSet"
+								style="font-size:0.75em;text-align:center"
+								legend="View I-TASSER Report(s)"
+								rendered="#{userLoginView.itasser}">
+								<p:panelGrid style="text-align:left;">
+									<p:row>
+										<p:column>
+											<p:outputLabel for="levelFourViewLevel"
+												value="Select Run Level" />
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:selectOneRadio id="levelFourViewLevel" layout="pageDirection"
+												style="text-align: left"
+												value="#{reportView.chosenLevelFourViewLevel}">
+												<f:selectItem itemLabel="Level 1" itemValue='Level1' />
+												<f:selectItem itemLabel="Level 2" itemValue='Level2' />
+												<p:ajax event="change" execute="@this"
+													listener="#{reportView.changeLevelFourViewLevel()}"
+													update="lev4JobChoices" />
+											</p:selectOneRadio>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column style="width:95%">
+											<h:outputText value="Choose Reports to View" />
+										</p:column>
+										<p:column>
+											<p:commandLink styleClass="infoBtn"
+												oncomplete="PF('infoDlg').show()"
+												action="#{reportView.populateInfoText('chooseLevel4Reports')}"
+												update="levelOneInfoBox">
+												<p:graphicImage library="images" name="info_small.png"
+													style="border-radius:50%; width:15px; float:right;margin-left:5px;" />
+											</p:commandLink>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:selectCheckboxMenu id="lev4JobChoices"
+												label="-Select Level 4 Run Names -"
+												converter="levelFourRequestableConverter" var="s"
+												value="#{reportView.selectedCombineLevelFourRuns}"
+												panelStyle="width:550px;white-space: nowrap;">
+												<f:selectItems value="#{reportView.filteredStartedLevelFourRuns}"
+													var="item" itemLabel="#{item.displayName}"
+													itemValue="#{LevelFourRequestableRow}" 
+													itemDisabled="#{item.disable}"/>
+												<p:ajax event="change" execute="@this"
+													listener="#{reportView.lev4JobViewSelectionChange}"
+													update="lev4Count,lev4JobChoices" />
+												<p:ajax event="toggleSelect" execute="@this"
+													listener="#{reportView.lev4JobViewSelectAllChange}"
+													update="lev4Count,lev4JobChoices" />
+											</p:selectCheckboxMenu>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<h:outputText id="lev4Count" value="# of selected runs: #{fn:length(reportView.selectedCombineLevelFourRuns)}"/>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:commandButton id="viewCombinedItasserBtn"
+												value="View Combined Level 4 Data"
+												style="color:black;background-color:#5585bf;"
+												action="#{reportView.viewCombinedLevel4Button}" update="@form"
+												onstart="PF('statusDialog1').show();"
+												onsuccess="PF('statusDialog1').hide();" />
+										</p:column>
+									</p:row>
+								</p:panelGrid>
+							</p:fieldset>
+						</p:panel>
+						<p:panel style="font-size:0.75em;text-align:center;border:none;">
+							<p:commandButton id="refreshLevel4" value="Refresh Level 4 Runs"
+								style="color:black;background-color:#5585bf;"
+								action="#{reportView.reloadLevelFourResults}"
+								update="level4QueryPanel" onstart="PF('statusDialog1').show();"
+								onsuccess="PF('statusDialog1').hide();" />
+						</p:panel>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:panel>
+
+		<p:panel style="width:100%;padding:0px;">
+			<p:panelGrid style="width:100%">
+				<p:row>
+					<p:column style="width:50%">
+						<p:panelGrid id="reportTypeGrid" cellpadding="10"
+							style="vertical-align:top; font-size:0.75em; padding:0px;">
+							<p:row>
+								<p:column style="width:150px" rowspan="2">
+									<p:selectOneRadio id="reportTypeRadio" layout="pageDirection"
+										style="text-align: left"
+										value="#{reportView.levelOneReportType}">
+										<f:selectItem itemLabel="Primary Report" itemValue='Primary' />
+										<f:selectItem itemLabel="Full Report" itemValue='Full' />
+										<p:ajax event="change"
+											listener="#{reportView.changeLevelOneReportPage()}"
+											update="levelOneDataPanel, levelInfoPanels, queryInfoGrid, cutoffGrid, otherReportsGrid "
+											process="templateBox, jobNameBox"
+											oncomplete="closeCutWin(1);" />
+									</p:selectOneRadio>
+								</p:column>
+								<p:column style="width:300px;" rowspan="2">
+									<p:panelGrid columns="2" style="margin-bottom:10px"
+										cellpadding="5" columnClasses="align-right, align-left">
+										<p:selectBooleanCheckbox
+											value="#{reportView.highlightPartials}">
+											<p:ajax update="levelOneDataPanel" />
+										</p:selectBooleanCheckbox>
+										<h:outputText value="Partial Hit Protein Sequence"
+											style="background-color:#ffff99;" />
+										<p:selectBooleanCheckbox
+											value="#{reportView.highlightPercSim}">
+											<p:ajax update="levelOneDataPanel" />
+										</p:selectBooleanCheckbox>
+										<h:outputText value="Percent Similarity > 100%"
+											style="background-color:#ff5b33;" />
+										<p:selectBooleanCheckbox
+											value="#{reportView.highlightZeroOrtho}">
+											<p:ajax update="levelOneDataPanel" />
+										</p:selectBooleanCheckbox>
+										<h:outputText value="Susceptible = Y, Ortholog Count = 0"
+											style="background-color:#ff33cc;" />
+										<p:selectBooleanCheckbox value="#{reportView.eukaryotesOnly1}">
+											<p:ajax
+												listener="#{reportView.changeLevelOneReportsWithEukaryoteChoice}"
+												onstart="PF('statusDialog1').show();"
+												onsuccess="PF('statusDialog1').hide();closeCutWin(1)"
+												update="levelOneDataPanel, queryInfoGrid, taxonimicChoiceMenu,cutoffPanel,otherReportsGrid" />
+										</p:selectBooleanCheckbox>
+										<h:outputText value="Show Only Eukaryotes" />
+									</p:panelGrid>
+								</p:column>
+								<p:column style="width:40px;vertical-align:top" rowspan="2">
+									<p:commandLink styleClass="infoBtn"
+										oncomplete="PF('infoDlg').show();"
+										action="#{reportView.populateInfoText('ReportTableSettings')}"
+										update="levelOneInfoBox">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px" />
+									</p:commandLink>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:column>
+					<p:column style="width:50%">
+						<p:panelGrid id="otherReportsGrid" cellpadding="10"
+							style="vertical-align:top; font-size:0.75em; padding:0px;width:100%">
+							<p:row>
+								<p:column style="width:60%;text-align:right" rowspan="1">
+									<p:commandButton id="viewLevel1Summary"
+										value="View Level 1 Summary Report"
+										style="color:black;background-color:#5585bf;"
+										action="#{reportView.viewLevelSummaryButton(1)}"
+										update="summaryTable"
+										oncomplete="PF('summaryTableDlg').show();" />
+								</p:column>
+								<p:column
+									style="padding-right:0px; padding-left:0px; text-align: left; width:10%"
+									rowspan="1">
+									<p:commandLink oncomplete="PF('infoDlg').show();"
+										action="#{reportView.populateInfoText('viewSummaryReport')}"
+										update="levelOneInfoBox">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px" />
+									</p:commandLink>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column style="text-align:right;width:60%" rowspan="1">
+									<p:commandButton id="pushLevel1ToRA"
+										value="Push Level 1 To DS Report"
+										style="color:black;background-color:#5585bf;"
+										action="#{reportView.pushToRA('level1')}"
+										update="tabView:reportForm:RAReportButton,otherReportsGrid"
+										disabled="#{!reportView.level1RAReportDiffers}" />
+								</p:column>
+								<p:column
+									style="padding-right:0px; padding-left:0px; text-align: left;width:10%"
+									rowspan="1">
+									<p:commandLink oncomplete="PF('infoDlg').show();"
+										action="#{reportView.populateInfoText('pushLevOneToDS')}"
+										update="levelOneInfoBox">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px" />
+									</p:commandLink>
+								</p:column>
+								<p:column style="width:30%">
+									<h:outputText value="Click to push new changes"
+										style="color:red;width:10%; padding-left:0px"
+										rendered="#{reportView.level1RAReportDiffers and reportView.level1RAPushWarning}" />
+								</p:column>
+							</p:row>
+
+						</p:panelGrid>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:panel>
+
+		<p:dialog id="levelOneInfoBox" widgetVar="infoDlg" modal="true"
+			draggable="true" closable="true" resizable="true" showHeader="true"
+			header="#{reportView.infoHeaderText}" width="50%" fitViewport="true">
+			<h:outputText style="font-size:1.2em;" value="#{reportView.infoText}" escape="False" />
+		</p:dialog>
+
+
+		<p:dialog id="riskAssessorWizard" widgetVar="wizardDialog"
+			modal="true" draggable="true" closable="true" resizable="true"
+			showHeader="true" header="Combine Level 3 Reports" width="50%">
+			<p:ajax event="close"
+				oncomplete="PF('wiz').loadStep(PF('wiz').cfg.steps [0], true)" />
+			<p:wizard flowListener="#{reportView.onFlowProcess}"
+				showStepStatus="true" update="validateGrowl" widgetVar="wiz">
+				<p:tab id="lev3TemplateChoice" title="Level 3 Templates">
+					<p:panel styleClass="no-header">
+						<h:panelGrid>
+							<p:row>
+								<p:column>
+									<p:outputLabel for="templateChoices"
+										value="Choose a level 3 Template:" />
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:selectOneMenu id="templateChoices"
+										value="#{reportView.selectedAssessorTemplate}"
+										style="width:90%;white-space: nowrap; display:inline-grid;"
+										scrollHeight="150"
+										panelStyle="width:550px;white-space: nowrap;">
+										<f:selectItem itemLabel="-Select Level 3 Template -"
+											itemValue="#{null}" noSelectionOption="true" />
+										<f:selectItems value="#{reportView.availableTemplates}"
+											var="item" itemLabel="#{item}" itemValue="#{item}" />
+									</p:selectOneMenu>
+								</p:column>
+							</p:row>
+						</h:panelGrid>
+					</p:panel>
+				</p:tab>
+				<p:tab id="Lev3JobChoice" title="Level 3 Jobs">
+					<p:panel styleClass="no-header">
+						<h:panelGrid>
+							<p:row>
+								<p:column>
+									<p:outputLabel for="jobChoices" value="Choose level 3 Job(s):" />
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:selectCheckboxMenu id="jobChoices"
+										label="Select Level 3 Job(s)"
+										converter="levelThreeRequestableConverter" var="s"
+										value="#{reportView.selectedAssessorJobs}"
+										panelStyle="width:550px;white-space: nowrap;">
+										<f:selectItems value="#{reportView.availableJobs}" var="item"
+											itemLabel="#{item.jobName}"
+											itemValue="#{levelThreeRequestableRow}" />
+									</p:selectCheckboxMenu>
+								</p:column>
+							</p:row>
+						</h:panelGrid>
+					</p:panel>
+				</p:tab>
+				<p:tab id="Lev3JobOrder" title="Order Level 3 Jobs">
+					<p:panel styleClass="no-header">
+						<p:panelGrid>
+							<p:row>
+								<p:column>
+									<p:outputLabel for="level3OrderList"
+										value="Order Level 3 Jobs:" />
+								</p:column>
+								<p:column />
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:orderList value="#{reportView.selectedAssessorJobs}"
+										var="item" converter="levelThreeRequestableConverter"
+										itemLabel="#{item.jobName}" itemValue="#{item}"
+										controlsLocation="none" id="level3OrderList" />
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column />
+								<p:column style="text-align:right;width:100%;">
+									<p:commandButton id="viewCombinedLevel3Button"
+										value="View Level 3 Data"
+										style="color:black;background-color:#5585bf;"
+										action="#{reportView.viewCombinedLevel3Report}" update="@form" />
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:panel>
+				</p:tab>
+			</p:wizard>
+		</p:dialog>
+
+
+		<p:panel id="levelOneDataPanel"
+			header="#{reportView.levelOneHeaderText}"
+			styleClass="searchPanelContent">
+			<p style="font-size: 0.75em; text-align: right;">
+				<span class="disclaimer">The following links exit the site <a
+					class="exit-disclaimer" href="https://www.epa.gov/home/exit-epa"
+					title="EPA's External Link Disclaimer">Exit</a> <span
+					style="padding-right: 5%; display: inline-block; width: 70%; text-align: right;">
+						<p:commandButton id="downloadLev1Settings"
+							value="Download Current Level 1 Report Settings"
+							style="color:black;background-color:#5585bf;" ajax="false"
+							onclick="PrimeFaces.monitorDownload(start, stop);"
+							actionListener="#{reportView.createLev1SettingsFile}">
+							<p:fileDownload value="#{reportView.lev1SettingsFile}" />
+						</p:commandButton> <p:commandLink oncomplete="PF('infoDlg').show();"
+							action="#{reportView.populateInfoText('currentReportSettings')}"
+							update="levelOneInfoBox">
+							<p:graphicImage library="images" name="info_small.png"
+								style="border-radius:50%; width:15px; margin-left:5px;" />
+						</p:commandLink>
+				</span> <span
+					style="padding-right: 5%; padding-top: 5px; display: inline-block; width: 70%; text-align: right;">
+						<p:commandButton id="ecotoxWidget" value="ECOTOX Widget"
+							style="color:black;background-color:#5585bf;"
+							action="#{reportView.ecotoxBtn}" update="ecotoxDialog"
+							oncomplete="PF('ecotoxDlg').show();">
+						</p:commandButton> <p:commandLink oncomplete="PF('infoDlg').show();"
+							action="#{reportView.populateInfoText('ecotoxWidget')}"
+							update="levelOneInfoBox">
+							<p:graphicImage library="images" name="info_small.png"
+								style="border-radius:50%; width:15px; margin-left:5px;" />
+						</p:commandLink>
+				</span>
+				</span>
+			</p>
+			<ui:include src="#{reportView.getLevelOneReportPage()}" />
+
+		</p:panel>
+
+		<p:dialog id="summaryTable" widgetVar="summaryTableDlg" modal="true"
+			resizable="true" showEffect="clip" hideEffect="clip"
+			scrollable="true" width="900" height="300" focus="levOneSumPanel">
+			<p:panel header="Level One Summary Report" id="levOneSumPanel">
+				<p:dataTable id="levOneSummaryTable" var="r"
+					value="#{reportView.levelOneSummaryReport}" scrollable="true"
+					paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+					paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+					<f:facet name="{Exporters}">
+						<h:panelGroup>
+							<h:outputText value="Download Table:" />
+							<h:commandLink>
+								<p:graphicImage id="excelIcon" library="images" name="excel.png" />
+								<p:dataExporter type="xls" target="levOneSummaryTable"
+									fileName="SeqAPASS_Level1_Summary_Report" />
+								<p:tooltip id="excelIconTip" for="excelIcon"
+									value="Download table in excel(.xls) format" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage id="csvIcon" library="images" name="csv.png" />
+								<p:dataExporter type="csv" target="levOneSummaryTable"
+									fileName="SeqAPASS_Level1_Summary_Report" />
+								<p:tooltip id="csvIconTip" for="csvIcon"
+									value="Download table in csv format" />
+							</h:commandLink>
+						</h:panelGroup>
+					</f:facet>
+					<p:column id="taxGroup" headerText="Taxonomic Group"
+						sortBy="#{r.taxGroup}" filterBy="#{r.taxGroup}"
+						style="width:120px;text-align:center;white-space:normal"
+						filterStyle="display:none">
+						<h:outputText value="#{r.taxGroup}" />
+					</p:column>
+					<p:column id="filteredTaxGroup"
+						headerText="Filtered Taxonomic Group"
+						sortBy="#{r.filteredTaxGroup}" filterBy="#{r.filteredTaxGroup}"
+						style="width:120px;text-align:center;white-space:normal"
+						filterStyle="display:none">
+						<h:outputText value="#{r.filteredTaxGroup}" />
+					</p:column>
+					<p:column headerText="Number of Species" sortBy="#{r.numSpecies}"
+						style="width:80px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.numSpecies}" />
+					</p:column>
+					<p:column headerText="Mean Percent Similarity"
+						sortBy="#{r.meanSim}"
+						style="width:100px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.meanSim > 1.0 ? 100.0 : r.meanSim*100}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Median Percent Similarity"
+						sortBy="#{r.medSim}"
+						style="width:100px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.medSim > 1.0 ? 100.0 : r.medSim*100}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Susceptibility Prediction"
+						sortBy="#{r.susceptible}" filterBy="#{r.susceptible}"
+						filterStyle="display:none"
+						style="width:100px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.susceptible}" />
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+		</p:dialog>
+
+		<p:dialog id="xplorerLink" widgetVar="xplorerLinkDlg" modal="true"
+			resizable="true" showEffect="clip" hideEffect="clip"
+			scrollable="true" width="70%" header="Google Scholar">
+			<p:panelGrid id="xplorerLinkGrid" autoupdate="true"
+				style="margin-bottom:10px;margin-left:5px;width:100%">
+				<p:row>
+					<p:column colspan="2">
+						<p:inputTextarea id="linkBox" style="width:98%"
+							value="#{reportView.scholarString}" rows="3" cols="60" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:left">
+						<p:commandButton id="searchBtn" value="Search Google Scholar"
+							action="#{reportView.xplorerSearchBtn}"
+							update="refXplorerSearchLink"
+							oncomplete="openRefXplorerLinkInNewTab();" async="false"
+							style="color:black;background-color:#5585bf" />
+					</p:column>
+					<p:column style="text-align:right">
+						<p:commandButton id="copy2ClipboardBtn" value="Copy to Clipboard"
+							style="color:black;background-color:#5585bf"
+							onclick="copy2Clip();" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:link id="refXplorerSearchLink"
+							href="#{reportView.scholarString}" widgetVar="searchLinkWidget"
+							value="Search Google Scholar" target="_blank" rel="noreferrer noopener"
+							style="display:none" />
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+
+		<p:dialog id="ecotoxDialog" widgetVar="ecotoxDlg" modal="true"
+			resizable="true" showEffect="clip" hideEffect="clip"
+			scrollable="true" width="80%" height="700">
+			<p:panel id="ecotoxPanel">
+				<p:panel header="Select Species" id="ecotoxSpeciesPanel"
+					rendered="#{reportView.showEcotoxSpeciesPanel}">
+					<f:facet name="actions">
+						<p:commandLink styleClass="infoBtn"
+							oncomplete="PF('infoDlg').show();"
+							action="#{reportView.populateInfoText('ecotoxSpeciesSelection')}"
+							update="levelOneInfoBox">
+							<p:graphicImage library="images" name="info_small.png"
+								style="border-radius:50%; width:15px; float:right;" />
+						</p:commandLink>
+					</f:facet>
+					<p:panelGrid id="ecotoxSpeciesSelectionGrid" autoupdate="true"
+						style="table-layout:fixed; width:100%">
+						<p:row>
+							<p:column style="width:50%">
+								<p:dataTable id="ecotoxTaxMenu" var="r" style="height:400px;"
+									value="#{reportView.ecotoxTaxGroups}"
+									emptyMessage="No entries found with given criteria"
+									selection="#{reportView.ecotoxSelectedTaxGroups}"
+									resizableColumns="true" rowKey="#{r.taxGroup}"
+									rowSelectMode="checkbox" draggableColumns="false"
+									scrollable="true" scrollWidth="95%" paginator="false"
+									disabledSelection="#{r.disabled}">
+									<f:facet name="header">
+										<p:outputPanel>
+											<h:outputText
+												value="Select Taxonomic Groups (#{reportView.ecotoxSortTaxGroup})" />
+										</p:outputPanel>
+									</f:facet>
+									<p:column headerText="Select All" selectionMode="multiple"
+										exportable="false"
+										style="width:60px;text-align:center;white-space:normal" />
+									<p:ajax event="rowSelectCheckbox"
+										listener="#{reportView.onChangeEcotoxTaxMenu}"
+										update="tabView:reportForm:ecotoxSpeciesMenu,tabView:reportForm:ecotoxSpeciesCountGrid,tabView:reportForm:taxGrpBtnPanel" />
+									<p:ajax event="rowUnselectCheckbox"
+										listener="#{reportView.onChangeEcotoxTaxMenu}"
+										update="tabView:reportForm:ecotoxSpeciesMenu,tabView:reportForm:ecotoxSpeciesCountGrid,tabView:reportForm:taxGrpBtnPanel" />
+									<p:ajax event="toggleSelect"
+										listener="#{reportView.onChangeEcotoxTaxMenu}"
+										update="tabView:reportForm:ecotoxSpeciesMenu,tabView:reportForm:ecotoxSpeciesCountGrid,tabView:reportForm:taxGrpBtnPanel" />
+									<p:column headerText="Taxonomic Group">
+										<h:outputText value="#{r.taxGroup}" />
+									</p:column>
+								</p:dataTable>
+							</p:column>
+							<p:column style="width:50%">
+								<p:dataTable id="ecotoxSpeciesMenu" var="r"
+									style="height:400px;" value="#{reportView.ecotoxSpeciesColl}"
+									emptyMessage="No entries found with given criteria"
+									selection="#{reportView.ecotoxSelectedSpeciesColl}"
+									resizableColumns="true" rowKey="#{r.speciesTaxId}"
+									rowSelectMode="checkbox" draggableColumns="false"
+									scrollable="true" scrollWidth="95%" paginator="false"
+									disabledSelection="#{r.disabled}">
+									<f:facet name="header">
+										<p:outputPanel>
+											<h:outputText value="Select Species" />
+										</p:outputPanel>
+									</f:facet>
+									<p:column headerText="Select All" selectionMode="multiple"
+										exportable="false"
+										style="width:60px;text-align:center;white-space:normal" />
+									<p:ajax event="rowSelectCheckbox"
+										update="tabView:reportForm:ecotoxSpeciesCountGrid,tabView:reportForm:taxGrpBtnPanel" />
+									<p:ajax event="rowUnselectCheckbox"
+										update="tabView:reportForm:ecotoxSpeciesCountGrid,tabView:reportForm:taxGrpBtnPanel" />
+									<p:ajax event="toggleSelect"
+										update="tabView:reportForm:ecotoxSpeciesCountGrid,tabView:reportForm:taxGrpBtnPanel" />
+									<p:column headerText="Species">
+										<h:outputText
+											value="#{reportView.ecotoxSpeciesNameType eq 0 ? r.commonName : r.scientificName}" />
+									</p:column>
+								</p:dataTable>
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:panelGrid id="ecotoxSpeciesCountGrid">
+									<p:row>
+										<p:column>
+											<b>Max number of species:</b> 500
+									</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<b>Number of Species Selected:</b> #{fn:length(reportView.ecotoxSelectedSpeciesColl)}
+									</p:column>
+									</p:row>
+								</p:panelGrid>
+							</p:column>
+							<p:column>
+								<p:selectOneRadio id="nameType" layout="pageDirection"
+									value="#{reportView.ecotoxSpeciesNameType}">
+									<f:selectItem itemLabel="Common Name" itemValue="0" />
+									<f:selectItem itemLabel="Scientific Name" itemValue="1" />
+									<p:ajax event="change" update="ecotoxSpeciesMenu" />
+								</p:selectOneRadio>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+				<p:panel id="taxGrpBtnPanel" showHeader="false"
+					rendered="#{reportView.showEcotoxSpeciesPanel}"
+					style="font-size:0.9em;">
+					<p:panelGrid style="width:100%">
+						<p:row>
+							<p:column colspan="2" style="text-align:right;font-size:1.2em;">
+								<p:commandButton id="pushEcotoxNCBI" value="Push NCBI Tax IDs"
+									style="color:black;background-color:#5585bf;width:50%;"
+									disabled="#{fn:length(reportView.ecotoxSelectedSpeciesColl) gt 500}"
+									action="#{reportView.pushEcotoxNCBI}" update="ecotoxPanel" />
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+				<p:panel header="Select Chemicals (Optional)"
+					id="ecotoxChemicalsPanel" style="font-size:1.3em;"
+					rendered="#{!reportView.showEcotoxSpeciesPanel}">
+					<f:facet name="actions">
+						<p:commandLink styleClass="infoBtn"
+							oncomplete="PF('infoDlg').show();"
+							action="#{reportView.populateInfoText('ecotoxChemicalSelection')}"
+							update="levelOneInfoBox">
+							<p:graphicImage library="images" name="info_small.png"
+								style="border-radius:50%; width:15px; float:right;" />
+						</p:commandLink>
+					</f:facet>
+					<p:panelGrid id="chemicalSearchPanel" autoupdate="true"
+						style="margin-bottom:10px;margin-left:0px" cellpadding="5">
+						<p:row>
+							<p:column />
+							<p:column>
+								<p:link id="comptoxLink"
+									href="https://comptox.epa.gov/dashboard/"
+									value="CompTox Chemical Dashboard" target="_blank" rel="noreferrer noopener"
+									style="font-size:0.75em;" />
+								<p:tooltip id="comptoxLinkTip" for="comptoxLink"
+									value="Explore chemicals in CompTox Chemical Dashboard" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column styleClass="requestRun-leftColumn">
+								<p:outputLabel value=" Chemical Search:" for="chemicalString" />
+							</p:column>
+							<p:column>
+								<p:autoComplete id="chemicalString" queryDelay="333"
+									emptyMessage="No results found"
+									value="#{reportView.ecotoxSearchChemical}" minQueryLength="3"
+									completeMethod="#{reportView.completeChemical}" var="chemical"
+									itemLabel="#{chemical.displayName}" itemValue="#{chemical}"
+									converter="searchChemicalConverter" forceSelection="true"
+									scrollHeight="200" size="50">
+								</p:autoComplete>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column styleClass="requestRun-leftColumn">
+								<p:commandButton id="addChemicalButton"
+									value="Add Selected Chemical"
+									action="#{reportView.addEcotoxChemicalButton}"
+									styleClass="custom-small-button" update="chemicalSearchPanel"
+									onstart="PF('statusDialog1').show();"
+									onsuccess="PF('statusDialog1').hide()">
+								</p:commandButton>
+							</p:column>
+							<p:column>
+								<p:link id="chemicalLink"
+									href="https://cfpub.epa.gov/ecotox/explore.cfm?sub=Chemicals"
+									value="ECOTOX Chemicals" target="_blank" rel="noreferrer noopener"
+									style="font-size:0.75em; float:left" />
+								<a class="exit-disclaimer"
+									style="font-size: 0.75em; float: left"
+									href="https://www.epa.gov/home/exit-epa"
+									title="EPA's External Link Disclaimer">Exit</a>
+								<p:tooltip id="chemicalLinkTip" for="chemicalLink"
+									value="Explore chemicals in ECOTOX" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column styleClass="requestRun-leftColumn">
+								<p:outputLabel for="selectedChemicalsList"
+									value="Selected Chemicals:" />
+							</p:column>
+							<p:column>
+								<p:selectManyMenu id="selectedChemicalsList" autoupdate="true"
+									value="#{reportView.ecotoxSelectedChemicalList}"
+									converter="selectedChemicalConverter" var="c"
+									style="width:99%;white-space: nowrap;" scrollHeight="150">
+									<f:selectItems value="#{reportView.ecotoxChemicalList}"
+										var="chemicalItem" itemLabel="#{chemicalItem.displayName}"
+										itemValue="#{chemical}" />
+									<p:column>
+										<h:outputText value="#{c.displayName}" />
+									</p:column>
+								</p:selectManyMenu>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column styleClass="requestRun-leftColumn" />
+							<p:column>
+								<p:commandButton id="removeChemicalButton"
+									value="Remove Selected&#10;Chemical"
+									action="#{reportView.removeChemicalButton}"
+									styleClass="custom-small-button-break"
+									update="chemicalSearchPanel">
+								</p:commandButton>
+								<p:commandButton id="removeAllChemicalsButton"
+									value="Remove All&#10;Chemicals"
+									action="#{reportView.removeAllChemicalsButton}"
+									styleClass="custom-small-button-break"
+									update="chemicalSearchPanel">
+								</p:commandButton>
+								<div style="display: inline-block; float: right;">(#{fn:length(reportView.ecotoxChemicalList)}/5)
+									CAS Numbers Selected</div>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+
+
+
+				</p:panel>
+				<p:panel id="chemicalsBtnPanel" showHeader="false"
+					rendered="#{!reportView.showEcotoxSpeciesPanel}">
+					<p:panelGrid id="chemicalsBtnPanelGrid"
+						style="margin-bottom:10px;width:100%;" cellpadding="5">
+						<p:row>
+							<p:column style="width:25%; vertical-align:bottom;">
+								<p:commandButton id="backButton" value="Back to Tax IDs"
+									style="color:black;background-color:#5585bf;"
+									action="#{reportView.ecotoxBackButton}" update="ecotoxPanel" />
+							</p:column>
+							<p:column style="width:75%">
+								<p:panelGrid style="width:100%;text-align:right">
+									<p:row>
+
+									</p:row>
+									<p:row>
+										<p:column>
+											<p:commandButton id="gotoEcotoxBtn" value="Open in ECOTOX"
+												style="color:black;background-color:#5585bf;"
+												action="#{reportView.pushEcotoxCASRN}" />
+										</p:column>
+									</p:row>
+								</p:panelGrid>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+			</p:panel>
+		</p:dialog>
+
+		<p:dialog id="prioritizeDialog" widgetVar="prioritizeDlg" modal="true"
+			resizable="true" showEffect="clip" hideEffect="clip"
+			onHide="closePriority();" scrollable="true" width="80%"
+			height="500px">
+			<p:panel header="Level 4 Prioritize Accessions"
+				id="levFourPriorityPanel">
+				<p:dataTable id="prioritizeTable" var="r"
+					widgetVar="l4PrioritizeTableVar"
+					value="#{reportView.levelFourAccessions}"
+					selection="#{reportView.selectedLevelFourAccessions}"
+					filteredValue="#{reportView.filteredLevelFourAccessions}"
+					rowSelectMode="checkbox" rowKey="#{r.ncbiAccession}"
+					scrollable="true" scrollWidth="95%" emptyMessage="No entries found"
+					paginator="true" 
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+					paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+					<f:facet name="header">
+						<p:outputPanel>
+							<h:outputText value="Search:" />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('l4PrioritizeTableVar').filter()" style="width:150px"
+								placeholder="Enter keyword" />
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('levFourPriorityTable')}"
+								update="tabView:reportForm:levelOneInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="padding:5px; border-radius:50%; width:15px" />
+							</p:commandLink>
+						</p:outputPanel>
+					</f:facet>
+					<f:facet name="{Exporters}">
+						<h:panelGroup>
+							<h:outputText value="Download Table:" />
+							<h:commandLink>
+								<p:graphicImage id="excelPriority" library="images"
+									name="excel.png" width="24" />
+								<p:dataExporter type="xls" target="prioritizeTable"
+									fileName="Level4_priorities" />
+								<p:tooltip id="excelPriorityTip" for="excelPriority"
+									value="Download report table in excel(.xls) format" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage id="csvPriority" library="images" name="csv.png"
+									width="24" />
+								<p:dataExporter type="csv" target="prioritizeTable"
+									fileName="Level4_priorities" />
+								<p:tooltip id="csvPriorityTip" for="csvPriority"
+									value="Download report table in csv format" />
+							</h:commandLink>
+						</h:panelGroup>
+					</f:facet>
+					<p:ajax event="rowSelectCheckbox"
+						listener="#{reportView.onL4PriorityChange}"
+						update="prioritizeTable" />
+					<p:ajax event="rowUnselectCheckbox"
+						listener="#{reportView.onL4PriorityChange}"
+						update="prioritizeTable" />
+					<p:ajax event="toggleSelect"
+						listener="#{reportView.onL4PriorityChange}"
+						update="prioritizeTable" />
+					<p:column selectionMode="multiple" headerText="Include"
+						style="width:40px;text-align:center" />
+					<p:column headerText="Current Priority"
+						style="width:50px;text-align:center" sortBy="#{r.priority}">
+						<h:outputText value="#{r.priority}" />
+					</p:column>
+					<p:column headerText="Default Priority"
+						style="width:50px;text-align:center" sortBy="#{r.autoPriority}">
+						<h:outputText value="#{r.autoPriority}" />
+					</p:column>
+					<p:column headerText="NCBI Accession" sortBy="#{r.ncbiAccession}"
+						filterBy="#{r.ncbiAccession}" filterStyle="display:none">
+						<h:outputText value="#{r.ncbiAccession}" />
+					</p:column>
+					<p:column headerText="Domain" sortBy="#{r.domain}"
+						filterBy="#{r.domainId}" filterStyle="display:none"
+						rendered="#{reportView.levelFourDomainVisible}">
+						<h:outputText value="#{r.domainId}" />
+					</p:column>
+					<p:column headerText="Taxonomic Group" sortBy="#{r.taxonomyName}"
+						filterBy="#{r.taxonomyName}" filterStyle="display:none">
+						<h:outputText value="#{r.taxonomyName}" />
+					</p:column>
+					<p:column headerText="Scientific Name" sortBy="#{r.scientificName}"
+						filterBy="#{r.scientificName}" filterStyle="display:none">
+						<h:outputText value="#{r.scientificName}" />
+					</p:column>
+					<p:column headerText="Common Name" sortBy="#{r.commonName}"
+						filterBy="#{r.commonName}" filterStyle="display:none">
+						<h:outputText value="#{r.commonName}" />
+					</p:column>
+					<p:column headerText="Protein Name" sortBy="#{r.proteinName}"
+						filterBy="#{r.proteinName}" filterStyle="display:none">
+						<h:outputText value="#{r.proteinName}" />
+					</p:column>
+				</p:dataTable>
+				<p:panelGrid id="L4priorityPanel" style="width:100%;">
+					<p:row>
+						<p:column>
+							<p:commandButton id="resetDefaultL4PriorityButton"
+								value="Reset Priorities"
+								style="color:black;background-color:#5585bf;width:150px;"
+								action="#{reportView.resetDefaultL4Priority}"
+								update="prioritizeTable" />
+						</p:column>
+						<p:column>
+							<p:commandButton id="updatePrioritiesBtn"
+								value="Update Priorities"
+								actionListener="#{reportView.updatePrioritiesButton}"
+								style="color:black;background-color:#5585bf;width:150px;float:right;"
+								update="level4Fieldset" oncomplete="PF('prioritizeDlg').hide();" />
+						</p:column>
+
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+		</p:dialog>
+
+		<p:dialog id="viewFASTAsDialog" widgetVar="viewFASTAsDlg" modal="true"
+			resizable="true" showEffect="clip" hideEffect="clip"
+			onHide="closeFASTAFilter();" scrollable="true" width="80%"
+			height="600px">
+			<p:panel header="Level 4 Filter FASTAs" id="levFourFilterFASTAsPanel"
+				styleClass="zeroPaddingPanel">
+				<p:dataTable id="viewFASTAsTable" var="r"
+					widgetVar="viewFASTAsTableVar"
+					scrollHeight="300px"
+					value="#{reportView.levelFourFASTAs}"
+					selection="#{reportView.selectedLevelFourFASTAs}"
+					filteredValue="#{reportView.filteredLevelFourFASTAs}"
+					rowSelectMode="checkbox" rowKey="#{r.ncbiAccession}"
+					scrollable="true" emptyMessage="No entries found"
+					draggableRows="false" resizableColumns="true"
+					paginator="true"
+					paginatorTemplate="{Exporters}"
+					paginatorPosition="bottom" >
+					<f:facet name="header">
+						<p:outputPanel>
+							<h:outputText value="Search:" />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('viewFASTAsTableVar').filter()" style="width:150px"
+								placeholder="Enter keyword" />
+							<p:commandLink styleClass="infoBtn"
+								oncomplete="PF('infoDlg').show();"
+								action="#{reportView.populateInfoText('levFourFASTAsTable')}"
+								update="tabView:reportForm:levelOneInfoBox">
+								<p:graphicImage library="images" name="info_small.png"
+									style="padding:5px; border-radius:50%; width:15px" />
+							</p:commandLink>
+						</p:outputPanel>
+					</f:facet>
+					<f:facet name="{Exporters}">
+						<h:panelGroup>
+							<h:outputText value="Download Table:" />
+							<h:commandLink>
+								<p:graphicImage id="excelFASTA" library="images"
+									name="excel.png" width="24" />
+								<p:dataExporter type="xls" target="viewFASTAsTable"
+									fileName="Level4_FASTAs" />
+								<p:tooltip id="excelFASTATip" for="excelFASTA"
+									value="Download report table in excel(.xls) format" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage id="csvFASTA" library="images" name="csv.png"
+									width="24" />
+								<p:dataExporter type="csv" target="viewFASTAsTable"
+									fileName="Level4_FASTAs" />
+								<p:tooltip id="csvFASTATip" for="csvFASTA"
+									value="Download report table in csv format" />
+							</h:commandLink>
+						</h:panelGroup>
+					</f:facet>
+					<p:column selectionMode="multiple" headerText="Include"
+						style="width:40px;text-align:center" />
+					<p:column headerText="Status" sortBy="#{r.status}"
+						filterBy="#{r.status}" filterStyle="display:none"
+						style="width:80px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.status}" />
+					</p:column>
+					<p:column headerText="NCBI Accession" sortBy="#{r.ncbiAccession}"
+						filterBy="#{r.ncbiAccession}" filterStyle="display:none"
+						style="width:80px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.ncbiAccession}" />
+					</p:column>
+					<p:column headerText="Domain" sortBy="#{r.domain}"
+						filterBy="#{r.domainId}" filterStyle="display:none"
+						style="width:80px;text-align:center;white-space:normal"
+						rendered="#{reportView.selectedCreatedLevelFourRun.getSourceLevel() == 2}">
+						<h:outputText value="#{r.domainId}" />
+					</p:column>
+					<p:column headerText="Protein Count" sortBy="#{r.proteinCount}"
+						style="width:45px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.proteinCount}" />
+					</p:column>
+					<p:column headerText="Species Tax ID" sortBy="#{r.speciesTaxId}"
+						style="width:50px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.speciesTaxId}" />
+					</p:column>
+					<p:column headerText="Taxonomic Group" sortBy="#{r.taxonomyName}"
+						filterBy="#{r.taxonomyName}" filterStyle="display:none"
+						style="width:80px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.taxonomyName}" />
+					</p:column>
+					<p:column headerText="Filtered Taxonomic Group"
+						sortBy="#{r.filteredTaxName}" filterBy="#{r.filteredTaxName}"
+						filterStyle="display:none"
+						style="width:80px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.filteredTaxName}" />
+					</p:column>
+					<p:column headerText="Scientific Name" sortBy="#{r.scientificName}"
+						filterBy="#{r.scientificName}" filterStyle="display:none"
+						style="width:80px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.scientificName}" />
+					</p:column>
+					<p:column headerText="Common Name" sortBy="#{r.commonName}"
+						filterBy="#{r.commonName}" filterStyle="display:none"
+						style="width:80px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.commonName}" />
+					</p:column>
+					<p:column headerText="Protein Name" sortBy="#{r.proteinName}"
+						filterBy="#{r.proteinName}" filterStyle="display:none"
+						style="width:200px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.proteinName}" />
+					</p:column>
+					<p:column headerText="BLASTp Bitscore" sortBy="#{r.blastPBitScore}"
+						style="width:50px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.blastPBitScore}" />
+					</p:column>
+					<p:column headerText="Ortholog Candidate" sortBy="#{r.ortholog}"
+						style="width:60px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.ortholog}" />
+					</p:column>
+					<p:column headerText="Cut-off" sortBy="#{r.cutoff}"
+						style="width:40px;text-align:center"
+						rendered="#{reportView.selectedCreatedLevelFourRun.getSourceLevel() != 2}">
+						<h:outputText value="#{r.cutoff}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Percent Similarity"
+						sortBy="#{r.percentSimilarity}"
+						style="width:60px;text-align:center;white-space:normal">
+						<h:outputText
+							value="#{r.percentSimilarity > 1.0 ? 100.0 : r.percentSimilarity*100}">
+							<f:convertNumber pattern="#0.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Susceptibility Prediction"
+						sortBy="#{r.susceptible}"
+						style="width:90px;text-align:center;white-space:normal"
+						rendered="#{reportView.selectedCreatedLevelFourRun.getSourceLevel() != 2}">
+						<h:outputText value="#{r.susceptible}" />
+					</p:column>
+					<p:column headerText="Analysis Completed" sortBy="#{r.endDate}"
+						style="width:90px;text-align:center;white-space:normal">
+						<h:outputText
+							value="#{reportView.convertUnixTimeToDate(r.endDate)}" />
+					</p:column>
+					<p:column headerText="Eukaryote" sortBy="#{r.eukaryote}"
+						style="width:60px;text-align:center">
+						<h:outputText value="#{r.eukaryote}" />
+					</p:column>
+					<p:column headerText="FASTA" style="width:100px;text-align:center;">
+						<h:outputText value="#{empty r.fasta ? '-': r.fasta}" />
+					</p:column>
+					<p:column headerText="Formatted FASTA"
+						style="width:300px;text-align:center;white-space:pre-line;">
+						<h:outputText value="#{r.formattedFasta}" />
+					</p:column>
+				</p:dataTable>
+				<p:panelGrid id="L4fastaPanel" style="width:100%;">
+					<p:row>
+						<p:column>
+							<p:commandButton id="downloadFormatFastaButton"
+								value="Download Formatted FASTAs"
+								style="color:black;background-color:#5585bf;width:150px;"
+								ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+								actionListener="#{reportView.createFastaFile}">
+								<p:fileDownload value="#{reportView.lev4FastaFile}" />
+							</p:commandButton>
+						</p:column>
+						<p:column>
+							<p:commandButton id="updateFastasBtn" value="Update Changes"
+								style="color:black;background-color:#5585bf;width:150px;float:right;"
+								actionListener="#{reportView.updateFilterFASTAsButton}"
+								update="level4Fieldset, viewFASTAFieldset"
+								oncomplete="PF('viewFASTAsDlg').hide();" />
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+		</p:dialog>
+
+
+		<p:dialog id="requestITasserDialog" widgetVar="requestITasserDlg"
+			modal="true" resizable="true" showEffect="clip" hideEffect="clip"
+			scrollable="true" width="500px" height="250px">
+			<p:panel
+				header="#{fn:length(reportView.selectedLevelFourFASTAs)} FASTAs selected"
+				style="text-align:center;background-color:#aacdec;">
+				<p:panelGrid>
+					<p:row>
+						<p:column colspan="2">
+							<i class="pi pi-exclamation-triangle"
+								style="font-size: 3em; color: orange;"></i>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="2">
+							<h:outputText
+								value="Each FASTA may take ~1.5 days to complete.  All FASTAs may not run simultaneously."
+								style="text-align:left;" />
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="2">
+							<h:outputText value="Submit?"
+								style="text-align:center;font-size:1.5em" />
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:commandButton id="submitITasserButton"
+								value="Submit I-TASSER Run"
+								action="#{reportView.submitItasserRun}"
+								oncomplete="PF('requestITasserDlg').hide();"
+								style="color:black;background-color:#5585bf;float:left;pointer-events: all;"
+								update="growl, itasserPDBIDTemplate, viewFASTAFieldset" />
+						</p:column>
+						<p:column>
+							<p:commandButton id="cancelITasserButton" value="Cancel"
+								style="color:black;background-color:#5585bf;float:left;pointer-events: all;"
+								oncomplete="PF('requestITasserDlg').hide();"
+								update="growl,requestITasserDialog" />
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+
+
+		</p:dialog>
+
+
+		<p:remoteCommand name="reloadTable" update="levelOneDataPanel"
+			autoRun="true" />
+
+		<p:remoteCommand name="closePriority"
+			action="#{reportView.onHidePrioritiesDlg}"
+			update="level4Fieldset,prioritizeTable" />
+		<p:remoteCommand name="closeFASTAFilter"
+			action="#{reportView.onHideFASTADlg}"
+			update="viewFASTAFieldset,viewFASTAsTable" />
+
+		<script type="text/javascript">
+			function copy2Clip() {
+				//var linkText = document.getElementById('tabView:reportForm:linkBox').innerHTML;
+				//alert("Hello World!");
+				//alert(linkText);
+				var textArea = document
+						.getElementById('tabView:reportForm:linkBox');
+				textArea.select();
+				document.execCommand('copy');
+			}
+
+			function openRefXplorerLinkInNewTab() {
+				var link = document
+						.getElementById('tabView:reportForm:refXplorerSearchLink').href;
+				window.open(link, '_blank');
+			}
+		</script>
+		
+		<script>
+			function resetGlobalFilter() {
+				jQuery('input[id*="globalFilter"]').val('');
+			}
+		</script>
+
+
+
+	</ui:composition>
+</body>
+</html>

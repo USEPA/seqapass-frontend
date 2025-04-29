@@ -1,0 +1,193 @@
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="id-SFNoGTErWjt1HCbNe2haybZpC9uQUbzVNv-h34-p"
+	cacheDuration="P30DT0H0M0S" entityID="https://wamssoprd.epa.gov/oam/fed"
+	validUntil="2028-05-22T18:48:37Z">
+	<md:IDPSSODescriptor WantAuthnRequestsSigned="false"
+		protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+		<md:KeyDescriptor use="signing">
+			<dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+				<dsig:X509Data>
+					<dsig:X509Certificate>MIIB/DCCAWWgAwIBAgIBCjANBgkqhkiG9w0BAQUFADAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwHhcNMTgwNTI1MTg0ODM3WhcNMjgwNTIyMTg0ODM3WjAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKRn0SK5PbGjEEeX3hGFH9zYaRzRT7QIi8gcRmrA7pCGfoM4/c5f13HDzdGX8q3omtLfcLHpYp9d+r7CkvQHmoShalg8XCVl7SnrQbuT0g8MHUmggjfi4jHmmEkwB+GXC+BHVp29Q9gPT/ndovMksrqkZMImicoAHp/bbptID1HpAgMBAAGjQDA+MAwGA1UdEwEB/wQCMAAwDwYDVR0PAQH/BAUDAwfYADAdBgNVHQ4EFgQUAMKnQ0yRZVYUJVp8e7IZ2crUJKYwDQYJKoZIhvcNAQEFBQADgYEAl1riZ1nqH+JUgR81tD5BXx3cqaroK7id8Nd3hYmp4Ls3tfkBc/9J8l75pz1PhvzRkSii77u0px5cigGFpHRkZ92aWa+DPzZ703RZv5ulpuCvcDF7pyHrew2DKvmsetvmznWxlU/hsWc/K9dHuwmcH75er5/XJhKbTAwX+y+Vc30=
+					</dsig:X509Certificate>
+					<dsig:X509IssuerSerial>
+						<dsig:X509IssuerName>CN=wamappprd1.rtpnc.epa.gov
+						</dsig:X509IssuerName>
+						<dsig:X509SerialNumber>10</dsig:X509SerialNumber>
+					</dsig:X509IssuerSerial>
+					<dsig:X509SubjectName>CN=wamappprd1.rtpnc.epa.gov
+					</dsig:X509SubjectName>
+				</dsig:X509Data>
+			</dsig:KeyInfo>
+		</md:KeyDescriptor>
+		<md:KeyDescriptor use="encryption">
+			<dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+				<dsig:X509Data>
+					<dsig:X509Certificate>MIIB/DCCAWWgAwIBAgIBCjANBgkqhkiG9w0BAQUFADAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwHhcNMTgwNTI1MTg0ODM3WhcNMjgwNTIyMTg0ODM3WjAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKRn0SK5PbGjEEeX3hGFH9zYaRzRT7QIi8gcRmrA7pCGfoM4/c5f13HDzdGX8q3omtLfcLHpYp9d+r7CkvQHmoShalg8XCVl7SnrQbuT0g8MHUmggjfi4jHmmEkwB+GXC+BHVp29Q9gPT/ndovMksrqkZMImicoAHp/bbptID1HpAgMBAAGjQDA+MAwGA1UdEwEB/wQCMAAwDwYDVR0PAQH/BAUDAwfYADAdBgNVHQ4EFgQUAMKnQ0yRZVYUJVp8e7IZ2crUJKYwDQYJKoZIhvcNAQEFBQADgYEAl1riZ1nqH+JUgR81tD5BXx3cqaroK7id8Nd3hYmp4Ls3tfkBc/9J8l75pz1PhvzRkSii77u0px5cigGFpHRkZ92aWa+DPzZ703RZv5ulpuCvcDF7pyHrew2DKvmsetvmznWxlU/hsWc/K9dHuwmcH75er5/XJhKbTAwX+y+Vc30=
+					</dsig:X509Certificate>
+					<dsig:X509IssuerSerial>
+						<dsig:X509IssuerName>CN=wamappprd1.rtpnc.epa.gov
+						</dsig:X509IssuerName>
+						<dsig:X509SerialNumber>10</dsig:X509SerialNumber>
+					</dsig:X509IssuerSerial>
+					<dsig:X509SubjectName>CN=wamappprd1.rtpnc.epa.gov
+					</dsig:X509SubjectName>
+				</dsig:X509Data>
+			</dsig:KeyInfo>
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes192-cbc" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />
+		</md:KeyDescriptor>
+		<md:ArtifactResolutionService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://wamssoprd.epa.gov/oamfed/idp/soap"
+			index="1" isDefault="true" />
+		<md:SingleLogoutService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+			Location="https://wamssoprd.epa.gov/oamfed/idp/samlv20"
+			ResponseLocation="https://wamssoprd.epa.gov/oamfed/idp/samlv20" />
+		<md:SingleLogoutService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://wamssoprd.epa.gov/oamfed/idp/samlv20"
+			ResponseLocation="https://wamssoprd.epa.gov/oamfed/idp/samlv20" />
+		<md:SingleSignOnService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+			Location="https://wamssoprd.epa.gov/oamfed/idp/samlv20" />
+		<md:SingleSignOnService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://wamssoprd.epa.gov/oamfed/idp/samlv20" />
+		<md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+			Location="https://wamssoprd.epa.gov/oamfed/idp/soap" />
+	</md:IDPSSODescriptor>
+	<md:AttributeAuthorityDescriptor
+		protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+		<md:KeyDescriptor use="signing">
+			<dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+				<dsig:X509Data>
+					<dsig:X509Certificate>MIIB/DCCAWWgAwIBAgIBCjANBgkqhkiG9w0BAQUFADAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwHhcNMTgwNTI1MTg0ODM3WhcNMjgwNTIyMTg0ODM3WjAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKRn0SK5PbGjEEeX3hGFH9zYaRzRT7QIi8gcRmrA7pCGfoM4/c5f13HDzdGX8q3omtLfcLHpYp9d+r7CkvQHmoShalg8XCVl7SnrQbuT0g8MHUmggjfi4jHmmEkwB+GXC+BHVp29Q9gPT/ndovMksrqkZMImicoAHp/bbptID1HpAgMBAAGjQDA+MAwGA1UdEwEB/wQCMAAwDwYDVR0PAQH/BAUDAwfYADAdBgNVHQ4EFgQUAMKnQ0yRZVYUJVp8e7IZ2crUJKYwDQYJKoZIhvcNAQEFBQADgYEAl1riZ1nqH+JUgR81tD5BXx3cqaroK7id8Nd3hYmp4Ls3tfkBc/9J8l75pz1PhvzRkSii77u0px5cigGFpHRkZ92aWa+DPzZ703RZv5ulpuCvcDF7pyHrew2DKvmsetvmznWxlU/hsWc/K9dHuwmcH75er5/XJhKbTAwX+y+Vc30=
+					</dsig:X509Certificate>
+					<dsig:X509IssuerSerial>
+						<dsig:X509IssuerName>CN=wamappprd1.rtpnc.epa.gov
+						</dsig:X509IssuerName>
+						<dsig:X509SerialNumber>10</dsig:X509SerialNumber>
+					</dsig:X509IssuerSerial>
+					<dsig:X509SubjectName>CN=wamappprd1.rtpnc.epa.gov
+					</dsig:X509SubjectName>
+				</dsig:X509Data>
+			</dsig:KeyInfo>
+		</md:KeyDescriptor>
+		<md:KeyDescriptor use="encryption">
+			<dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+				<dsig:X509Data>
+					<dsig:X509Certificate>MIIB/DCCAWWgAwIBAgIBCjANBgkqhkiG9w0BAQUFADAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwHhcNMTgwNTI1MTg0ODM3WhcNMjgwNTIyMTg0ODM3WjAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKRn0SK5PbGjEEeX3hGFH9zYaRzRT7QIi8gcRmrA7pCGfoM4/c5f13HDzdGX8q3omtLfcLHpYp9d+r7CkvQHmoShalg8XCVl7SnrQbuT0g8MHUmggjfi4jHmmEkwB+GXC+BHVp29Q9gPT/ndovMksrqkZMImicoAHp/bbptID1HpAgMBAAGjQDA+MAwGA1UdEwEB/wQCMAAwDwYDVR0PAQH/BAUDAwfYADAdBgNVHQ4EFgQUAMKnQ0yRZVYUJVp8e7IZ2crUJKYwDQYJKoZIhvcNAQEFBQADgYEAl1riZ1nqH+JUgR81tD5BXx3cqaroK7id8Nd3hYmp4Ls3tfkBc/9J8l75pz1PhvzRkSii77u0px5cigGFpHRkZ92aWa+DPzZ703RZv5ulpuCvcDF7pyHrew2DKvmsetvmznWxlU/hsWc/K9dHuwmcH75er5/XJhKbTAwX+y+Vc30=
+					</dsig:X509Certificate>
+					<dsig:X509IssuerSerial>
+						<dsig:X509IssuerName>CN=wamappprd1.rtpnc.epa.gov
+						</dsig:X509IssuerName>
+						<dsig:X509SerialNumber>10</dsig:X509SerialNumber>
+					</dsig:X509IssuerSerial>
+					<dsig:X509SubjectName>CN=wamappprd1.rtpnc.epa.gov
+					</dsig:X509SubjectName>
+				</dsig:X509Data>
+			</dsig:KeyInfo>
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes192-cbc" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />
+		</md:KeyDescriptor>
+		<md:AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+			Location="https://wamssoprd.epa.gov/oamfed/aa/soap" />
+		<md:AttributeProfile>urn:oasis:names:tc:SAML:2.0:profiles:attribute:basic
+		</md:AttributeProfile>
+	</md:AttributeAuthorityDescriptor>
+	<md:SPSSODescriptor AuthnRequestsSigned="true"
+		WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+		<md:KeyDescriptor use="signing">
+			<dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+				<dsig:X509Data>
+					<dsig:X509Certificate>MIIB/DCCAWWgAwIBAgIBCjANBgkqhkiG9w0BAQUFADAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwHhcNMTgwNTI1MTg0ODM3WhcNMjgwNTIyMTg0ODM3WjAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKRn0SK5PbGjEEeX3hGFH9zYaRzRT7QIi8gcRmrA7pCGfoM4/c5f13HDzdGX8q3omtLfcLHpYp9d+r7CkvQHmoShalg8XCVl7SnrQbuT0g8MHUmggjfi4jHmmEkwB+GXC+BHVp29Q9gPT/ndovMksrqkZMImicoAHp/bbptID1HpAgMBAAGjQDA+MAwGA1UdEwEB/wQCMAAwDwYDVR0PAQH/BAUDAwfYADAdBgNVHQ4EFgQUAMKnQ0yRZVYUJVp8e7IZ2crUJKYwDQYJKoZIhvcNAQEFBQADgYEAl1riZ1nqH+JUgR81tD5BXx3cqaroK7id8Nd3hYmp4Ls3tfkBc/9J8l75pz1PhvzRkSii77u0px5cigGFpHRkZ92aWa+DPzZ703RZv5ulpuCvcDF7pyHrew2DKvmsetvmznWxlU/hsWc/K9dHuwmcH75er5/XJhKbTAwX+y+Vc30=
+					</dsig:X509Certificate>
+					<dsig:X509IssuerSerial>
+						<dsig:X509IssuerName>CN=wamappprd1.rtpnc.epa.gov
+						</dsig:X509IssuerName>
+						<dsig:X509SerialNumber>10</dsig:X509SerialNumber>
+					</dsig:X509IssuerSerial>
+					<dsig:X509SubjectName>CN=wamappprd1.rtpnc.epa.gov
+					</dsig:X509SubjectName>
+				</dsig:X509Data>
+			</dsig:KeyInfo>
+		</md:KeyDescriptor>
+		<md:KeyDescriptor use="encryption">
+			<dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+				<dsig:X509Data>
+					<dsig:X509Certificate>MIIB/DCCAWWgAwIBAgIBCjANBgkqhkiG9w0BAQUFADAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwHhcNMTgwNTI1MTg0ODM3WhcNMjgwNTIyMTg0ODM3WjAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKRn0SK5PbGjEEeX3hGFH9zYaRzRT7QIi8gcRmrA7pCGfoM4/c5f13HDzdGX8q3omtLfcLHpYp9d+r7CkvQHmoShalg8XCVl7SnrQbuT0g8MHUmggjfi4jHmmEkwB+GXC+BHVp29Q9gPT/ndovMksrqkZMImicoAHp/bbptID1HpAgMBAAGjQDA+MAwGA1UdEwEB/wQCMAAwDwYDVR0PAQH/BAUDAwfYADAdBgNVHQ4EFgQUAMKnQ0yRZVYUJVp8e7IZ2crUJKYwDQYJKoZIhvcNAQEFBQADgYEAl1riZ1nqH+JUgR81tD5BXx3cqaroK7id8Nd3hYmp4Ls3tfkBc/9J8l75pz1PhvzRkSii77u0px5cigGFpHRkZ92aWa+DPzZ703RZv5ulpuCvcDF7pyHrew2DKvmsetvmznWxlU/hsWc/K9dHuwmcH75er5/XJhKbTAwX+y+Vc30=
+					</dsig:X509Certificate>
+					<dsig:X509IssuerSerial>
+						<dsig:X509IssuerName>CN=wamappprd1.rtpnc.epa.gov
+						</dsig:X509IssuerName>
+						<dsig:X509SerialNumber>10</dsig:X509SerialNumber>
+					</dsig:X509IssuerSerial>
+					<dsig:X509SubjectName>CN=wamappprd1.rtpnc.epa.gov
+					</dsig:X509SubjectName>
+				</dsig:X509Data>
+			</dsig:KeyInfo>
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes192-cbc" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />
+		</md:KeyDescriptor>
+		<md:SingleLogoutService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+			Location="https://wamssoprd.epa.gov/oamfed/sp/samlv20"
+			ResponseLocation="https://wamssoprd.epa.gov/oamfed/sp/samlv20" />
+		<md:SingleLogoutService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://wamssoprd.epa.gov/oamfed/sp/samlv20"
+			ResponseLocation="https://wamssoprd.epa.gov/oamfed/sp/samlv20" />
+		<md:AssertionConsumerService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
+			Location="https://wamssoprd.epa.gov/oam/server/fed/sp/sso" index="0"
+			isDefault="true" />
+		<md:AssertionConsumerService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://wamssoprd.epa.gov/oam/server/fed/sp/sso"
+			index="1" />
+	</md:SPSSODescriptor>
+	<md:RoleDescriptor xmlns:query="urn:oasis:names:tc:SAML:metadata:ext:query"
+		WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"
+		xsi:type="query:AttributeQueryDescriptorType">
+		<md:KeyDescriptor use="signing">
+			<dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+				<dsig:X509Data>
+					<dsig:X509Certificate>MIIB/DCCAWWgAwIBAgIBCjANBgkqhkiG9w0BAQUFADAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwHhcNMTgwNTI1MTg0ODM3WhcNMjgwNTIyMTg0ODM3WjAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKRn0SK5PbGjEEeX3hGFH9zYaRzRT7QIi8gcRmrA7pCGfoM4/c5f13HDzdGX8q3omtLfcLHpYp9d+r7CkvQHmoShalg8XCVl7SnrQbuT0g8MHUmggjfi4jHmmEkwB+GXC+BHVp29Q9gPT/ndovMksrqkZMImicoAHp/bbptID1HpAgMBAAGjQDA+MAwGA1UdEwEB/wQCMAAwDwYDVR0PAQH/BAUDAwfYADAdBgNVHQ4EFgQUAMKnQ0yRZVYUJVp8e7IZ2crUJKYwDQYJKoZIhvcNAQEFBQADgYEAl1riZ1nqH+JUgR81tD5BXx3cqaroK7id8Nd3hYmp4Ls3tfkBc/9J8l75pz1PhvzRkSii77u0px5cigGFpHRkZ92aWa+DPzZ703RZv5ulpuCvcDF7pyHrew2DKvmsetvmznWxlU/hsWc/K9dHuwmcH75er5/XJhKbTAwX+y+Vc30=
+					</dsig:X509Certificate>
+					<dsig:X509IssuerSerial>
+						<dsig:X509IssuerName>CN=wamappprd1.rtpnc.epa.gov
+						</dsig:X509IssuerName>
+						<dsig:X509SerialNumber>10</dsig:X509SerialNumber>
+					</dsig:X509IssuerSerial>
+					<dsig:X509SubjectName>CN=wamappprd1.rtpnc.epa.gov
+					</dsig:X509SubjectName>
+				</dsig:X509Data>
+			</dsig:KeyInfo>
+		</md:KeyDescriptor>
+		<md:KeyDescriptor use="encryption">
+			<dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+				<dsig:X509Data>
+					<dsig:X509Certificate>MIIB/DCCAWWgAwIBAgIBCjANBgkqhkiG9w0BAQUFADAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwHhcNMTgwNTI1MTg0ODM3WhcNMjgwNTIyMTg0ODM3WjAjMSEwHwYDVQQDExh3YW1hcHBwcmQxLnJ0cG5jLmVwYS5nb3YwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKRn0SK5PbGjEEeX3hGFH9zYaRzRT7QIi8gcRmrA7pCGfoM4/c5f13HDzdGX8q3omtLfcLHpYp9d+r7CkvQHmoShalg8XCVl7SnrQbuT0g8MHUmggjfi4jHmmEkwB+GXC+BHVp29Q9gPT/ndovMksrqkZMImicoAHp/bbptID1HpAgMBAAGjQDA+MAwGA1UdEwEB/wQCMAAwDwYDVR0PAQH/BAUDAwfYADAdBgNVHQ4EFgQUAMKnQ0yRZVYUJVp8e7IZ2crUJKYwDQYJKoZIhvcNAQEFBQADgYEAl1riZ1nqH+JUgR81tD5BXx3cqaroK7id8Nd3hYmp4Ls3tfkBc/9J8l75pz1PhvzRkSii77u0px5cigGFpHRkZ92aWa+DPzZ703RZv5ulpuCvcDF7pyHrew2DKvmsetvmznWxlU/hsWc/K9dHuwmcH75er5/XJhKbTAwX+y+Vc30=
+					</dsig:X509Certificate>
+					<dsig:X509IssuerSerial>
+						<dsig:X509IssuerName>CN=wamappprd1.rtpnc.epa.gov
+						</dsig:X509IssuerName>
+						<dsig:X509SerialNumber>10</dsig:X509SerialNumber>
+					</dsig:X509IssuerSerial>
+					<dsig:X509SubjectName>CN=wamappprd1.rtpnc.epa.gov
+					</dsig:X509SubjectName>
+				</dsig:X509Data>
+			</dsig:KeyInfo>
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes192-cbc" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" />
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc" />
+		</md:KeyDescriptor>
+	</md:RoleDescriptor>
+</md:EntityDescriptor>

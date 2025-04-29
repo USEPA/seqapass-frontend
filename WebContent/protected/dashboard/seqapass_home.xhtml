@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+		<h:form id="homeForm">
+			<h:panelGrid columns="3" cellpadding="10" styleClass="menuBar"
+				columnClasses="left-column,center-column,right-column">
+				<p:column>Welcome to SeqAPASS</p:column>
+				<p:column>Version #{userLoginView.updateInfo.get(0).getSeqapassVersion()}</p:column>
+				<p:column>Logged in as: #{userLoginView.username}</p:column>
+			</h:panelGrid>
+
+			<p:panel id="basic" header="SeqAPASS Home" style="margin-bottom:20px">
+				<p:commandLink id="aboutLink" value="About SeqAPASS"
+					style="color:black;background-color:#ffffff;" action="about.xhtml" />
+				<p:tooltip id="aboutLinkTip" for="aboutLink"
+							value="Version information and references" />
+				<p />
+				<p:link id="userGuideLink" href="https://www.epa.gov/chemical-research/seqapass-user-guide" 
+					value="SeqAPASS User Guide" target="_blank" rel="noreferrer noopener" style="text-decoration: none; border-bottom: 1px solid #000000; color: #000000;" 
+					/>
+				<p:tooltip id="userGuideLinkTip" for="userGuideLink"
+							value="Comprehensive guide to using SeqAPASS" />
+				<p />
+				<p:link id="feedbackLink" href="mailto:SeqAPASS.support@epa.gov" 
+					value="Submit Comment/Question or Report a Problem" target="_blank" rel="noreferrer noopener" style="text-decoration: none; border-bottom: 1px solid #000000; color: #000000;" 
+					/>
+				<p:tooltip id="feedbackLinkTip" for="feedbackLink"
+							value="Give us feedback" />
+				<p:commandLink styleClass="infoBtn" 
+						oncomplete="PF('homeDlg').show();" action="#{reportView.populateInfoText('reportProblem')}" update="homeInfoBox">
+						<p:graphicImage library="images" name="info_small.png" style="border-radius:50%; width:15px;margin-left:5px;"/>
+				</p:commandLink>
+				<p />
+				<br/>
+<h3>Welcome to the Sequence Alignment to Predict Across Species Susceptibility (SeqAPASS) Tool</h3>
+<p>
+The SeqAPASS tool is intended to be used to extrapolate chemical toxicity knowledge/data from one species to others. This extrapolation is termed cross species extrapolation and is based on the current understanding of a chemical-protein or protein-protein interaction in one species and the collection of lines of evidence indicating a similar interaction in another species is likely to occur. The results from SeqAPASS provide evidence of protein conservation to be used for predictions of chemical susceptibility or pathway conservation across the diversity of species. This is important as the majority of species will never be tested in the laboratory for toxicity though researchers and regulators are interested in understanding the potential for chemical impacts on all species that have potential for exposure in the environment. 
+</p>
+<p>
+Specifically, the tool takes advantage of existing knowledge of a chemical causing an effect through a particular protein in a particular species (usually a species known to be sensitive to a chemical) or a protein involved in an assay where a test species is represented. The protein from that species is queried in the SeqAPASS tool to generated lines of evidence for conservation in other species. 
+</p>
+<p>
+Note: Necessary input to SeqAPASS is the combination of a protein and an individual species 
+</p>
+<p>
+There are three levels to the SeqAPASS evaluation available to all users. Level 1 compares primary amino acid sequences, Level 2 compares functional domains, and Level 3 compares critical individual amino acids across species. Each level provides an additional line of evidence toward conservation and a prediction of susceptibility, which is equivalent to saying the protein is conserved in that species and the chemical is likely to interact similar to the query species. Users will choose to run Level 2 or Level 3 if there is enough knowledge available relative to functional domains and critical amino acids. There are information buttons integrated throughout the tool to guide users through this streamlined analysis as well as visualizations, summary reports, and strategic interoperability with other valuable resources for interpreting the results for cross species extrapolation.  
+</p>
+<h3>Demonstrated uses of SeqAPASS</h3>
+Academic, industry, and government researchers and decision-makers are using this tool to inform studies and decisions, including:
+<ul>
+<li>Predicting chemical susceptibility across the diversity of species</li>
+<li>Defining how broadly data from toxicity studies may be extrapolated to other non-tested species (including threatened and endangered species) </li>
+<li>Defining the taxonomic domain of applicability for biological pathways, such as adverse outcome pathways</li>
+<li>Predicting bioaccumulation potential of chemicals known to bioaccumulate through interactions with proteins</li>
+<li>Generating research hypotheses for further laboratory study</li>
+</ul>
+<h3>Advanced Users of SeqAPASS Level 4</h3>
+<p>
+The Level 4 evaluation is intended for advanced users only and generates protein structural models to perform structural alignments for an additional line of evidence of conservation. Such results can also be exported for more advanced bioinformatics approaches like molecular docking, virtual screening, or molecular dynamic simulations.
+</p>
+<h3>Want to learn more?</h3>
+<p>
+Please feel free to reach out the SeqAPASS team with any questions or to request training <a href="mailto:SeqAPASS.support@epa.gov">SeqAPASS.support@epa.gov</a>.
+</p>
+<h3><u>Presentations:</u></h3>
+<p>
+Presenter: Dr. Carlie LaLone, US EPA<br/>
+Title: Bioinformatics for Cross Species Extrapolation<br/>
+Host: US EPA<br/>
+Link: <a href="https://youtu.be/ToavVp6gWa8" target="_blank" rel="noreferrer noopener">https://youtu.be/ToavVp6gWa8</a>
+</p>
+<p>
+Presenter: Dr. Carlie LaLone, US EPA<br/>
+Title: Bioinformatics is for Everyone: Applications to Challenges in Ecotoxicology<br/>
+Host: Eawag – aquatic research<br/>
+Link: <a href="https://www.youtube.com/watch?v=5TnEUW_d9fM" target="_blank" rel="noreferrer noopener">https://www.youtube.com/watch?v=5TnEUW_d9fM</a>
+</p>
+<h3><u>Publications:</u></h3>
+<p>
+Schumann, P. G., Chang D. T., Mayasich, S. A., Vliet, S. M. F., Brown, T. N., LaLone, C. A. Cross-species molecular docking method to support predictions of species susceptibility to chemical effects. Computational Toxicology. <a href="https://doi.org/10.1016/j.comtox.2024.100319" target="_blank" rel="noreferrer_noopener">https://doi.org/10.1016/j.comtox.2024.100319</a> 
+</p>
+<p>
+Vliet, S. M. F., Hazemi, M., Blatz, D. J., Jensen, M. A., Mayasich, S., Transue, T., Simmons, C., Wilkinson, A., LaLone, C. A. (2023) Demonstration of the Sequence Alignment to Predict Across Species Susceptibility Tool for Rapid Assessment of Protein Conservation. Journal of Visualized Experiments. <a href="https://doi.org/10.3791/63970-v" target="_blank" rel="noreferrer noopener">https://doi.org/10.3791/63970-v</a>
+</p>
+<p>
+LaLone, C. A., Blatz, D. J., Jensen, M. A., Vliet, S. M. F., Mayasich, S., Mattingly, K. Z., Transue, T. R., Melendez, W., Wilkinson, A., Simmons, C. W., Ng, C., Zhang, C., Zhang, Y. (2023) From Protein Sequence to Structure: The Next Frontier in Cross Species Extrapolation for Chemical Safety Evaluations. Environmental Toxicology and Chemistry. <a href="https://doi.org/10.1002/etc.5537" target="_blank" rel="noreferrer noopener">https://doi.org/10.1002/etc.5537</a>
+</p>
+<p>
+Jensen, M. A. Blatz, D. J., LaLone, C. A. (2022) Defining the Plausible Taxonomic Domain of Applicability of an Adverse Outcome Pathway Linking Nicotinic Acetylcholine Receptor Activation to Colony Death. Environmental Toxicology and Chemistry. <a href="https://doi.org/10.1002/etc.5501" target="_blank" rel="noreferrer noopener">https://doi.org/10.1002/etc.5501</a>
+</p>
+<p>
+Cheng, W., Doering, J. A., LaLone, C. A., Ng, C. (2021) Integrative Computational Approaches to Inform Relative Bioaccumulation Potential of Per- and Polyfluoroalkyl Substances Across Species. Toxicological Sciences. 180(2), 212–223. <a href="https://doi.org/10.1093/toxsci/kfab004" target="_blank" rel="noreferrer noopener">https://doi.org/10.1093/toxsci/kfab004</a>
+</p>
+<p>
+LaLone, C. A., Villeneuve, D. L., Doering, J. A., Blackwell, B. R., Transue, T. R., Simmons, C. W., Swintek, J. A., Degitz, S. J., Williams, A. J., Ankley, G. T. (2018) Evidence for Cross Species Extrapolation of Mammalian-Based High-Throughput Screening Assay Results. Environmental Science and Technology. 52(23), 13960-13971. <a href="https://doi.org/10.1021/acs.est.8b04587" target="_blank" rel="noreferrer noopener">https://doi.org/10.1021/acs.est.8b04587</a>
+</p>
+<p>
+Doering, J. A., Lee, S., Kristiansen, K., Evenseth, L., Barron, M., Sylte, I., and LaLone, C. A. (2018) In silico site-directed mutagenesis informs species-specific predictions of chemical susceptibility derived from the Sequence Alignment to Predict Across Species Susceptibility (SeqAPASS) tool. Toxicological Sciences. 166(1), 131-145. <a href="https://doi.org/10.1093/toxsci/kfy186" target="_blank" rel="noreferrer noopener">https://doi.org/10.1093/toxsci/kfy186</a>
+</p>
+<p>
+LaLone, C. A., Villeneuve, D. L., Lyons, D., Helgen, H. W., Robinson, S. L., Swintek, J. A., Saari, T.W, Ankley, G. T. (2016) Sequence Alignment to Predict Across Species Susceptibility (SeqAPASS): A web-based tool for addressing the challenges of cross-species extrapolation of chemical toxicity. Toxicological Sciences. 153(2): 228-245. <a href="https://doi.org/10.1093/toxsci/kfw119" target="_blank" rel="noreferrer noopener">https://doi.org/10.1093/toxsci/kfw119</a>
+</p>
+<p>
+LaLone, C. A., Villeneuve, D. L., Burgoon, L. D., Russom, C. L., Helgen, H. W., Berninger, J. P., Tietge, J. E., Severson, M. N., Cavallin, J. E., Ankley, G. T. (2013) Molecular Target Sequence Similarity as a Basis for Species Extrapolation to Assess the Ecological Risk of Chemicals with Known Modes of Action. Aquatic Toxicology. 144-145:141-154. <a href="https://doi.org/10.1016/j.aquatox.2013.09.004" target="_blank" rel="noreferrer noopener">https://doi.org/10.1016/j.aquatox.2013.09.004</a>
+</p>
+ 
+				
+			</p:panel>
+			
+			<p:dialog id="homeInfoBox" widgetVar="homeDlg" modal="true"
+					draggable="true" closable="true" resizable="true"
+					showHeader="true" header="#{reportView.infoHeaderText}" width="50%" fitViewport="true">
+					<h:outputText style="font-size:1.2em;" value="#{reportView.infoText}" escape="False"/>
+			</p:dialog>
+			
+		</h:form>
+	</ui:composition>
+</body>
+</html>

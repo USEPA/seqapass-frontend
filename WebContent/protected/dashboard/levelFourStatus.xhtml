@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+
+
+
+		<p:panel id="runStatusLevelFourPanel"
+			header="SeqAPASS Level 4 Run Status" style="margin:0; padding:0;">
+
+			<p:panel id="level4StatusPanel" header="I-TASSER Status"
+				style="margin:0; padding:0;">
+				<p:dataTable id="runStatusLevelFourTableId" var="r"
+					widgetVar="LevFourStatusTable" style="font-size:0.75em"
+					value="#{statusView.levelFourStatusList}" rowKey="#{r.key}"
+					emptyMessage="No entries found with given criteria"
+					filteredValue="#{statusView.filteredLevelFourStatusList}"
+					resizableColumns="true" draggableColumns="true" scrollable="true"
+					scrollWidth="95%" paginator="true" sortOrder="descending"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+					paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+					<f:facet name="header">
+						<p:outputPanel>
+							<h:outputText value="Search:" />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('LevFourStatusTable').filter()" style="width:150px"
+								placeholder="Enter keyword" />
+						</p:outputPanel>
+					</f:facet>
+					<f:facet name="{Exporters}">
+						<h:panelGroup>
+							<h:outputText value="Download Table:" />
+							<h:commandLink>
+								<p:graphicImage id="excelStatusLev4" library="images"
+									name="excel.png" />
+								<p:dataExporter type="xls" target="runStatusLevelFourTableId"
+									fileName="SeqAPASS_Level4_Status" />
+								<p:tooltip id="excelStatusLev4Tip" for="excelStatusLev4"
+									value="Download level 4 status table in excel(.xls) format" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage id="csvStatusLev4" library="images"
+									name="csv.png" />
+								<p:dataExporter type="csv" target="runStatusLevelFourTableId"
+									fileName="SeqAPASS_Level4_Status" />
+								<p:tooltip id="csvStatusLev4Tip" for="csvStatusLev4"
+									value="Download level 4 status table in csv format" />
+							</h:commandLink>
+						</h:panelGroup>
+					</f:facet>
+					<p:column headerText="SeqAPASS Run Id" style="white-space:normal;text-align:center;width:100px;"
+						sortOrder="desc" sortPriority="1" sortBy="#{r.runId}">
+						<h:outputText value="#{r.runId}" />
+					</p:column>
+					<p:column headerText="Data Version" style="width:100px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.updateVersion}" />
+					</p:column>
+					<p:column headerText="User" style="width:150px;text-align:center"
+						filterBy="#{r.email}" filterStyle="display:none">
+						<h:outputText value="#{r.email}" />
+					</p:column>
+					<p:column headerText="Job Name" style="width:150px;text-align:center;"
+						filterBy="#{r.jobName}" filterStyle="display:none">
+						<h:outputText value="#{r.jobName}" />
+					</p:column>
+					<p:column headerText="Level 1 Query Accession" style="width:150px;text-align:center;white-space:normal"
+						filterBy="#{r.accession}" filterStyle="display:none">
+						<h:outputText value="#{r.accession}" />
+					</p:column>
+					<p:column headerText="Status" style="width:120px;text-align:center;">
+						<h:outputText value="#{r.status}" />
+					</p:column>
+					<p:column headerText="FASTA: Date Completed"  style="width:190px;text-align:center;">
+						<h:outputText
+							value="#{reportView.convertUnixTimeToDate(r.fastaEnd)}" />
+					</p:column>
+					<p:column headerText="FASTA: # Completed" style="width:80px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.fastasCompleted}" />
+					</p:column>
+					<p:column headerText="I-TASSER: FASTAs Run" style="width:80px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.itasserFastas}" />
+					</p:column>
+					<p:column headerText="I-TASSER: Start Date" style="width:190px;text-align:center;white-space:normal">
+						<h:outputText
+							value="#{reportView.convertUnixTimeToDate2(r.itasserStart)}" />
+					</p:column>
+					<p:column headerText="I-TASSER: Date Completed" style="width:190px;text-align:center;white-space:normal">
+						<h:outputText
+							value="#{r.itasserEnd == r.itasserStart ? '-' : reportView.convertUnixTimeToDate(r.itasserEnd)}" />
+					</p:column>
+					<p:column headerText="I-TASSER: Duration" style="width:300px;text-align:center;white-space:normal">
+						<h:outputText
+							value="#{statusView.convertRunDuration(r.itasserDuration)}" />
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+			<p:panel id="tmalignStatusPanel" header="TM-align Status"
+				style="margin:0; padding:0;">
+				<p:dataTable id="runStatusTMAlignTableId" var="r"
+					widgetVar="TMAlignStatusTable" style="font-size:0.75em"
+					value="#{statusView.tmAlignStatusList}" rowKey="#{r.key}"
+					emptyMessage="No entries found with given criteria"
+					filteredValue="#{statusView.filteredTMAlignStatusList}"
+					resizableColumns="true" draggableColumns="true" scrollable="true"
+					scrollWidth="95%" paginator="true" sortOrder="descending"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+					paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+					<f:facet name="header">
+						<p:outputPanel>
+							<h:outputText value="Search:" />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('TMAlignStatusTable').filter()" style="width:150px"
+								placeholder="Enter keyword" />
+						</p:outputPanel>
+					</f:facet>
+					<f:facet name="{Exporters}">
+						<h:panelGroup>
+							<h:outputText value="Download Table:" />
+							<h:commandLink>
+								<p:graphicImage id="excelStatusTMAlign" library="images"
+									name="excel.png" />
+								<p:dataExporter type="xls" target="runStatusTMAlignTableId"
+									fileName="SeqAPASS_TMAlign_Status" />
+								<p:tooltip id="excelStatusTMAlignTip" for="excelStatusTMAlign"
+									value="Download TM-align status table in excel(.xls) format" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage id="csvStatusTMAlign" library="images"
+									name="csv.png" />
+								<p:dataExporter type="csv" target="runStatusTMAlignTableId"
+									fileName="SeqAPASS_TMAlign_Status" />
+								<p:tooltip id="csvStatusTMAlignTip" for="csvStatusTMAlign"
+									value="Download TM-align status table in csv format" />
+							</h:commandLink>
+						</h:panelGroup>
+					</f:facet>
+
+
+					<p:column headerText="TM-align Run Id" sortOrder="desc"
+						sortPriority="1" sortBy="#{r.runId}" style="width:100px;text-align:center;">
+						<h:outputText value="#{r.runId}" />
+					</p:column>
+					<p:column headerText="Level 4 Run Id(s)" sortOrder="desc"
+						sortPriority="1" sortBy="#{r.runId}" style="width:100px;text-align:center;">
+						<h:outputText value="#{r.otherRunIdsLabel}" />
+					</p:column>
+					<p:column headerText="Data Version" style="width:100px;text-align:center;">
+						<h:outputText value="#{r.updateVersion}" />
+					</p:column>
+					<p:column headerText="User" style="width:150px;text-align:center;"
+						filterBy="#{r.email}" filterStyle="display:none">
+						<h:outputText value="#{r.email}" />
+					</p:column>
+					<p:column headerText="Job Names(s)" style="width:150px;text-align:center;"
+						filterBy="#{r.jobName}" filterStyle="display:none">
+						<h:outputText value="#{r.jobName}" />
+					</p:column>
+					<p:column headerText="TM-align Query Accession"
+						style="width:150px;text-align:center;"
+						filterBy="#{r.accession}" filterStyle="display:none">
+						<h:outputText value="#{r.accession}" />
+					</p:column>
+					<p:column headerText="Query Accession Level 4 Run Id"
+						style="width:100px;text-align:center;">
+						<h:outputText value="#{r.queryLevel4RunId}" />
+					</p:column>
+					<p:column headerText="Status" style="width:75px;text-align:center;">
+						<h:outputText value="#{r.status}" />
+					</p:column>
+					<p:column headerText="Start Date" style="width:200px;text-align:center;">
+						<h:outputText
+							value="#{reportView.convertUnixTimeToDate2(r.tmalignStart)}" />
+					</p:column>
+					<p:column headerText="Date Completed" style="width:190px;text-align:center;">
+						<h:outputText
+							value="#{reportView.convertUnixTimeToDate(r.tmalignEnd)}" />
+					</p:column>
+					<p:column headerText="Duration" style="width:100px;text-align:center;">
+						<h:outputText
+							value="#{statusView.convertRunDuration(r.tmalignDuration)}" />
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+		</p:panel>
+
+	</ui:composition>
+</body>
+</html>

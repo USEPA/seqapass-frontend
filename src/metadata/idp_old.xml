@@ -1,0 +1,52 @@
+<md:EntityDescriptor entityID="https://idp.epa.gov/"
+	xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata">
+	<md:IDPSSODescriptor WantAuthnRequestsSigned="0"
+		protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+		<md:KeyDescriptor use="signing">
+			<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+				<ds:X509Data>
+					<ds:X509Certificate>MIIFdjCCBF6gAwIBAgIKH4vQZAAAAAAEyzANBgkqhkiG9w0BAQUFADCBxzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExHzAdBgNVBAoTFlNlY3VyZUF1dGggQ29ycG9yYXRpb24xOzA5BgNVBAsTMihjKSAyMDEyIFNlY3VyZUF1dGggQ29ycCAtIEZvciBhdXRob3JpemVkIHVzZSBvbmx5MR0wGwYDVQQLExRDZXJ0aWZpY2F0ZSBTZXJ2aWNlczEmMCQGA1UEAxMdU2VjdXJlQXV0aCBJbnRlcm1lZGlhdGUgQ0EgMUEwHhcNMTMwNzAxMTc0MjQzWhcNMjMwNzAxMTc0MjQzWjCBsDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMR8wHQYDVQQHExZSZXNlYXJjaCBUcmlhbmdsZSBQYXJrMSgwJgYDVQQKEx9FbnZpcm9ubWVudGFsIFByb3RlY3Rpb24gQWdlbmN5MRwwGgYDVQQLExNTZW5pb3IgSVQgQXJjaGl0ZWN0MR8wHQYDVQQDExZTZWN1cmVBdXRoMDZWTS5lcGEuZ292MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5izhE/Ts2LtBcVuy39Bs84TrnoO0n6dTab0yIpL6JI3xmog5ytoGjO6vpAAgCnVTnOfd5pxXyRzpRQXD1RMqTS+EX6tP6QJHyftZ8ZddMpB/+YhFcygZKvVwST9zl27CbuArnVdZJtS7gKDPFPuwEKrLzlFRa6os26RQ1y/kBVPqnzh245jK8zcJYNpqLIi6+VGJd1pvyY3ngD+rRa7BCxSVcur+sInXaBjY1nqs/mXg7TZ1j6dNR7PlRvcjjA63TYdSwM8AsiUNA9M5eDY+J6VPWKBqNKv42xRkZetDmQynSJFFaZ2mtEe85LFhqVMMXfALtbF+UhxRKa2dneoyWQIDAQABo4IBdzCCAXMwDgYDVR0PAQH/BAQDAgTwMCAGA1UdJQEB/wQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAdBgNVHQ4EFgQUSBy7pf8p0AU0RqOou2D7aN2y158wHwYDVR0jBBgwFoAUxgSdmPDKdjfM0WXV/LP7dSy5Fg0wYwYDVR0fBFwwWjBYoFagVIZSaHR0cDovL3g1MDkubXVsdGlmYWN0b3J0cnVzdDMuY29tL0NlcnRJbmZvL1NlY3VyZUF1dGglMjBJbnRlcm1lZGlhdGUlMjBDQSUyMDFBLmNybDCBmQYIKwYBBQUHAQEEgYwwgYkwgYYGCCsGAQUFBzAChnpodHRwOi8veDUwOS5tdWx0aWZhY3RvcnRydXN0My5jb20vQ2VydEluZm8vU0FJbnRDQS0xQS5iYW5uZXIubXVsdGlmYWN0b3J0cnVzdDMuY29tX1NlY3VyZUF1dGglMjBJbnRlcm1lZGlhdGUlMjBDQSUyMDFBLmNydDANBgkqhkiG9w0BAQUFAAOCAQEAozF6UIg74I/SSluGY4HaverybiAmmz7vexZ3AZ3c26RtdyYjVvFYWuyHi0228aarUdyzVGFaRPeZpR5WvcM7HgRxwnRdbDMsZ1TN+4F2JBev9rKENQYo8p0frH5O4gBj/g+yi3BzOHLlnBaL4c150vPdP1ve4IT4Nk4Eu0b7zAQPsxAaYgibnlHFexR8Nbx81sNC7vrvEPq+NYqIgR82RvJ3YMgVPmKcmraM+Iq+ZUP64Mfo6TdTDJYIjXa8lIS7lH1kkaTEm+uUgDk58c/enAISUvk34P+P8VXAseUy3BMdgrMHdHCbbgMZIElnPE8qKb37lN+oz2Y1MBZKbRCnug==
+					</ds:X509Certificate>
+				</ds:X509Data>
+			</ds:KeyInfo>
+		</md:KeyDescriptor>
+		<md:ArtifactResolutionService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://idp.epa.gov/piv_option_nootp/"
+			index="0" isDefault="1" />
+		<md:SingleLogoutService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+			Location="https://idp.epa.gov/piv_option_nootp/" />
+		<md:SingleLogoutService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://idp.epa.gov/piv_option_nootp/" />
+		<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+			Location="https://idp.epa.gov/piv_option_nootp/" />
+		<md:ManageNameIDService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+			Location="https://idp.epa.gov/piv_option_nootp/" />
+		<md:ManageNameIDService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://idp.epa.gov/piv_option_nootp/" />
+		<md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+			Location="https://idp.epa.gov/piv_option_nootp/" />
+		<md:SingleSignOnService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+			Location="https://idp.epa.gov/piv_option_nootp/" />
+		<md:SingleSignOnService
+			Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://idp.epa.gov/piv_option_nootp/" />
+		<md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+			Location="https://idp.epa.gov/piv_option_nootp/" />
+	</md:IDPSSODescriptor>
+	<md:AttributeAuthorityDescriptor
+		protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+		<md:KeyDescriptor use="signing">
+			<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+				<ds:X509Data>
+					<ds:X509Certificate>MIIFdjCCBF6gAwIBAgIKH4vQZAAAAAAEyzANBgkqhkiG9w0BAQUFADCBxzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExHzAdBgNVBAoTFlNlY3VyZUF1dGggQ29ycG9yYXRpb24xOzA5BgNVBAsTMihjKSAyMDEyIFNlY3VyZUF1dGggQ29ycCAtIEZvciBhdXRob3JpemVkIHVzZSBvbmx5MR0wGwYDVQQLExRDZXJ0aWZpY2F0ZSBTZXJ2aWNlczEmMCQGA1UEAxMdU2VjdXJlQXV0aCBJbnRlcm1lZGlhdGUgQ0EgMUEwHhcNMTMwNzAxMTc0MjQzWhcNMjMwNzAxMTc0MjQzWjCBsDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMR8wHQYDVQQHExZSZXNlYXJjaCBUcmlhbmdsZSBQYXJrMSgwJgYDVQQKEx9FbnZpcm9ubWVudGFsIFByb3RlY3Rpb24gQWdlbmN5MRwwGgYDVQQLExNTZW5pb3IgSVQgQXJjaGl0ZWN0MR8wHQYDVQQDExZTZWN1cmVBdXRoMDZWTS5lcGEuZ292MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5izhE/Ts2LtBcVuy39Bs84TrnoO0n6dTab0yIpL6JI3xmog5ytoGjO6vpAAgCnVTnOfd5pxXyRzpRQXD1RMqTS+EX6tP6QJHyftZ8ZddMpB/+YhFcygZKvVwST9zl27CbuArnVdZJtS7gKDPFPuwEKrLzlFRa6os26RQ1y/kBVPqnzh245jK8zcJYNpqLIi6+VGJd1pvyY3ngD+rRa7BCxSVcur+sInXaBjY1nqs/mXg7TZ1j6dNR7PlRvcjjA63TYdSwM8AsiUNA9M5eDY+J6VPWKBqNKv42xRkZetDmQynSJFFaZ2mtEe85LFhqVMMXfALtbF+UhxRKa2dneoyWQIDAQABo4IBdzCCAXMwDgYDVR0PAQH/BAQDAgTwMCAGA1UdJQEB/wQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAdBgNVHQ4EFgQUSBy7pf8p0AU0RqOou2D7aN2y158wHwYDVR0jBBgwFoAUxgSdmPDKdjfM0WXV/LP7dSy5Fg0wYwYDVR0fBFwwWjBYoFagVIZSaHR0cDovL3g1MDkubXVsdGlmYWN0b3J0cnVzdDMuY29tL0NlcnRJbmZvL1NlY3VyZUF1dGglMjBJbnRlcm1lZGlhdGUlMjBDQSUyMDFBLmNybDCBmQYIKwYBBQUHAQEEgYwwgYkwgYYGCCsGAQUFBzAChnpodHRwOi8veDUwOS5tdWx0aWZhY3RvcnRydXN0My5jb20vQ2VydEluZm8vU0FJbnRDQS0xQS5iYW5uZXIubXVsdGlmYWN0b3J0cnVzdDMuY29tX1NlY3VyZUF1dGglMjBJbnRlcm1lZGlhdGUlMjBDQSUyMDFBLmNydDANBgkqhkiG9w0BAQUFAAOCAQEAozF6UIg74I/SSluGY4HaverybiAmmz7vexZ3AZ3c26RtdyYjVvFYWuyHi0228aarUdyzVGFaRPeZpR5WvcM7HgRxwnRdbDMsZ1TN+4F2JBev9rKENQYo8p0frH5O4gBj/g+yi3BzOHLlnBaL4c150vPdP1ve4IT4Nk4Eu0b7zAQPsxAaYgibnlHFexR8Nbx81sNC7vrvEPq+NYqIgR82RvJ3YMgVPmKcmraM+Iq+ZUP64Mfo6TdTDJYIjXa8lIS7lH1kkaTEm+uUgDk58c/enAISUvk34P+P8VXAseUy3BMdgrMHdHCbbgMZIElnPE8qKb37lN+oz2Y1MBZKbRCnug==
+					</ds:X509Certificate>
+				</ds:X509Data>
+			</ds:KeyInfo>
+		</md:KeyDescriptor>
+		<md:AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+			Location="https://idp.epa.gov/piv_option_nootp/" />
+	</md:AttributeAuthorityDescriptor>
+</md:EntityDescriptor>
+                

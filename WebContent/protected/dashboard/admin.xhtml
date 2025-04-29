@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<head>
+<!-- force IE to render to use the highest compatibility mode -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<title>SeqAPASS Settings Page</title>
+</head>
+
+<body>
+	<ui:composition>
+
+		<h:form id="addUserForm">
+			<p:growl id="growl" showDetail="true" sticky="false" life="10000" />
+
+			<p:confirmDialog id="confirmDialog" widgetVar="confirmDialogVar"
+				global="false" showEffect="fade" hideEffect="fade"
+				message="#{settingsView.dialogMsg}" style="white-space:pre;max-height:95%;overflow-y:scroll;">
+				<p:commandButton value="Yes"
+					actionListener="#{settingsView.deleteRuns}"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check"
+					oncomplete="PF('confirmDialogVar').hide();"
+					update="growl, deleteRunsPanel" />
+				<p:commandButton value="No" type="button"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close"
+					onclick="PF('confirmDialogVar').hide();" />
+			</p:confirmDialog>
+
+
+
+			<h:panelGrid columns="3" cellpadding="10" styleClass="menuBar"
+				columnClasses="left-column,center-column,right-column">
+				<p:column>Welcome to SeqAPASS</p:column>
+				<p:column>Version #{userLoginView.updateInfo.get(0).getSeqapassVersion()}</p:column>
+				<p:column>Logged in as: #{userLoginView.username}</p:column>
+			</h:panelGrid>
+
+			<p:panel header="Add/Update SeqAPASS User" id="addUserPanel"
+				styleClass="searchPanelContent"
+				style="width:75%; margin: auto; margin-bottom: 20px;"
+				rendered="#{userLoginView.admin}">
+
+				<p:panelGrid columns="2" styleClass="no-border"
+					columnClasses="no-border,no-border,no-border">
+
+					<p:outputLabel value="Email" for="email" />
+					<p:inputText id="email" label="email" value="#{settingsView.email}" />
+					<p:outputLabel value="Grant Admin Rights" for="adminCheckBox" />
+					<p:selectBooleanCheckbox id="adminCheckBox"
+						value="#{settingsView.adminRights}" label="adminCheckBox" />
+					<p:outputLabel value="Grant I-TASSER Rights" for="itasserCheckBox"/>
+					<p:selectBooleanCheckbox id="itasserCheckBox"
+						value="#{settingsView.itasserRights}" label="itasserCheckBox"/>
+
+					<p:column />
+					<p:commandButton id="addUserButton" value="Add/Update User"
+						action="#{settingsView.addUserButton}"
+						styleClass="custom-small-button" update="growl, addUserPanel">
+					</p:commandButton>
+				</p:panelGrid>
+			</p:panel>
+
+			<p:panel header="Change Password" id="changePassPanel"
+				styleClass="searchPanelContent"
+				style="width:75%; margin: auto; margin-bottom: 20px;">
+				<p>External Users: To change or reset a password, follow instructions at <a href="https://login.gov" target="_blank" rel="noreferrer noopener">https://login.gov</a>.</p>
+				<p>EPA users: Manage your EPA password with help from the Enterprise IT Service Desk (Formerly Call Center and EZ Tech) 1-866-411-4EPA (4372) <a href="mailto:eisd@epa.gov">eisd@epa.gov</a> </p>
+			</p:panel>
+
+			<p:panel header="Delete Runs" id="deleteRunsPanel"
+				styleClass="searchPanelContent"
+				style="width:75%; margin: auto; margin-bottom: 20px;"
+				rendered="#{userLoginView.admin}">
+
+				<p:panelGrid style="margin-bottom:10px;margin-left:0px;"
+					cellpadding="5">
+					<p:row>
+						<p:column
+							style="width:250px; text-align:right; vertical-align:top;">
+							<br />
+							<br />
+							<p:outputLabel value="Enter accessions to delete"
+								for="accessionBox" />
+						</p:column>
+						<p:column>
+							<p:inputTextarea id="accessionBox"
+								value="#{settingsView.deleteText}" rows="6" cols="33" />
+							<p:tooltip id="accessionBoxTip" for="accessionBox"
+								showEvent="focus" hideEvent="blur">
+								<h:panelGroup>
+									<h:outputText
+										value="-Enter seqapass_run_id:accession to delete-" />
+									<br />
+									<h:outputText value="Example:  123:NP_000116.2" />
+									<br />
+									<h:outputText value="   to delete accession NP_000116.2 run with seqapass run id 123" />
+								</h:panelGroup>
+							</p:tooltip>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+						</p:column>
+						<p:column>
+							<p:commandButton id="deleteAccessionRunButton"
+								value="Delete Run(s)" action="#{settingsView.deleteAccButton}"
+								styleClass="custom-small-button" update="growl, confirmDialog">
+							</p:commandButton>
+							<p:spacer width="130" height="20" />
+							<p:commandButton id="clearAccessionsButton" value="Clear"
+								styleClass="custom-small-button"
+								action="#{settingsView.clearAccButton}" update="deleteRunsPanel" />
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+			</p:panel>
+
+		</h:form>
+
+	</ui:composition>
+</body>
+</html>
+
+
+

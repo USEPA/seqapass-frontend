@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+		<p:dataTable id="reportLevelThreePrimaryTableId" var="r"
+			widgetVar="LevThreePrimaryTable"
+			value="#{reportView.levelThreeReport}"
+			emptyMessage="No entries found with given criteria"
+			filteredValue="#{reportView.filteredLevelThreeReport}"
+			resizableColumns="true" draggableColumns="false" scrollable="true"
+			scrollWidth="95%" paginator="true"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+			paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+			<f:facet name="header">
+				<p:outputPanel>
+					<h:outputText value="Search:" />
+					<p:inputText id="globalFilter"
+						onkeyup="PF('LevThreePrimaryTable').filter()" style="width:150px"
+						placeholder="Enter keyword" />
+					<p:commandLink styleClass="infoBtn" 
+						oncomplete="PF('infoDlg').show();" action="#{reportView.populateInfoText('levThreePrimaryReport')}" update="tabView:reportForm:levelThreeInfoBox">
+						<p:graphicImage library="images" name="info_small.png" style="padding:5px; border-radius:50%; width:15px"/>
+					</p:commandLink>
+				</p:outputPanel>
+			</f:facet>
+			<f:facet name="{Exporters}">
+				<h:panelGroup>
+					<h:outputText value="Download Table:" />
+					<h:commandLink>
+						<p:graphicImage id="excelIcon" library="images" name="excel.png" />
+						<p:dataExporter type="xls" target="reportLevelThreePrimaryTableId"
+							fileName="SeqAPASS_Level3_Primary_Report" />
+						<p:tooltip id="excelIconTip" for="excelIcon"
+							value="Download table in excel(.xls) format" />
+					</h:commandLink>
+
+					<h:commandLink>
+						<p:graphicImage id="csvIcon" library="images" name="csv.png" />
+						<p:dataExporter type="csv" target="reportLevelThreePrimaryTableId"
+							fileName="SeqAPASS_Level3_Primary_Report" />
+						<p:tooltip id="csvIconTip" for="csvIcon"
+							value="Download table in csv format" />
+					</h:commandLink>
+				</h:panelGroup>
+			</f:facet>>
+			<p:column headerText="Data Version"
+				style="width:80px;text-align:center;font-size:0.75em;white-space:normal">
+				<h:outputText value="#{r.updateVersion}" />
+			</p:column>
+			<p:column headerText="Job Name"
+				style="width:80px;text-align:center;font-size:0.75em;white-space:normal"
+				rendered="#{reportView.combinedLevel3Report}">
+				<h:outputText value="#{r.jobName}" />
+			</p:column>
+			<p:column headerText="NCBI Accession" sortBy="#{r.accession}"
+				filterBy="#{r.accession}"
+				style="width:150px;text-align:center;font-size:0.75em"
+				filterStyle="display:none"
+				exportFunction="#{reportView.exportLink}">
+				<p:tooltip for="accessionCol" trackMouse="true">
+					<h:panelGroup style="font-size:0.75em">
+					   #{r.accession}
+					</h:panelGroup>
+				</p:tooltip>
+				<p:link id="accessionCol" href="http://www.ncbi.nlm.nih.gov/protein/#{r.accession}"
+					value="#{r.accession}" target="_blank" rel="noreferrer noopener"/>
+			</p:column>
+			<p:column headerText="Protein Count" sortBy="#{r.proteinCount}"
+				style="width:80px;text-align:center;font-size:0.75em;white-space:normal">
+				<h:outputText value="#{r.proteinCount}" />
+			</p:column>
+			<p:column headerText="Species Tax ID" sortBy="#{r.speciesTaxId}"
+				style="width:80px;text-align:center;;font-size:0.75em;white-space:normal"
+				exportFunction="#{reportView.exportLink}">
+				<p:link
+					href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&amp;id=#{r.speciesTaxId}&amp;lvl=3&amp;lin=f&amp;keep=1&amp;srchmode=1&amp;unlock"
+					value="#{r.speciesTaxId}" target="_blank" rel="noreferrer noopener"/>
+			</p:column>
+			<p:column headerText="Taxonomic Group" sortBy="#{r.taxonomyName}"
+				filterBy="#{r.taxonomyName}"
+				style="width:250px;text-align:center;font-size:0.75em"
+				filterStyle="display:none">
+				<h:outputText value="#{r.taxonomyName}" />
+			</p:column>
+			<p:column headerText="Scientific Name" sortBy="#{r.scientificName}"
+				filterBy="#{r.scientificName}"
+				style="width:300px;text-align:center;;font-size:0.75em"
+				filterStyle="display:none"
+				exportFunction="#{reportView.exportLink}">
+				<p:link
+					href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&amp;id=#{r.speciesTaxId}&amp;lvl=3&amp;lin=f&amp;keep=1&amp;srchmode=1&amp;unlock"
+					value="#{r.scientificName}" target="_blank" rel="noreferrer noopener"/>
+			</p:column>
+			<p:column headerText="Common Name" sortBy="#{r.commonName}"
+				filterBy="#{r.commonName}"
+				style="width:200px;text-align:center;font-size:0.75em"
+				filterStyle="display:none">
+				<h:outputText value="#{r.commonName}" />
+			</p:column>
+			<p:column headerText="Protein Name" sortBy="#{r.proteinName}"
+				filterBy="#{r.proteinName}"
+				style="width:400px;text-align:center;font-size:0.75em"
+				filterStyle="display:none"
+				exportFunction="#{reportView.exportLink}">
+				<p:link href="http://www.ncbi.nlm.nih.gov/protein/#{r.accession}"
+					value="#{r.proteinName}" target="_blank" rel="noreferrer noopener"/>
+			</p:column>
+			<p:column headerText="Analysis Completed" sortBy="#{r.endDate}"
+				filterBy="#{r.endDate}" filterStyle="display:none"
+				style="width:190px;text-align:center;font-size:0.75em">
+				<h:outputText value="#{reportView.convertUnixTimeToDate(r.endDate)}" />
+			</p:column>
+			<p:column headerText="Similar Susceptibility as Template" sortBy="#{r.susceptible}"
+				filterBy="#{r.susceptible}" filterStyle="display:none"
+				style="width:130px;text-align:center;font-size:0.75em;white-space:normal">
+				<h:outputText value="#{r.susceptible}" />
+			</p:column>
+			<p:columns value="#{reportView.primaryResidueHeaders}" var="id"
+				headerText="#{id}" escape="false"
+				style="width:80px;text-align:center;font-size:0.75em">
+				<h:outputText value="#{r.primaryFlatResidues[id]}" />
+			</p:columns>
+		</p:dataTable>
+
+		<p:remoteCommand name="reloadTable" process="@this"
+			update="reportLevelThreePrimaryTableId" autoRun="true" />
+
+
+	</ui:composition>
+</body>
+</html>

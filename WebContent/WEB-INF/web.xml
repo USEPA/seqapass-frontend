@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
+  <display-name>SeqAPASS-BE</display-name>
+  
+  <!-- Spring root -->
+	<context-param>
+		<param-name>contextClass</param-name>
+		<param-value>
+         org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+      </param-value>
+	</context-param>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>gov.epa.seqapass.spring</param-value>
+	</context-param>
+		<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+  <display-name>SeqAPASS-FE</display-name>
+  <welcome-file-list>
+  	<welcome-file>index.xhtml</welcome-file>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  <context-param>
+    <description>State saving method: 'client' or 'server' (=default). See JSF Specification 2.5.2</description>
+    <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+    <param-value>client</param-value>
+  </context-param>
+  <context-param>
+    <param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+    <param-value>resources.application</param-value>
+  </context-param>
+  <context-param>
+  	<param-name>facelets.SKIP_COMMENTS</param-name>
+  	<param-value>true</param-value>
+  </context-param>
+  <servlet>
+    <servlet-name>Faces Servlet</servlet-name>
+    <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Faces Servlet</servlet-name>
+    <url-pattern>*.xhtml</url-pattern>
+  </servlet-mapping>
+  <context-param>
+    <description>
+	This parameter tells MyFaces if javascript code should be allowed in
+	the rendered HTML output.
+	If javascript is allowed, command_link anchors will have javascript code
+	that submits the corresponding form.
+	If javascript is not allowed, the state saving info and nested parameters
+	will be added as url parameters.
+	Default is 'true'</description>
+    <param-name>org.apache.myfaces.ALLOW_JAVASCRIPT</param-name>
+    <param-value>true</param-value>
+  </context-param>
+  <context-param>
+    <description>
+	If true, rendered HTML code will be formatted, so that it is 'human-readable'
+	i.e. additional line separators and whitespace will be written, that do not
+	influence the HTML code.
+	Default is 'true'</description>
+    <param-name>org.apache.myfaces.PRETTY_HTML</param-name>
+    <param-value>true</param-value>
+  </context-param>
+  <context-param>
+    <param-name>org.apache.myfaces.DETECT_JAVASCRIPT</param-name>
+    <param-value>false</param-value>
+  </context-param>
+  
+  
+  <!-- Change to "Production" when you are ready to deploy -->
+	<context-param>
+		<param-name>javax.faces.PROJECT_STAGE</param-name>
+		<param-value>Production</param-value>
+	</context-param>
+	
+	<!--  PrimeFaces theme setting -->
+	<context-param>
+	  <param-name>primefaces.THEME</param-name>
+	  <param-value>bootstrap</param-value>
+	</context-param>
+  
+  
+  <context-param>
+  
+    <description>
+	If true, a javascript function will be rendered that is able to restore the
+	former vertical scroll on every request. Convenient feature if you have pages
+	with long lists and you do not want the browser page to always jump to the top
+	if you trigger a link or button action that stays on the same page.
+	Default is 'false'
+</description>
+    <param-name>org.apache.myfaces.AUTO_SCROLL</param-name>
+    <param-value>true</param-value>
+  </context-param>
+  <context-param>
+    <param-name>config_file</param-name>
+    <param-value>/config.properties</param-value>
+  </context-param>
+  <listener>
+    <listener-class>org.apache.myfaces.webapp.StartupServletContextListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>
+             gov.epa.seqapass.listener.SeqAPassServletContextListener
+        </listener-class>
+  </listener>
+  <filter>
+    <filter-name>SessionFilter</filter-name>
+    <filter-class>
+		gov.epa.seqapass.filter.SessionFilter
+	</filter-class>
+    <init-param>
+      <param-name>avoid-urls</param-name>
+      <param-value></param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>SessionFilter</filter-name>
+    <url-pattern>/protected/*</url-pattern>
+  </filter-mapping>
+  
+  <!-- Spring Security -->
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+  
+  
+</web-app>

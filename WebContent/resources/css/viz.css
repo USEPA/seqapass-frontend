@@ -1,0 +1,178 @@
+.invis {
+	visibility: hidden;
+	display: none;
+}
+
+.removeThis1 {
+  fill:#ff0000;
+}
+
+.removeThis2 {
+  fill:#ff0000;
+}
+
+.xaxis1 {
+  font-size:12pt;
+}
+
+.xaxis2 {
+  font-size:12pt;
+}
+
+.yaxis1 {
+  font-size:12pt;
+}
+
+.yaxis2 {
+  font-size:12pt;
+}
+
+#levOneVizForm\:speciesMenu_panel .ui-selectcheckboxmenu-header .ui-chkbox-box
+	{
+	display: none;
+}
+
+#levTwoVizForm\:speciesMenu2_panel .ui-selectcheckboxmenu-header .ui-chkbox-box
+	{
+	display: none;
+}
+
+#popupDiv1 {
+	height: auto;
+	background-color: #4d4d4d;
+	border: none;
+	padding: 5px;
+	color: #FFFFFF;
+}
+
+#popupDiv2 {
+	height: auto;
+	background-color: #4d4d4d;
+	border: none;
+	padding: 5px;
+	color: #FFFFFF;
+}
+
+.cursorRemove {
+	cursor: url("../resources/images/delete_cursor6.gif"), pointer;
+}
+
+.taxonText1 {
+	// Note that this is also in the seqapass.js in a keyup function
+	cursor: url("../resources/images/delete_cursor6.gif"), pointer;
+}
+
+.taxonText2 {
+	// Note that this is also in the seqapass.js in a keyup function
+	cursor: url("../resources/images/delete_cursor6.gif"), pointer;
+}
+
+
+
+
+// heatmap stylings
+
+#heatmapDiv body{
+    font-family: Arial;
+}
+#heatmapDiv h1{
+    color: #0099FF;
+}
+#heatmapDiv p{
+    color: #000000;
+}
+#heatmapDiv tr{
+    background-color: #FFFFFF;
+
+}
+#heatmapDiv td{
+    /*background-color: #345d96;*/
+	border: 1px black solid;
+	border-radius:5px;
+	padding:5px;
+	white-space:nowrap;
+	min-width:70px;
+	/*min-width:40px;*/
+}
+
+#heatmapDiv td:nth-child(1){
+	/*background-color: #f9f9f9;*/
+	border-radius:0px;
+}
+
+#heatmapDiv th{
+	border: 1px black solid;
+	padding:3px;
+	background-color: #c4c4c4;
+}
+
+#heatmapDiv table{
+    color: #000000;
+	border-spacing: 1px 2px;
+	width:100%;
+	/*border: 2px black solid;*/
+}
+
+#heatmapDiv #tipTableDiv{
+	background-color: #AACEDC;
+}
+
+#heatmapDiv #tipTable{
+    color: #000000;
+	border-spacing: 0px 0px
+	/*border: 2px black solid;*/
+}
+
+#heatmapDiv #tipTable td{
+    /*background-color: #FFFFFF;*/
+	background-color: #f0f0f0;
+	border: 1px black solid;
+}
+
+#heatmapDiv #tipTable td:nth-child(1){
+	background-color: #CFCFCF;
+}
+
+
+/*#legend1Table tr{
+    background-color: red;
+
+}*/
+#heatmapDiv .legend td{
+    /*background-color: #345d96;*/
+	border: 1px black solid;
+	border-radius:5px;
+	background-color: #FFFFFF;
+	min-width:10px;
+}
+
+#heatmapDiv .legend{
+    color: #000000;
+	border-spacing: 1px 2px;
+	width: auto;
+	font-size: 14px;
+	/*border: 1px solid black;*/
+	border: none;
+	align-self: flex-end;
+}
+
+#heatmapDiv .legend td:nth-child(1){
+	width:10px;
+	
+}
+
+#heatmapDiv .legend td:nth-child(2){
+	border: none;
+}
+
+#heatmapDiv #legendDiv{
+	display: flex;
+	float: left;
+	border:1px solid black;
+}
+
+.verticaltext {
+	width:1px;
+	word-wrap: break-word;
+	white-space:pre-wrap;
+}

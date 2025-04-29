@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+
+		<p:dialog widgetVar="statusDialog1" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false">
+			<p:panelGrid>
+				<p:row>
+					<p:column style="text-align:center">
+								Querying Database...
+							</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+						<p:graphicImage library="images" name="spinner.gif" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="text-align:center">
+								Please Wait
+							</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+
+		<p:panel id="LevelThreeQueryPanel"
+			header="Level 3 Template Protein Information"
+			styleClass="searchPanelContent">
+			<h:outputText style="font-size:0.75em"
+				value="Individual amino acid residue(s) aligned with template sequence.  Use the main button to go back to the SeqAPASS Reports list." />
+			<p:panelGrid id="queryInfoGrid" autoupdate="true"
+				style="margin-bottom:10px;margin-left:5px;font-size:0.75em;width:100%">
+				<p:row>
+					<p:column style="width:20%">
+						<b>SeqAPASS ID:</b> #{reportView.runId}</p:column>
+					<p:column style="width:30%">
+						<b>Query Accession: </b>
+						<p:link
+							href="http://www.ncbi.nlm.nih.gov/protein/#{reportView.accession}"
+							value="#{reportView.accession}" target="_blank" rel="noreferrer noopener"/>
+						<a class="exit-disclaimer" style="font-size: 0.75em;"
+							href="https://www.epa.gov/home/exit-epa"
+							title="EPA's External Link Disclaimer">Exit</a>
+					</p:column>
+					<p:column style="width:25%">
+						<b>Ortholog Count:</b> #{reportView.ortholog_count}</p:column>
+					<p:column style="width:25%">
+						<b>Protein and Taxonomy Data: </b>
+						<h:outputText escape="false" value="#{reportView.ncbiDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputText>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="3">
+						<b> Level 3 Run Name:</b> #{reportView.levelThreeRunName}
+					</p:column>
+					<p:column>
+						<b>BLAST Version: </b>
+						<h:outputText value="#{reportView.blastVersion}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="3">
+						<b>Template Species:</b> #{reportView.templateSpecies}
+					</p:column>
+					<p:column>
+						<b>Cobalt Data: </b>
+						<h:outputText escape="false" value="#{reportView.cobaltDate}">
+							<f:convertDateTime pattern="MM/dd/yyyy" />
+						</h:outputText>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="3">
+						<b>Template Protein:</b> #{reportView.templateProtein}
+					</p:column>
+					<p:column>
+						<b>Cobalt Version: </b>
+						<h:outputText value="#{reportView.cobaltVersion}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="3">
+						<b>Query Residues:</b> #{reportView.queryResiduesText}
+					</p:column>
+					<p:column>
+						<b>Software Version: </b>
+						<h:outputText value="#{reportView.seqapassVersion}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="3">
+						<p:link
+							href="https://www.ncbi.nlm.nih.gov/tools/cobalt/re_cobalt.cgi?"
+							value="NCBI COBALT" target="_blank" rel="noreferrer noopener"/>
+						<a class="exit-disclaimer" style="font-size: 0.75em;"
+							href="https://www.epa.gov/home/exit-epa"
+							title="EPA's External Link Disclaimer">Exit</a>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column />
+				</p:row>
+				<p:row>
+					<p:column colspan="4">
+						<p:commandButton id="showAminoAcidInfo"
+							value="Show Amino Acid Info..."
+							style="color:black;background-color:#5585bf;"
+							onclick="PF('aAInfoDlgWidget').show();" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="4">
+						<p:panel header="Select Amino Acid Residues" toggleable="true"
+							collapsed="false" style="width:75%">
+							<f:facet name="actions">
+								<p:commandLink styleClass="infoBtn"
+									oncomplete="PF('infoDlg').show();"
+									action="#{reportView.populateInfoText('residues')}"
+									update="levelThreeInfoBox">
+									<p:graphicImage library="images" name="info_small.png"
+										style="border-radius:50%; width:15px; float:right;" />
+								</p:commandLink>
+							</f:facet>
+							<p:panelGrid>
+								<p:row>
+									<p:column colspan="2">
+										<p:pickList id="lev3pick"
+											value="#{reportView.levelThreePickList}" var="pos"
+											itemLabel="#{pos}" itemValue="#{pos}">
+											<p:ajax event="transfer" listener="#{reportView.sortList}"
+												update="@this" />
+										</p:pickList>
+									</p:column>
+									<p:column colspan="2">
+										<p:panelGrid>
+											<p:row>
+												<p:column colspan="2">
+													<b>Enter Amino Acid Residue Positions</b>
+												</p:column>
+											</p:row>
+											<p:row>
+												<p:column>
+													<p:inputTextarea id="positionBox"
+														value="#{reportView.positionBoxList}" rows="1" cols="40" />
+													<p:tooltip id="positionBoxTip" for="positionBox"
+														showEvent="focus" hideEvent="blur">
+														<h:outputText
+															value="Enter residue positions as a comma separated list" />
+													</p:tooltip>
+												</p:column>
+											</p:row>
+											<p:row>
+												<p:column>
+													<p:commandButton id="copyToResidues"
+														value="Copy to Residue List"
+														action="#{reportView.copyToPickList}"
+														update="lev3pick, growl"
+														style="color:black;background-color:#5585bf;" />
+												</p:column>
+											</p:row>
+										</p:panelGrid>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:commandButton id="updateLevel3Positions"
+											action="#{reportView.updateLevel3Positions}"
+											value="Update Report"
+											update="LevelThreeQueryPanel, levelThreeDataPanel,otherReportsGrid growl"
+											style="color:black;background-color:#5585bf;"
+											onstart="PF('statusDialog1').show();"
+											oncomplete="PF('statusDialog1').hide()" />
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+						</p:panel>
+					</p:column>
+				</p:row>
+				<p:row>
+				<p:column colspan="2">
+					<p:panel id="viz3Panel" header="Visualization" toggleable="true"
+							collapsed="true" style="text-align:center">
+							<f:facet name="actions">
+								<p:commandLink styleClass="infoBtn"
+									oncomplete="PF('infoDlg').show();"
+									action="#{reportView.populateInfoText('visualizationHeatMap')}"
+									update="levelThreeInfoBox">
+									<p:graphicImage library="images" name="info_small.png"
+										style="border-radius:50%; width:15px; float:right;" />
+								</p:commandLink>
+							</f:facet>
+							<p:panelGrid id="viz3Grid">
+								<p:row>
+									<p:column>
+										<p:commandButton id="viz3Button" value="Visualize Data"
+											style="color:black;background-color:#5585bf;"
+											action="#{visualizationView.resetLevelThreeViz}"
+											oncomplete="OpenVizInBrowserTab(3); setLastClick('_viz3');" />
+									</p:column>
+									<p:column>
+									  This will open in a separate tab.
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+					</p:panel>
+				</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:panel>
+
+		<p:panel style="width:100%;padding:0px">
+			<p:panelGrid style="width:100%">
+				<p:row>
+					<p:column style="width:50%">
+						<p:panelGrid id="reportTypeGrid" cellpadding="10"
+							style="vertical-align:top; font-size:0.75em;">
+							<p:row>
+								<p:column style="width:50%" rowspan="2">
+									<p:selectOneRadio id="reportTypeRadio" layout="pageDirection"
+										style="text-align: left"
+										value="#{reportView.levelThreeReportType}">
+										<f:selectItem itemLabel="Primary Report" itemValue='Primary' />
+										<f:selectItem itemLabel="Full Report" itemValue='Full' />
+										<p:ajax event="change" execute="@this"
+											listener="#{reportView.changeLevelThreeReportPage()}"
+											update="levelThreeDataPanel" />
+									</p:selectOneRadio>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:column>
+					<p:column style="width:50%">
+						<p:panelGrid id="otherReportsGrid" cellpadding="10"
+							style="vertical-align:top;font-size:0.75em;padding:0px;width:100%">
+							<p:row>
+								<p:column style="width:40%;text-align:right" rowspan="1">
+									<p:commandButton id="viewLevel3Summary"
+										value="View Level 3 Summary Report"
+										style="color:black;background-color:#5585bf;"
+										action="#{reportView.viewLevelSummaryButton(3)}"
+										update="summaryTable"
+										oncomplete="PF('summaryTableDlg').show();" />
+								</p:column>
+								<p:column
+									style="padding-right:0px; padding-left:0px; text-align: left"
+									rowspan="1">
+									<p:commandLink oncomplete="PF('infoDlg').show();"
+										action="#{reportView.populateInfoText('viewSummaryReport')}"
+										update="levelThreeInfoBox">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px" />
+									</p:commandLink>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column style="width:60%;text-align:right;padding-top:10px;"
+									rowspan="1">
+									<p:commandButton id="pushLevel3ToRA"
+										value="Push Level 3 To DS Report"
+										style="color:black;background-color:#5585bf;"
+										action="#{reportView.pushToRA('level3')}"
+										update="tabView:reportForm:RAReportButton,otherReportsGrid"
+										disabled="#{!reportView.level3RAReportDiffers}" />
+								</p:column>
+								<p:column
+									style="padding-right:0px; padding-left:0px; text-align: left;width:10%"
+									rowspan="1">
+									<p:commandLink oncomplete="PF('infoDlg').show();"
+										action="#{reportView.populateInfoText('pushLevThreeToDS')}"
+										update="levelThreeInfoBox">
+										<p:graphicImage library="images" name="info_small.png"
+											style="border-radius:50%; width:15px" />
+									</p:commandLink>
+								</p:column>
+								<p:column style="width:30%">
+									<h:outputText value="Click to push new changes"
+										style="color:red;width:10%; padding-left:0px"
+										rendered="#{reportView.level3RAReportDiffers and reportView.level3RAPushWarning}" />
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:column>
+				</p:row>
+
+			</p:panelGrid>
+		</p:panel>
+
+		<p:panel id="levelThreeDataPanel"
+			header="#{reportView.levelThreeHeaderText}"
+			styleClass="searchPanelContent">
+			<p style="font-size: 0.75em;">
+				<span class="disclaimer">The following links exit the site <a
+					class="exit-disclaimer" href="https://www.epa.gov/home/exit-epa"
+					title="EPA's External Link Disclaimer">Exit</a> <span
+					style="padding-right: 5%; display: inline-block; width: 70%; text-align: right;">
+						<p:commandButton id="downloadLev3Settings"
+							value="Download Current Level 3 Report Settings"
+							style="color:black;background-color:#5585bf;" ajax="false"
+							onclick="PrimeFaces.monitorDownload(start, stop);"
+							actionListener="#{reportView.createLev3SettingsFile}">
+							<p:fileDownload value="#{reportView.lev3SettingsFile}" />
+						</p:commandButton> <p:commandLink oncomplete="PF('infoDlg').show();"
+							action="#{reportView.populateInfoText('currentReportSettings')}"
+							update="levelThreeInfoBox">
+							<p:graphicImage library="images" name="info_small.png"
+								style="border-radius:50%; width:15px;margin-left:5px;" />
+						</p:commandLink>
+				</span>
+				</span>
+			</p>
+			<ui:include src="#{reportView.getLevelThreeReportPage()}" />
+
+		</p:panel>
+
+		<p:dialog id="aAInfoDlg" widgetVar="aAInfoDlgWidget"
+			header="Amino Acid info" resizable="true" showEffect="clip"
+			hideEffect="clip" scrollable="true" height="625px" width="800px">
+			<p:panel>
+				<p:dataTable id="aminoAcidTable" var="r"
+					value="#{reportView.aminoAcidInfo}" scrollable="true"
+					paginator="false">
+					<f:facet name="{Exporters}">
+						<h:panelGroup>
+							<h:outputText value="Download Table:" />
+							<h:commandLink>
+								<p:graphicImage id="excelIcon" library="images" name="excel.png" />
+								<p:dataExporter type="xls" target="aminoAcidTable"
+									fileName="SeqAPASS_Amino_Acid_Info" />
+								<p:tooltip id="excelIconTip" for="excelIcon"
+									value="Download table in excel(.xls) format" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage id="csvIcon" library="images" name="csv.png" />
+								<p:dataExporter type="csv" target="aminoAcidTable"
+									fileName="SeqAPASS_Amino_Acid_Info" />
+								<p:tooltip id="csvIconTip" for="csvIcon"
+									value="Download table in csv format" />
+							</h:commandLink>
+						</h:panelGroup>
+					</f:facet>
+					<p:column headerText="ID" sortBy="#{r.id}"
+						style="width:150px;text-align:center;;font-size:0.75em">
+						<h:outputText value="#{r.id}" />
+					</p:column>
+					<p:column headerText="Name" sortBy="#{r.name}"
+						style="width:150px;text-align:center;;font-size:0.75em">
+						<h:outputText value="#{r.name}" />
+					</p:column>
+					<p:column headerText="Side Chain" sortBy="#{r.sideChain}"
+						style="width:150px;text-align:center;;font-size:0.75em">
+						<h:outputText value="#{r.sideChain}" />
+					</p:column>
+					<p:column headerText="Size" sortBy="#{r.size}"
+						style="width:150px;text-align:center;;font-size:0.75em">
+						<h:outputText value="#{r.size lt 0.0 ? '-' : r.size}" />
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+		</p:dialog>
+
+		<p:dialog id="levelThreeInfoBox" widgetVar="infoDlg" modal="true"
+			draggable="true" closable="true" resizable="true" showHeader="true"
+			header="#{reportView.infoHeaderText}" width="50%">
+			<h:outputText style="font-size:1.2em;" value="#{reportView.infoText}" escape="False" />
+		</p:dialog>
+
+		<p:dialog id="summaryTable" widgetVar="summaryTableDlg" modal="true"
+			resizable="true" showEffect="clip" hideEffect="clip"
+			scrollable="true" width="900" height="300" focus="levThreeSumPanel">
+			<p:panel header="Level Three Summary Report" id="levThreeSumPanel">
+				<p:dataTable id="levThreeSummaryTable" var="r"
+					value="#{reportView.levelThreeSummaryReport}" scrollable="true"
+					paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+					paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+					<f:facet name="{Exporters}">
+						<h:panelGroup>
+							<h:outputText value="Download Table:" />
+							<h:commandLink>
+								<p:graphicImage id="excelIcon" library="images" name="excel.png" />
+								<p:dataExporter type="xls" target="levThreeSummaryTable"
+									fileName="SeqAPASS_Level3_Summary_Report" />
+								<p:tooltip id="excelIconTip" for="excelIcon"
+									value="Download table in excel(.xls) format" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage id="csvIcon" library="images" name="csv.png" />
+								<p:dataExporter type="csv" target="levThreeSummaryTable"
+									fileName="SeqAPASS_Level3_Summary_Report" />
+								<p:tooltip id="csvIconTip" for="csvIcon"
+									value="Download table in csv format" />
+							</h:commandLink>
+						</h:panelGroup>
+					</f:facet>
+					<p:column id="taxGroup" headerText="Taxonomic Group"
+						sortBy="#{r.taxGroup}" filterBy="#{r.taxGroup}"
+						style="width:120px;text-align:center;white-space:normal"
+						filterStyle="display:none">
+						<h:outputText value="#{r.taxGroup}" />
+					</p:column>
+					<p:column headerText="Number of Species" sortBy="#{r.numSpecies}"
+						style="width:80px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.numSpecies}" />
+					</p:column>
+					<p:column headerText="Majority Similar Susceptibility as Template"
+						sortBy="#{r.susceptible}" filterBy="#{r.susceptible}"
+						filterStyle="display:none"
+						style="width:100px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.susceptible}" />
+					</p:column>
+					<p:column headerText="Number Y" sortBy="#{r.numY}"
+						style="width:80px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.numY}" />
+					</p:column>
+					<p:column headerText="Number N" sortBy="#{r.numN}"
+						style="width:80px;text-align:center;white-space:normal">
+						<h:outputText value="#{r.numN}" />
+					</p:column>
+					<p:columns value="#{reportView.summaryResidueHeaders}" var="id"
+						headerText="#{id}" escape="false"
+						style="width:80px;text-align:center;">
+						<h:outputText value="#{r.flatResidues[id]}" />
+					</p:columns>
+				</p:dataTable>
+			</p:panel>
+		</p:dialog>
+
+
+	</ui:composition>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<!-- force IE to render to use the highest compatibility mode -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>About SeqAPASS</title>
+</h:head>
+
+<h:body>
+	<ui:composition>
+		<h:form>
+			<p:messages>
+				<p:autoUpdate/>
+			</p:messages>
+			<p:button href="index.xhtml" value="Return" />
+			<p:panel id="epaPanel" header="EPA Users"
+				style="margin-bottom:20px; width:98%; margin-left: 1%; margin-top: 0.5em">
+				<ol>
+					<li>Go to <p:link href="https://waa.epa.gov"
+							value="https://waa.epa.gov" target="_blank"/> and login with your existing EPA LAN id and password.
+					</li>
+					<li>Under the "Community Access" menu, select "Request Web Community Access"</li>
+					<li>Select the "SeqAPASS Users" community and click submit.</li>
+					<li>Return to the SeqAPASS login page to access SeqAPASS</li>
+				</ol>
+			</p:panel>
+			<p:panel id="externalPanel" header="External Users"
+				style="margin-bottom:20px; width:98%; margin-left: 1%; margin-top: 0.5em">
+				<ol>
+					<li>Go to <p:link href="https://waa.epa.gov"
+							value="https://waa.epa.gov" target="_blank"/> and click on the "Self Register" link.
+					</li>
+					<li>Fill out the form using the following EPA Contact
+						information:</li>
+					<font size="-0.25">
+					<ul>
+						<li>EPA Contact Name - <i>Carlie Lalone</i></li>
+						<li>EPA Contact's Email Address - <i>lalone.carlie@epa.gov</i></li>
+						<li>EPA Contact's Phone Number - <i>218-529-5038</i></li>
+					</ul>
+					</font>
+					<li>Select the "SeqAPASS Users" community from the dropdown
+						menu at the bottom of the page.</li>
+					<li>Once you submit the form you will receive an email confirming your request and a follow-up email with your username
+					once your account has been activated.</li>
+				</ol>
+			</p:panel>
+			<p:commandButton value="Top of Page"
+				onclick="javascript:window.scrollTo(0,0)" style="margin-left: 1%" />
+		</h:form>
+	</ui:composition>
+</h:body>
+</html>

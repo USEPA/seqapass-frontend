@@ -1,0 +1,261 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<!-- SPECIES PANEL -->
+	
+	#{requestRunView.pageReload()}
+	
+	<p:dialog widgetVar="statusDialog1" modal="true" draggable="false"
+		closable="false" resizable="false" showHeader="false">
+		<p:panelGrid>
+			<p:row>
+				<p:column style="text-align:center">
+								Querying Database...
+							</p:column>
+			</p:row>
+			<p:row>
+				<p:column style="text-align:center">
+					<p:graphicImage library="images" name="spinner.gif" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column style="text-align:center">
+								Please Wait
+							</p:column>
+			</p:row>
+		</p:panelGrid>
+	</p:dialog>
+
+	<p:dialog modal="true" widgetVar="statusDialog2"
+		style="position:absolute;left:400px;top:400px;"
+		header="Processing request ... Please wait" draggable="false"
+		closable="false" resizable="False">
+		<p:graphicImage library="images" name="status.gif" />
+	</p:dialog>
+
+	<p:panel id="mainSpeciesSearchPanel" header="Query Species Selection"
+		styleClass="searchPanelContent">
+		<f:facet name="actions">
+			<p:commandLink styleClass="infoBtn" 
+				oncomplete="PF('infoRunDlg').show();" action="#{reportView.populateInfoText('querySpeciesSelection')}" update="infoDlg">
+				<p:graphicImage library="images" name="info_small.png" style="border-radius:50%; width:15px; float:right;"/>
+			</p:commandLink>
+		</f:facet>
+		<p:panelGrid id="speciesSearchPanel" autoupdate="true"
+			style="margin-bottom:10px;margin-left:0px" cellpadding="5">
+			<p:row>
+				<p:column styleClass="requestRun-leftColumn">
+					<p:outputLabel value=" Query Species Search:"
+						for="querySpeciesString" />
+				</p:column>
+				<p:column>
+					<p:autoComplete id="querySpeciesString" queryDelay="333"
+						emptyMessage="No results found"
+						value="#{requestRunView.searchSpecies}" minQueryLength="3"
+						completeMethod="#{requestRunView.completeSpecies}" var="species"
+						itemLabel="#{species.displayName}" itemValue="#{species}"
+						converter="searchSpeciesConverter" forceSelection="true"
+						scrollHeight="200" size="50">
+					</p:autoComplete>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column styleClass="requestRun-leftColumn">
+					<p:commandButton id="addSpeciesButton" value="Add Query Species"
+						action="#{requestRunView.addSpeciesButton}"
+						styleClass="custom-small-button"
+						update="speciesSearchPanel, selectSpeciesPanel, queryProteinPanel"
+						onstart="PF('statusDialog1').show();"
+						onsuccess="PF('statusDialog1').hide()">
+					</p:commandButton>
+				</p:column>
+				<p:column>
+					<p:link id="speciesLink" href="http://www.ncbi.nlm.nih.gov/taxonomy"
+						value="NCBI Taxonomy Database" target="_blank" rel="noreferrer noopener"
+						style="font-size:0.75em" /><a class="exit-disclaimer" style="font-size:0.75em;" href="https://www.epa.gov/home/exit-epa" title="EPA's External Link Disclaimer">Exit</a>
+					<p:tooltip id="speciesLinkTip" for="speciesLink" value="Explore species in database"/>		
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+		<p:panelGrid id="selectSpeciesPanel" style="margin-bottom:10px"
+			cellpadding="5">
+			<p:row>
+				<p:column styleClass="requestRun-leftColumn">
+					<p:outputLabel for="selectedSpeciesList" value="Query Species:" />
+				</p:column>
+				<p:column>
+					<p:selectOneListbox id="selectedSpeciesList" autoupdate="true"
+						value="#{requestRunView.selectedSpeciesItem}"
+						converter="selectedSpeciesConverter" var="s"
+						style="width:750px;white-space: nowrap;" scrollHeight="150">
+						<p:ajax listener="#{requestRunView.onSpeciesSelected}"
+							update="queryProteinPanel" />
+						<f:selectItems value="#{requestRunView.selectedSpeciesList}"
+							var="speciesItem" itemLabel="#{speciesItem.displayName}"
+							itemValue="#{species}" />
+						<p:column>
+							<h:outputText value="#{s.displayName}" />
+						</p:column>
+					</p:selectOneListbox>
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+	</p:panel>
+
+
+	<!--  PROTEIN PANEL -->
+
+	<p:panel id="mainProteinSearchPanel" header="Query Protein Selection"
+		styleClass="searchPanelContent">
+		<f:facet name="actions">
+			<p:commandLink styleClass="infoBtn" 
+				oncomplete="PF('infoRunDlg').show();" action="#{reportView.populateInfoText('queryProteinSelection')}" update="infoDlg">
+				<p:graphicImage library="images" name="info_small.png" style="border-radius:50%; width:15px; float:right;"/>
+			</p:commandLink>
+		</f:facet>
+		<p:panelGrid id="queryProteinSearchPanel" autoupdate="true"
+			style="margin-bottom:10px;margin-left:0px" cellpadding="5">
+			<p:row>
+				<p:column styleClass="requestRun-leftColumn">
+					<p:outputLabel value="Query Protein Search:"
+						for="querySearchProteins" />
+				</p:column>
+				<p:column colspan="2">
+					<p:inputText id="querySearchProteins" label="querySearchProteins"
+						value="#{requestRunView.queryProteinString}" size="50" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column styleClass="requestRun-leftColumn" />
+				<p:column style="width:170px">
+					<p:commandButton id="filterProteinButton" value="Filter Protein"
+						styleClass="custom-small-button"
+						action="#{requestRunView.filterProteinButton}"
+						update="queryProteinPanel, querySearchProteins"
+						onstart="PF('statusDialog1').show();"
+						onsuccess="PF('statusDialog1').hide()" />
+				</p:column>
+				<p:column>
+					<p:link id="proteinLink" href="http://www.ncbi.nlm.nih.gov/protein"
+						value="NCBI Protein Database" target="_blank" rel="noreferrer noopener"
+						style="font-size:0.75em"/><a class="exit-disclaimer" style="font-size:0.75em;" href="https://www.epa.gov/home/exit-epa" title="EPA's External Link Disclaimer">Exit</a>
+					<p:tooltip id="proteinLinkTip" for="proteinLink" value="Explore proteins in database"/>		
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+		<p:panelGrid id="queryProteinPanel"
+			style="margin-bottom:10px;margin-left:0px" cellpadding="5">
+			<p:row>
+				<p:column styleClass="requestRun-leftColumn">
+					<p:outputLabel value=" Query Proteins:" for="queryProteins" />
+				</p:column>
+				<p:column colspan="2">
+					<p:selectManyMenu id="queryProteins"
+						value="#{requestRunView.selectedProteinList}"
+						converter="queryProteinConverter" var="t"
+						style="width:750px;white-space: nowrap;" scrollHeight="150"
+						showCheckbox="true">
+						<f:selectItems value="#{requestRunView.proteinList}"
+							var="proteinItems" itemLabel="#{proteinItems.displayName}"
+							itemValue="#{protein}" />
+						<p:column>
+							<h:outputText value="#{t.displayName}" />
+						</p:column>
+					</p:selectManyMenu>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column styleClass="requestRun-leftColumn" />
+				<p:column>
+					<p:commandButton id="addProteinButton"
+						value="Add Selected Protein(s)"
+						action="#{requestRunView.addProteinButton}"
+						styleClass="custom-small-button" update="finalProteinPanel"
+						global="false">
+					</p:commandButton>
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+	</p:panel>
+
+
+	<!--  Submission Panel -->
+	<p:panel id="mainSubmissionPanel" header="SeqAPASS Submission"
+		styleClass="searchPanelContent">
+		<f:facet name="actions">
+			<p:commandLink styleClass="infoBtn" 
+				oncomplete="PF('infoRunDlg').show();" action="#{reportView.populateInfoText('submitRun')}" update="infoDlg">
+				<p:graphicImage library="images" name="info_small.png" style="border-radius:50%; width:15px; float:right;"/>
+			</p:commandLink>
+		</f:facet>
+		<p:panelGrid id="finalProteinPanel"
+			style="margin-bottom:10px;margin-left:0px" cellpadding="5">
+			<p:row>
+				<p:column styleClass="requestRun-leftColumn">
+					<p:outputLabel value="Final Query Protein(s)" for="finalProteins" />
+				</p:column>
+				<p:column>
+					<p:selectManyMenu id="finalProteins"
+						value="#{requestRunView.finalSelectedProteinList}"
+						converter="finalProteinConverter" var="s"
+						style="width:750px;white-space: nowrap;" scrollHeight="150"
+						showCheckbox="true">
+						<f:selectItems value="#{requestRunView.finalProteinList}"
+							var="finalProteinItems"
+							itemLabel="#{finalProteinItems.displayName}"
+							itemValue="#{protein}" />
+						<p:column>
+							<h:outputText value="#{s.displayName}" />
+						</p:column>
+					</p:selectManyMenu>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column styleClass="requestRun-leftColumn" />
+				<p:column>
+					<p:commandButton id="removeProteinButton"
+						value="Remove Selected Protein(s)"
+						action="#{requestRunView.removeProteinButton}"
+						styleClass="custom-small-button" update="finalProteinPanel"
+						global="false">
+					</p:commandButton>
+					<p:commandButton id="removeAllProteinButton"
+						value="Remove All Proteins"
+						action="#{requestRunView.removeAllProteinButton}"
+						styleClass="custom-small-button" update="finalProteinPanel"
+						global="false">
+					</p:commandButton>
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+
+		<h:panelGrid columns="2">
+			<p:commandButton id="requestSpeciesRunButton" value="Request Run"
+				styleClass="custom-small-button"
+				actionListener="#{requestRunView.requestRunButton}"
+				update="growl,speciesSearchPanel,selectSpeciesPanel,queryProteinSearchPanel,queryProteinPanel,finalProteinPanel"
+				onclick="javascript:window.scrollTo(0,0)"
+				onstart="PF('statusDialog2').show();"
+				oncomplete="PF('statusDialog2').hide()" />
+
+			<p:commandButton id="clearSpeciesFormButton" value="Clear"
+				styleClass="custom-small-button"
+				actionListener="#{requestRunView.clearButton}"
+				update="speciesSearchPanel,selectSpeciesPanel,queryProteinSearchPanel,queryProteinPanel,finalProteinPanel"
+				global="false" />
+		</h:panelGrid>
+
+
+	</p:panel>
+
+
+
+</ui:composition>
+
+

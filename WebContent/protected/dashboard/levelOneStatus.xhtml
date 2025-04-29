@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<!-- Do not use <head> here, as it would break down tabs -->
+
+<body>
+	<ui:composition>
+
+
+
+		<p:panel id="runStatusLevelOnePanel"
+			header="SeqAPASS Level 1 Run Status" style="margin:0; padding:0;">
+			<p:dataTable id="runStatusLevelOneTableId" var="r"
+				widgetVar="LevOneStatusTable"
+				value="#{statusView.levelOneStatusList}" rowKey="#{r.key}"
+				emptyMessage="No entries found with given criteria"
+				filteredValue="#{statusView.filteredLevelOneStatusList}"
+				selection="#{statusView.selectedLevelOneRuns}" sortBy="#{r.runId}"
+				sortOrder="descending" resizableColumns="true"
+				draggableColumns="false" paginator="true" scrollable="true"
+				scrollWidth="95%"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+				paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,50">
+				<f:facet name="header">
+					<p:outputPanel>
+						<h:outputText value="Search:" />
+						<p:inputText id="globalFilter"
+							onkeyup="PF('LevOneStatusTable').filter()" style="width:150px"
+							placeholder="Enter keyword" />
+					</p:outputPanel>
+				</f:facet>
+				<f:facet name="{Exporters}">
+					<h:panelGroup>
+						<h:outputText value="Download Table:" />
+						<h:commandLink>
+							<p:graphicImage id="excelStatusLev1" library="images" name="excel.png" />
+							<p:dataExporter type="xls" target="runStatusLevelOneTableId"
+								fileName="SeqAPASS_Level1_Status" />
+							<p:tooltip id="excelStatusLev1Tip" for="excelStatusLev1"
+								value="Download level 1 status table in excel(.xls) format" />
+						</h:commandLink>
+
+						<h:commandLink>
+							<p:graphicImage id="csvStatusLev1" library="images" name="csv.png" />
+							<p:dataExporter type="csv" target="runStatusLevelOneTableId"
+								fileName="SeqAPASS_Level1_Status" />
+							<p:tooltip id="csvStatusLev1Tip" for="csvStatusLev1"
+								value="Download level 1 status table in csv format" />
+						</h:commandLink>
+					</h:panelGroup>
+				</f:facet>
+				<p:column headerText="SeqAPASS Run Id" sortBy="#{r.runId}"
+					style="width:100px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText value="#{r.runId}" />
+				</p:column>
+				<p:column headerText="Data Version" sortBy="#{r.updateVersion}"
+					style="width:100px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText value="#{r.updateVersion}" />
+				</p:column>
+				<p:column headerText="User" sortBy="#{r.email}"
+					filterBy="#{r.email}" filterStyle="display:none"
+					style="width:150px;text-align:center;font-size:0.75em">
+					<h:outputText value="#{r.email}" />
+				</p:column>
+				<p:column headerText="Level 1 Query Accession" sortBy="#{r.accession}"
+					filterBy="#{r.accession}" filterStyle="display:none"
+					style="width:150px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText value="#{r.accession}" />
+				</p:column>
+				<p:column headerText="BLASTp" sortBy="#{r.blastp}"
+					sortFunction="#{statusView.sortStatus}" filterBy="#{r.blastp}"
+					filterStyle="display:none"
+					style="width:80px;text-align:center;font-size:0.75em">
+					<h:outputText value="#{r.blastp}" />
+				</p:column>
+				<p:column headerText="Common Domains"
+					sortBy="#{statusView.formatStatus(r.commonDomains)}"
+					sortFunction="#{statusView.sortStatus}"
+					filterBy="#{r.commonDomains}" filterStyle="display:none"
+					style="width:85px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText value="#{r.commonDomains}" />
+				</p:column>
+				<p:column headerText="Ortholog Candidate"
+					sortBy="#{statusView.formatStatus(r.ortholog)}"
+					sortFunction="#{statusView.sortStatus}" filterBy="#{r.ortholog}"
+					filterStyle="display:none"
+					style="width:100px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText value="#{r.ortholog}" />
+				</p:column>
+				<p:column headerText="Start Date" sortBy="#{r.startDate}"
+					filterBy="#{reportView.convertUnixTimeToDate(r.startDate)}"
+					filterStyle="display:none"
+					style="width:190px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText
+						value="#{reportView.convertUnixTimeToDate(r.startDate)}" />
+				</p:column>
+				<p:column headerText="Date Completed" sortBy="#{r.endDate}"
+					filterBy="#{reportView.convertUnixTimeToDate(r.endDate)}"
+					filterStyle="display:none"
+					style="width:190px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText
+						value="#{reportView.convertUnixTimeToDate(r.endDate)}" />
+				</p:column>
+				<p:column headerText="SeqAPASS Run Duration"
+					sortBy="#{r.runDuration}"
+					style="width:300px;text-align:center;font-size:0.75em;white-space:normal">
+					<h:outputText
+						value="#{statusView.convertRunDuration(r.runDuration)}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		
+		<p:dialog id="infoDlg" widgetVar="infoStatusDlg" modal="true"
+					draggable="true" closable="true" resizable="true"
+					showHeader="true" header="#{reportView.infoHeaderText}" width="50%">
+					<h:outputText value="#{reportView.infoText}" escape="False"/>
+		</p:dialog>
+
+		<p:commandButton id="deleteRecord" value="Delete Selected Record(s)"
+			action="#{statusView.deleteLevelOneRecord}"
+			style="color:black;background-color:#5585bf;" update="message"
+			rendered="false">
+			<p:confirm header="Confirmation"
+				message="Are you sure you want to delete the selected record(s)?"
+				icon="ui-icon-alert" />
+		</p:commandButton>
+		
+		<p:remoteCommand name="showDlgPanel" update="infoDlg" oncomplete="PF('infoStatusDlg').show();"/>
+
+	</ui:composition>
+</body>
+</html>
